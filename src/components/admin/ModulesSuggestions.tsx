@@ -78,7 +78,7 @@ const ModSuggTabAdmin = () => {
         <>
           <Heading>Sugestões para os módulos</Heading>
           <Tabs
-            className="p-4 bg-white rounded-lg shadow-lg"
+            className="rounded-lg bg-white p-4 shadow-lg"
             variant="soft-rounded"
           >
             <TabList>
@@ -120,17 +120,17 @@ const ModSuggTabAdmin = () => {
                             <Tr key={sugg.id}>
                               <Td>{sugg.module.name}</Td>
                               <Td>
-                                <div className="flex gap-x-2 items-center">
-                                  <div className="relative w-8 h-8">
+                                <div className="flex items-center gap-x-2">
+                                  <div className="relative h-8 w-8">
                                     {sugg.user?.image ? (
                                       <NextImage
                                         src={sugg.user.image}
                                         alt="user avatar"
                                         fill
-                                        className="object-cover rounded-full"
+                                        className="rounded-full object-cover"
                                       />
                                     ) : (
-                                      <FaUserCircle className="w-full h-full" />
+                                      <FaUserCircle className="h-full w-full" />
                                     )}
                                   </div>
                                   {sugg.user.name}
@@ -141,7 +141,7 @@ const ModSuggTabAdmin = () => {
                               </Td>
                               <Td
                                 isNumeric
-                                className="flex gap-x-2 justify-end items-center"
+                                className="flex items-center justify-end gap-x-2"
                               >
                                 <Popover>
                                   <PopoverTrigger>
@@ -222,17 +222,17 @@ const ModSuggTabAdmin = () => {
                           <Tr key={sugg.id}>
                             <Td>{sugg.module.name}</Td>
                             <Td>
-                              <div className="flex gap-x-2 items-center">
-                                <div className="relative w-8 h-8">
+                              <div className="flex items-center gap-x-2">
+                                <div className="relative h-8 w-8">
                                   {sugg.user?.image ? (
                                     <NextImage
                                       src={sugg.user.image}
                                       alt="user avatar"
                                       fill
-                                      className="object-cover rounded-full"
+                                      className="rounded-full object-cover"
                                     />
                                   ) : (
-                                    <FaUserCircle className="w-full h-full" />
+                                    <FaUserCircle className="h-full w-full" />
                                   )}
                                 </div>
                                 {sugg.user.name}
@@ -243,7 +243,7 @@ const ModSuggTabAdmin = () => {
                             </Td>
                             <Td
                               isNumeric
-                              className="flex gap-x-2 justify-end items-center"
+                              className="flex items-center justify-end gap-x-2"
                             >
                               <Popover>
                                 <PopoverTrigger>

@@ -176,7 +176,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
-      <Logo className="inline-flex ml-10 md:hidden text-primary" />
+      <Logo className="ml-10 inline-flex text-primary md:hidden" />
       <HStack spacing={{ base: "0", md: "6" }}>
         <IconButton
           size="lg"
@@ -192,16 +192,16 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               _focus={{ boxShadow: "none" }}
             >
               <HStack>
-                <div className="relative w-8 h-8">
+                <div className="relative h-8 w-8">
                   {session?.user?.image ? (
                     <NextImage
                       src={session.user.image}
                       alt="user avatar"
                       fill
-                      className="object-cover rounded-full"
+                      className="rounded-full object-cover"
                     />
                   ) : (
-                    <FaUserCircle className="w-full h-full" />
+                    <FaUserCircle className="h-full w-full" />
                   )}
                 </div>
                 <VStack

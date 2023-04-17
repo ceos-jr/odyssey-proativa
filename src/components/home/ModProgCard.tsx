@@ -34,7 +34,7 @@ const ModProgCard = ({
   return (
     <NextLink
       href={`/modules/${id}`}
-      className="overflow-hidden relative shadow-lg"
+      className="relative overflow-hidden shadow-lg"
       onClick={() => updateLastSeen.mutate(id)}
     >
       {completed && (
@@ -80,7 +80,7 @@ const ModProgCard = ({
               lessonProg.length) *
             100
           }
-          className="absolute right-0 left-0 -inset-3 w-full rounded-b-lg"
+          className="absolute -inset-3 right-0 left-0 w-full rounded-b-lg"
         />
       )}
     </NextLink>

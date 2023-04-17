@@ -11,7 +11,7 @@ const DisplayMarkdown = ({ text }: DisplayMarkdownProps) => {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
-      className="max-w-none prose prose-lg"
+      className="prose prose-lg max-w-none"
     >
       {text}
     </ReactMarkdown>

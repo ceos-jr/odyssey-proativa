@@ -30,7 +30,7 @@ const AllModules = () => {
         </>
       ) : (
         <>
-          <div className="flex flex-col gap-2 justify-between sm:flex-row">
+          <div className="flex flex-col justify-between gap-2 sm:flex-row">
             {" "}
             <Heading as="h1" size="2xl">
               Todos os Modulos

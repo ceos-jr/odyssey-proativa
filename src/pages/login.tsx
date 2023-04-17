@@ -15,10 +15,10 @@ const Login = () => {
         <title>Login • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <div className="flex flex-col gap-y-8 justify-center items-center h-screen">
-        <Logo className="w-1/4 h-1/4 text-primary" />
+      <div className="flex h-screen flex-col items-center justify-center gap-y-8">
+        <Logo className="h-1/4 w-1/4 text-primary" />
         <AiFillGithub
-          className="w-16 h-16 transition-colors cursor-pointer hover:text-secondary"
+          className="h-16 w-16 cursor-pointer transition-colors hover:text-secondary"
           onClick={() => signIn("github")}
         />
         <Text>Sign in with Github</Text>

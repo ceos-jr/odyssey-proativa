@@ -121,7 +121,7 @@ const UserMembers = () => {
               confirmação pendente
             </Text>
           ) : (
-            <TableContainer className="bg-white rounded-lg shadow-lg">
+            <TableContainer className="rounded-lg bg-white shadow-lg">
               <Table>
                 <Thead>
                   <Tr>
@@ -137,17 +137,17 @@ const UserMembers = () => {
                     <Tr key={mem.id}>
                       <Td>
                         {" "}
-                        <div className="flex gap-x-2 items-center">
-                          <div className="relative w-8 h-8">
+                        <div className="flex items-center gap-x-2">
+                          <div className="relative h-8 w-8">
                             {mem?.image ? (
                               <NextImage
                                 src={mem.image}
                                 alt="user avatar"
                                 fill
-                                className="object-cover rounded-full"
+                                className="rounded-full object-cover"
                               />
                             ) : (
-                              <FaUserCircle className="w-full h-full" />
+                              <FaUserCircle className="h-full w-full" />
                             )}
                           </div>
                           {mem.name}

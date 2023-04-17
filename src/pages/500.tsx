@@ -9,8 +9,8 @@ const Custom500 = () => {
         <title>Erro no servidor • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <div className="flex flex-col gap-8 justify-center items-center h-screen">
-        <Logo className="w-1/4 h-1/3 text-primary" />
+      <div className="flex h-screen flex-col items-center justify-center gap-8">
+        <Logo className="h-1/3 w-1/4 text-primary" />
         <Heading>500 - Um erro no servidor ocorreu</Heading>
       </div>
     </>

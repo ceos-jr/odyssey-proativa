@@ -40,11 +40,11 @@ const EditProjects = ({
   });
   return (
     <>
-      <div className="flex flex-col gap-4 justify-between sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex gap-2">
           <Heading>Projetos</Heading>
           <BiReset
-            className="flex-shrink-0 w-6 h-6 transition-colors cursor-pointer hover:text-secondary"
+            className="h-6 w-6 flex-shrink-0 cursor-pointer transition-colors hover:text-secondary"
             onClick={() => resetField("projects")}
           />
         </div>
@@ -65,8 +65,8 @@ const EditProjects = ({
       {fields.map((field, index) => {
         return (
           <div key={field.id}>
-            <div className="flex gap-x-4 justify-between items-center">
-              <div className="flex flex-col w-full">
+            <div className="flex items-center justify-between gap-x-4">
+              <div className="flex w-full flex-col">
                 <FormControl
                   isRequired
                   isInvalid={
@@ -123,7 +123,7 @@ const EditProjects = ({
                 as={AiOutlineArrowUp}
                 w={6}
                 h={6}
-                className="transition-colors cursor-pointer hover:text-secondary"
+                className="cursor-pointer transition-colors hover:text-secondary"
                 onClick={() => {
                   move(index, index - 1);
                 }}

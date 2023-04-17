@@ -6,7 +6,7 @@ const StatInProgTasksCard = () => {
     refetchOnWindowFocus: false,
   });
   return (
-    <Stat className="p-4 bg-white rounded-lg shadow-lg">
+    <Stat className="rounded-lg bg-white p-4 shadow-lg">
       {!tasksInProg.data ? (
         <SkeletonText noOfLines={5} />
       ) : (

@@ -12,7 +12,7 @@ const Home = () => {
         <title>Dashboard • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="flex flex-col gap-4 p-4 h-max">
+      <main className="flex h-max flex-col gap-4 p-4">
         <Stats />
         <MostRecentModules />
       </main>

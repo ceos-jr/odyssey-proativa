@@ -52,7 +52,7 @@ const LessonList = ({ lessons, userModRel }: LessonListProps) => {
         <Tbody>
           {lessons.map((lesson) => (
             <Tr key={lesson.id}>
-              <Td className="flex gap-x-2 items-center">{lesson.name}</Td>
+              <Td className="flex items-center gap-x-2">{lesson.name}</Td>
               <Td>
                 {!userModRel ? (
                   "não inscrito"
