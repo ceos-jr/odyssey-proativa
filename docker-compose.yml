@@ -2,16 +2,15 @@ version: "3.9"
 services:
   db:
     image: postgres
-    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: jonathan
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: capacitacao
+      POSTGRES_USER: capacitacao
+      POSTGRES_PASSWORD: senha
+      POSTGRES_DB: odyssey
     volumes:
-      - jonathan:/var/lib/postgresql
+      - odyssey:/var/lib/postgresql
 
 volumes:
-  jonathan:
+  odyssey:
     external: false
