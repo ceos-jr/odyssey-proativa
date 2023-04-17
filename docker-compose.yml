@@ -1,5 +1,26 @@
 version: "3.9"
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MOCK_NEXT_AUTH: false
+        DATABASE_URL: "postgres://capacitacao:senha@localhost:5432/odyssey?schema=public"
+        NEXTAUTH_SECRET: "bigsecrethere"
+        NEXTAUTH_URL: "http://localhost"
+        GITHUB_CLIENT_ID: "123123123"
+        GITHUB_CLIENT_SECRET: "123123123123"
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    image: odyssey
+    environment:
+      - DATABASE_URL="postgres://capacitacao:senha@localhost:5432/odyssey?schema=public"
+      - NEXTAUTH_SECRET="bigsecrethere"
+      - NEXTAUTH_URL="http://localhost"
+      - GITHUB_CLIENT_ID="123123123"
+      - GITHUB_CLIENT_SECRET="123123123123"
   db:
     image: postgres
     ports:
