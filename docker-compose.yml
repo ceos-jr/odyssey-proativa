@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: jonathan
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: capacitacao
+    volumes:
+      - jonathan:/var/lib/postgresql
+
+volumes:
+  jonathan:
+    external: false
