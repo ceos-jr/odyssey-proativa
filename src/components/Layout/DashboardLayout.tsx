@@ -14,7 +14,6 @@ import {
   useDisclosure,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
@@ -28,14 +27,8 @@ import NextImage from "next/image";
 import Logo from "./Logo";
 import LogoExtended from "./LogoExtended";
 import { signOut } from "next-auth/react";
-import { Inter } from "@next/font/google";
 import { Roles } from "@utils/constants";
 import ChangeRoleFooter from "./ChangeRoleFooter";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 interface LinkItemProps {
   name: string;
@@ -50,11 +43,7 @@ const LinkItems: Array<LinkItemProps> = [
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <Box
-      minH="100vh"
-      bg={useColorModeValue("gray.100", "gray.900")}
-      className={`${inter.variable} font-inter`}
-    >
+    <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
       <SidebarContent
         onClose={() => onClose}
         display={{ base: "none", md: "block" }}
