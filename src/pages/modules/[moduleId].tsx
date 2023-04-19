@@ -109,8 +109,8 @@ const UniqueModule = () => {
   return (
     <>
       <Head>
-        <title>{moduleData?.name} • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>{moduleData?.name} • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex h-max flex-col p-4">
         <ModSuggestionModal

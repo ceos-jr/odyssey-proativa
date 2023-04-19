@@ -79,7 +79,7 @@ const UserMembers = () => {
         </>
       ) : (
         <>
-          <Heading>Membros da CEOS</Heading>
+          <Heading>Membros da Proativa</Heading>
           <AlertDialog
             motionPreset="slideInBottom"
             leastDestructiveRef={cancelRef}
@@ -117,7 +117,7 @@ const UserMembers = () => {
           </AlertDialog>
           {allMembers.data.length === 0 ? (
             <Text>
-              Nenhum membro da CEOS foi encontrado, veja se há alguma
+              Nenhum membro da Proativa foi encontrado, veja se há alguma
               confirmação pendente
             </Text>
           ) : (
