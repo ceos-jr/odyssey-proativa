@@ -11,7 +11,7 @@ module.exports = {
         accent: "#ff9100",
       },
       fontFamily: {
-        inter: ["var(--font-inter)", ...fontFamily.sans],
+        poppins: ["var(--font-poppins)", ...fontFamily.sans],
       },
     },
   },

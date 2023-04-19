@@ -7,6 +7,14 @@ import "../styles/globals.css";
 import { type NextPage } from "next";
 import NextNProgress from "nextjs-progressbar";
 
+import { Poppins } from "@next/font/google";
+
+const poppins = Poppins({
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+  subsets: ["latin"],
+});
+
 const colors = {
   primary: "#2196f2",
   secondary: "#ffc107",
@@ -14,7 +22,13 @@ const colors = {
   accent: "#ff9100",
 };
 
-const theme = extendTheme({ colors });
+const theme = extendTheme({
+  colors,
+  fonts: {
+    body: poppins.style.fontFamily,
+    heading: poppins.style.fontFamily,
+  },
+});
 
 export type NextPageWithLayout = NextPage & {
   /* eslint-disable no-unused-vars */
@@ -34,7 +48,9 @@ function MyApp({
   return (
     <SessionProvider session={session}>
       <NextNProgress color={colors.primary} />
-      <ChakraProvider theme={theme}>{layout}</ChakraProvider>
+      <ChakraProvider theme={theme}>
+        <div className={`${poppins.variable} font-poppins`}>{layout}</div>
+      </ChakraProvider>
     </SessionProvider>
   );
 }
