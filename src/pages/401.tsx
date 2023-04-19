@@ -7,8 +7,8 @@ const Custom401 = () => {
   return (
     <>
       <Head>
-        <title>Não autorizado • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>Não autorizado • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <div className="flex h-screen flex-col items-center justify-center gap-8">
         <Image

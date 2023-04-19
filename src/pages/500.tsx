@@ -7,8 +7,8 @@ const Custom500 = () => {
   return (
     <>
       <Head>
-        <title>Erro no servidor • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>Erro no servidor • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <div className="flex h-screen flex-col items-center justify-center gap-8">
         <Image

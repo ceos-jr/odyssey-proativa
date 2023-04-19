@@ -35,8 +35,8 @@ const Lesson = () => {
   return (
     <>
       <Head>
-        <title>{lesson?.data?.name} • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>{lesson?.data?.name} • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex flex-col gap-4 p-4">
         <LessSuggestionModal

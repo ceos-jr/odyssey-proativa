@@ -88,8 +88,8 @@ const CreateModule = () => {
   return (
     <>
       <Head>
-        <title>Criar modulo • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>Criar modulo • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex h-max flex-col p-4">
         <form onSubmit={handleSubmit(onSubmit)}>

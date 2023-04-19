@@ -13,11 +13,9 @@ const Login = () => {
   return (
     <>
       <Head>
-        <title>Login • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>Login • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
-      <div className="flex h-screen flex-col items-center justify-center gap-y-8">
-        <Logo className="h-1/4 w-1/4 text-primary" />
       <div className="flex h-screen flex-col items-center justify-center gap-y-8 p-8">
         <Image
           alt="logo proativa"

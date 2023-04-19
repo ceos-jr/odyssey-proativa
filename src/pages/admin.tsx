@@ -13,8 +13,8 @@ const Admin = () => {
   return (
     <>
       <Head>
-        <title>Admin • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>Admin • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="flex h-max flex-col gap-4 p-4">
         <AdminStats />
