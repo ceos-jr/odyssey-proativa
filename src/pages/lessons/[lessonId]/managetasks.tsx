@@ -38,8 +38,8 @@ const CreateTask = () => {
   return (
     <>
       <Head>
-        <title>Atividades • CEOS</title>
-        <meta name="description" content="CEOS Capacitacao" />
+        <title>Atividades • Proativa</title>
+        <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex h-max flex-col gap-4 p-4">
         {!tasks.data ? (

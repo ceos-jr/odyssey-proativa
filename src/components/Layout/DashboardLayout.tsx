@@ -24,11 +24,12 @@ import type { IconType } from "react-icons";
 import NextLink from "next/link";
 import { useSession } from "@utils/useSession";
 import NextImage from "next/image";
-import Logo from "./Logo";
-import LogoExtended from "./LogoExtended";
 import { signOut } from "next-auth/react";
 import { Roles } from "@utils/constants";
 import ChangeRoleFooter from "./ChangeRoleFooter";
+import Logo from "../../../public/logo.png";
+import LogoExtended from "../../../public/logo_extended.png";
+import Image from "next/image";
 
 interface LinkItemProps {
   name: string;
@@ -88,7 +89,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <LogoExtended />
+        <Image
+          alt="logo extendida proativa"
+          height={40}
+          width={200}
+          src={LogoExtended}
+        />
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link, index) => (
@@ -165,7 +171,13 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
-      <Logo className="ml-10 inline-flex text-primary md:hidden" />
+      <Image
+        alt="logo proativa"
+        className="ml-10 inline-flex md:hidden"
+        src={Logo}
+        height={40}
+        width={40}
+      />
       <HStack spacing={{ base: "0", md: "6" }}>
         <IconButton
           size="lg"
