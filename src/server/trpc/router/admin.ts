@@ -1,15 +1,23 @@
-import { TaskStatus } from "@utils/constants";
+import { Roles, TaskStatus } from "@utils/constants";
 import { z } from "zod";
 
 import { router, adminProcedure } from "../trpc";
 
 export const adminRouter = router({
   getUserCount: adminProcedure.query(({ ctx }) => {
-    return ctx.prisma.user.count({});
+    return ctx.prisma.user.count({
+      where: { NOT: { role: Roles.Guest } },
+    });
   }),
   getAllMembers: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.user.findMany({
       include: { modulesProgress: { select: { completed: true } } },
+      where: { NOT: { role: Roles.Guest } },
+    });
+  }),
+  getGuests: adminProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findMany({
+      where: { role: Roles.Guest },
     });
   }),
   getModCount: adminProcedure.query(({ ctx }) => {
@@ -50,6 +58,14 @@ export const adminRouter = router({
       where: { id: input },
     });
   }),
+  aproveGuest: adminProcedure
+    .input(z.string())
+    .mutation(({ ctx, input: id }) => {
+      return ctx.prisma.user.update({
+        data: { role: Roles.Member },
+        where: { id: id },
+      });
+    }),
   attributeGrade: adminProcedure
     .input(
       z.object({ taskId: z.string(), userId: z.string(), grade: z.number() })
