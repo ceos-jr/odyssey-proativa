@@ -3,10 +3,11 @@ import { signIn } from "next-auth/react";
 import { AiFillGithub } from "react-icons/ai";
 import { Text } from "@chakra-ui/react";
 import Head from "next/head";
-import Logo from "@components/Layout/Logo";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import { type GetServerSideProps } from "next";
 import ChangeRoleFooter from "@components/Layout/ChangeRoleFooter";
+import Image from "next/image";
+import LogoExtended from "../../public/logo_extended.png";
 
 const Login = () => {
   return (
@@ -17,11 +18,18 @@ const Login = () => {
       </Head>
       <div className="flex h-screen flex-col items-center justify-center gap-y-8">
         <Logo className="h-1/4 w-1/4 text-primary" />
+      <div className="flex h-screen flex-col items-center justify-center gap-y-8 p-8">
+        <Image
+          alt="logo proativa"
+          src={LogoExtended}
+          height={100}
+          width={500}
+        />
         <AiFillGithub
           className="h-16 w-16 cursor-pointer transition-colors hover:text-secondary"
           onClick={() => signIn("github")}
         />
-        <Text>Sign in with Github</Text>
+        <Text>Login com o Github</Text>
         <ChangeRoleFooter />
       </div>
     </>
