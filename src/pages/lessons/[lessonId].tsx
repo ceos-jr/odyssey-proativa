@@ -22,6 +22,7 @@ import { AiOutlineInbox } from "react-icons/ai";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
 import LessonFooter from "@components/lessons/LessonFooter";
+import { Roles } from "@utils/constants";
 
 moment.locale("pt-br");
 
@@ -120,7 +121,7 @@ const LessonSkeleton = () => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerAuthSession(context);
-  //TODO: O cara pode ter uma sessao e acessar mesmo que nã esteja inscrito
+  //TODO: O cara pode entrar na página mesmo sem estar inscrito na lesson
   if (!session) {
     return {
       redirect: {
@@ -128,5 +129,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         permanent: false,
       },
     };
-  } else return { props: {} };
+  } else if (session.user?.role === Roles.Guest) {
+    return {
+      redirect: {
+        destination: "/guest",
+        permanent: false,
+      },
+    };
+  } else
+    return {
+      props: {},
+    };
 };
