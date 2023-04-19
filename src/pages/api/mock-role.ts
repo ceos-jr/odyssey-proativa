@@ -11,6 +11,7 @@ export const getMockRole = async () => {
   );
   if (fileContents === Roles.Admin) return Roles.Admin;
   else if (fileContents === Roles.Member) return Roles.Member;
+  else if (fileContents === Roles.Guest) return Roles.Guest;
   else return null;
 };
 

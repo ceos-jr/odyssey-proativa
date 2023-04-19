@@ -39,6 +39,13 @@ export const ChangeRoleFooter = () => {
             </button>
             <button
               onClick={() => {
+                becomeRole(Roles.Guest);
+              }}
+            >
+              guest
+            </button>
+            <button
+              onClick={() => {
                 becomeRole("UNAUTHENTICATED");
               }}
             >

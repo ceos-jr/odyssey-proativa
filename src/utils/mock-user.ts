@@ -15,6 +15,13 @@ export const mockUsers = {
     email: "tubias@ceos.com",
     image: null,
   },
+  GUEST: {
+    id: "cl814zcy80074hloomogrg1mv",
+    role: Roles.Guest,
+    name: "Guest Gabrigas",
+    email: "gabrigas@ceos.com",
+    image: null,
+  },
   UNAUTHENTICATED: null,
 };
 
