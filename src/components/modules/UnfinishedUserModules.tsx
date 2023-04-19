@@ -19,9 +19,7 @@ const UnfinishedUserModules = () => {
       ) : (
         <>
           {" "}
-          <Heading as="h1" size="2xl">
-            Módulos não completados
-          </Heading>
+          <Heading as="h1">Módulos não completados</Heading>
           {unfUserMod.data.length === 0 ? (
             <Text>
               Nenhum módulo não completado foi encontrado, por favor se inscreva
