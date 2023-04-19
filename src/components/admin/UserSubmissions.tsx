@@ -70,11 +70,11 @@ const UserSubmissions = () => {
           />
           <Heading>Envio dos usuários</Heading>
           {lastSubmissions.data.length === 0 ? (
-            <div className="flex justify-center items-center h-32 bg-white rounded-lg shadow-lg">
+            <div className="flex h-32 items-center justify-center rounded-lg bg-white shadow-lg">
               <Text>Nenhuma submissão recente foi encontrada</Text>
             </div>
           ) : (
-            <TableContainer className="bg-white rounded-lg shadow-lg">
+            <TableContainer className="rounded-lg bg-white shadow-lg">
               <Table>
                 <Thead>
                   <Tr>
@@ -87,17 +87,17 @@ const UserSubmissions = () => {
                   {lastSubmissions.data.map((sub) => (
                     <Tr key={sub.taskId}>
                       <Td>
-                        <div className="flex gap-x-2 items-center">
-                          <div className="relative w-8 h-8">
+                        <div className="flex items-center gap-x-2">
+                          <div className="relative h-8 w-8">
                             {sub?.user.image ? (
                               <NextImage
                                 src={sub.user.image}
                                 alt="user avatar"
                                 fill
-                                className="object-cover rounded-full"
+                                className="rounded-full object-cover"
                               />
                             ) : (
-                              <FaUserCircle className="w-full h-full" />
+                              <FaUserCircle className="h-full w-full" />
                             )}
                           </div>
                           {sub.user.name}

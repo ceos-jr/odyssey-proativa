@@ -21,7 +21,7 @@ const ShowTaskModal = ({ task, isOpen, onClose }: ShowTaskModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="6xl">
       <ModalOverlay />
-      <ModalContent className="overflow-y-auto max-h-96">
+      <ModalContent className="max-h-96 overflow-y-auto">
         <ModalHeader>{task?.name}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

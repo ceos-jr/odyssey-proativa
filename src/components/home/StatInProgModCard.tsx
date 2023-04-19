@@ -5,7 +5,7 @@ const StatInProgModCard = () => {
     refetchOnWindowFocus: false,
   });
   return (
-    <Stat className="p-4 bg-white rounded-lg shadow-lg">
+    <Stat className="rounded-lg bg-white p-4 shadow-lg">
       {!modInProg.data && modInProg.data !== 0 ? (
         <SkeletonText noOfLines={5} />
       ) : (

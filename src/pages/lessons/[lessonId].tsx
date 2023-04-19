@@ -38,7 +38,7 @@ const Lesson = () => {
         <title>{lesson?.data?.name} • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="container flex flex-col gap-4 p-4 mx-auto">
+      <main className="container mx-auto flex flex-col gap-4 p-4">
         <LessSuggestionModal
           onClose={onClose}
           isOpen={isOpen}
@@ -48,7 +48,7 @@ const Lesson = () => {
           <LessonSkeleton />
         ) : (
           <>
-            <div className="flex flex-col gap-4 justify-between sm:flex-row sm:items-center">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <Heading as="h1" size="2xl">
                 {lesson.data?.name}
               </Heading>
@@ -64,7 +64,7 @@ const Lesson = () => {
               Ultima atualização {moment(lesson.data?.updatedAt).fromNow()}
             </Text>
             {lesson.data.richText.length === 0 ? (
-              <div className="flex flex-col justify-center items-center p-16 bg-white rounded-lg shadow-lg">
+              <div className="flex flex-col items-center justify-center rounded-lg bg-white p-16 shadow-lg">
                 <Text className="text-lg font-bold">
                   {" "}
                   Nenhum conteúdo foi disponibilizado para esse tópico

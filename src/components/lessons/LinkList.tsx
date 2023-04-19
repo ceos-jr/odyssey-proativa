@@ -23,7 +23,7 @@ const LinkList = ({ links }: LinkListProps) => {
             <ListItem key={link.id}>
               <NextLink
                 href={link.url}
-                className="flex gap-x-4 items-center group"
+                className="group flex items-center gap-x-4"
               >
                 <ListIcon
                   as={BsGlobe}
@@ -44,7 +44,7 @@ const LinkList = ({ links }: LinkListProps) => {
           ))}
         </List>
       ) : (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center justify-center">
           <Text>
             {" "}
             Nenhuma documentação foi disponíbilizada para esse tópico

@@ -41,7 +41,7 @@ const CreateTask = () => {
         <title>Atividades • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="container flex flex-col gap-4 p-4 mx-auto h-max">
+      <main className="container mx-auto flex h-max flex-col gap-4 p-4">
         {!tasks.data ? (
           <>
             <Skeleton height="30px" />
@@ -51,7 +51,7 @@ const CreateTask = () => {
           </>
         ) : (
           <>
-            <div className="flex flex-col gap-x-2 justify-between sm:flex-row sm:items-center">
+            <div className="flex flex-col justify-between gap-x-2 sm:flex-row sm:items-center">
               <Heading as="h1" size="2xl">
                 Atividades
               </Heading>
@@ -86,10 +86,10 @@ const CreateTask = () => {
               <Accordion defaultIndex={[0]} allowMultiple>
                 {tasks.data.map((task) => (
                   <AccordionItem
-                    className="p-2 mt-2 bg-white rounded-lg shadow-lg"
+                    className="mt-2 rounded-lg bg-white p-2 shadow-lg"
                     key={task.id}
                   >
-                    <h2 className="flex gap-x-2 justify-between font-bold">
+                    <h2 className="flex justify-between gap-x-2 font-bold">
                       <AccordionButton>
                         <Box flex="1" textAlign="left">
                           {task.name}

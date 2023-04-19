@@ -9,6 +9,7 @@
     "lint": "next lint",
     "start": "next start",
     "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write .",
     "test": "jest --passWithNoTests",
     "test:ci": "jest --coverage --silent --ci --passWithNoTests"
   },

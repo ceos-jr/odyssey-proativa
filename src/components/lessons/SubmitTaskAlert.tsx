@@ -69,7 +69,7 @@ const SubmitTaskAlert = ({
       size="6xl"
     >
       <AlertDialogOverlay />
-      <AlertDialogContent className="overflow-y-auto max-h-96">
+      <AlertDialogContent className="max-h-96 overflow-y-auto">
         <AlertDialogHeader>Atividade {task?.name}</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>

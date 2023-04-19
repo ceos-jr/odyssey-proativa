@@ -138,7 +138,7 @@ const Edit = () => {
         <title>{lesson.data?.name} • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="container flex flex-col gap-4 p-4 mx-auto">
+      <main className="container mx-auto flex flex-col gap-4 p-4">
         {!lesson.data ? (
           "loading..."
         ) : (
@@ -149,7 +149,7 @@ const Edit = () => {
                 <div className="flex gap-2">
                   <FormLabel>Nome do tópico</FormLabel>
                   <BiReset
-                    className="w-6 h-6 transition-colors cursor-pointer hover:text-secondary"
+                    className="h-6 w-6 cursor-pointer transition-colors hover:text-secondary"
                     onClick={() => resetField("name")}
                   />
                 </div>
@@ -170,7 +170,7 @@ const Edit = () => {
                 <div className="flex gap-2">
                   <FormLabel>Conteúdo do tópico (em markdown)</FormLabel>
                   <BiReset
-                    className="flex-shrink-0 w-6 h-6 transition-colors cursor-pointer hover:text-secondary"
+                    className="h-6 w-6 flex-shrink-0 cursor-pointer transition-colors hover:text-secondary"
                     onClick={() => resetField("richText")}
                   />
                 </div>

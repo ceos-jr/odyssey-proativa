@@ -19,7 +19,7 @@ const MostRecentModules = () => {
               inscreva em algum
             </Text>
           ) : (
-            <div className="grid grid-cols-1 gap-4 place-content-stretch sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 place-content-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {mostRecent.data.map((mod) => (
                 <ModProgCard
                   key={mod.moduleId}

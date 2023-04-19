@@ -32,9 +32,9 @@ const VideoList = ({ videos }: VideoListProps) => {
           {videos.map((video) => (
             <ListItem
               key={video.id}
-              className="flex gap-x-8 p-4 rounded-lg transition-colors hover:bg-gray-100"
+              className="flex gap-x-8 rounded-lg p-4 transition-colors hover:bg-gray-100"
             >
-              <div className="relative sm:w-60 aspect-video">
+              <div className="relative aspect-video sm:w-60">
                 {getYoutubeId(video.url) !== undefined ? (
                   <NextImage
                     src={`https://img.youtube.com/vi/${getYoutubeId(
@@ -42,13 +42,13 @@ const VideoList = ({ videos }: VideoListProps) => {
                     )}/mqdefault.jpg`}
                     alt="thumbnail"
                     fill
-                    className="object-cover rounded-xl"
+                    className="rounded-xl object-cover"
                   />
                 ) : (
-                  <AiFillYoutube className="w-full h-full" />
+                  <AiFillYoutube className="h-full w-full" />
                 )}
               </div>
-              <div className="flex flex-col w-full">
+              <div className="flex w-full flex-col">
                 <Heading as="h4" size="md">
                   {video.name}
                 </Heading>
@@ -57,7 +57,7 @@ const VideoList = ({ videos }: VideoListProps) => {
                 </Text>
                 <NextLink
                   href={video.url}
-                  className="self-end w-32"
+                  className="w-32 self-end"
                   target="_blank"
                 >
                   <Button
@@ -73,7 +73,7 @@ const VideoList = ({ videos }: VideoListProps) => {
           ))}
         </List>
       ) : (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center justify-center">
           <Text> Nenhum video foi disponibilizado para esse tópico</Text>
           <Text>
             {" "}

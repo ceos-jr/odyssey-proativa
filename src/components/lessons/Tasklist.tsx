@@ -77,7 +77,7 @@ const Tasklist = ({ lessonId, tasks }: TasklistProps) => {
         <>
           <Heading>Atividades</Heading>
           {tasks.length === 0 ? (
-            <div className="flex flex-col justify-center items-center p-16 bg-white rounded-lg shadow-lg">
+            <div className="flex flex-col items-center justify-center rounded-lg bg-white p-16 shadow-lg">
               <Text>
                 {" "}
                 Nenhuma atividade foi disponibilizada para esse tópico
@@ -100,7 +100,7 @@ const Tasklist = ({ lessonId, tasks }: TasklistProps) => {
               </Text>
             </div>
           ) : (
-            <TableContainer className="bg-white rounded-lg shadow-lg">
+            <TableContainer className="rounded-lg bg-white shadow-lg">
               <Table>
                 <Thead>
                   <Tr>

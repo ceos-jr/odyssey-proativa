@@ -14,9 +14,9 @@ const ProjectList = ({ projects }: VideoListProps) => {
           {projects.map((project) => (
             <ListItem
               key={project.id}
-              className="flex gap-x-8 p-4 rounded-lg transition-colors"
+              className="flex gap-x-8 rounded-lg p-4 transition-colors"
             >
-              <div className="flex flex-col w-full">
+              <div className="flex w-full flex-col">
                 <Heading as="h3" size="xl">
                   {project.name}
                 </Heading>
@@ -26,7 +26,7 @@ const ProjectList = ({ projects }: VideoListProps) => {
           ))}
         </List>
       ) : (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col items-center justify-center">
           <Text> Nenhum projeto foi disponibilizado para esse tópico</Text>
           <Text>
             {" "}

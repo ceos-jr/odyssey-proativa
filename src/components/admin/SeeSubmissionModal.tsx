@@ -28,7 +28,7 @@ const SeeSubmissionModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="6xl">
       <ModalOverlay />
-      <ModalContent className="overflow-y-auto max-h-96">
+      <ModalContent className="max-h-96 overflow-y-auto">
         <ModalHeader className="p-2">
           Atividade {taskname} de {username}
         </ModalHeader>

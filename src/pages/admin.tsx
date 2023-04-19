@@ -16,7 +16,7 @@ const Admin = () => {
         <title>Admin • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="flex flex-col gap-4 p-4 h-max">
+      <main className="flex h-max flex-col gap-4 p-4">
         <AdminStats />
         <UserMembers />
         <UserSubmissions />

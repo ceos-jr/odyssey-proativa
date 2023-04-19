@@ -112,7 +112,7 @@ const UniqueModule = () => {
         <title>{moduleData?.name} • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="container flex flex-col p-4 mx-auto h-max">
+      <main className="container mx-auto flex h-max flex-col p-4">
         <ModSuggestionModal
           isOpen={isOpen}
           onClose={onClose}
@@ -122,7 +122,7 @@ const UniqueModule = () => {
           <UniqueModuleSkeleton />
         ) : (
           <>
-            <div className="flex flex-col gap-4 justify-between sm:flex-row sm:items-center">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <Heading as="h1" size="3xl">
                 {`Modulo de ${moduleData.name}`}
               </Heading>

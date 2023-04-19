@@ -60,7 +60,7 @@ const LessonFooter = (props: OutputProcedure) => {
   });
 
   return (
-    <div className="flex gap-x-2 justify-center items-center">
+    <div className="flex items-center justify-center gap-x-2">
       {props.previous ? (
         <NextLink href={`/lessons/${props.previous}`}>
           <Button colorScheme="linkedin">Anterior</Button>

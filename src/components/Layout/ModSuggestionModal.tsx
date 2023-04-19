@@ -84,7 +84,7 @@ const ModSuggestionModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent className="self-center place-self-center">
+      <ModalContent className="place-self-center self-center">
         <ModalHeader>
           Deixe sua sugestão para melhorarmos este módulo
         </ModalHeader>

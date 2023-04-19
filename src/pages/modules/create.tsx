@@ -91,9 +91,9 @@ const CreateModule = () => {
         <title>Criar modulo • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="container flex flex-col p-4 mx-auto h-max">
+      <main className="container mx-auto flex h-max flex-col p-4">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-y-4 mx-auto max-w-4xl">
+          <div className="mx-auto flex max-w-4xl flex-col gap-y-4">
             <Heading>Modulo</Heading>
             <FormControl id="name" isInvalid={!!errors.name} isRequired>
               <FormLabel>Nome do Modulo</FormLabel>
@@ -114,7 +114,7 @@ const CreateModule = () => {
                 {...register("description")}
               />
             </FormControl>
-            <div className="flex gap-x-4 justify-between">
+            <div className="flex justify-between gap-x-4">
               <Heading>Tópicos</Heading>
               <Button
                 leftIcon={<AiOutlinePlus />}
@@ -143,7 +143,7 @@ const CreateModule = () => {
                   isRequired
                 >
                   <FormLabel>Nome do tópico</FormLabel>
-                  <div className="flex gap-x-4 justify-between">
+                  <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
                       {...register(`lessons.${index}.name` as const)}
@@ -161,7 +161,7 @@ const CreateModule = () => {
                       as={AiOutlineArrowUp}
                       w={6}
                       h={6}
-                      className="transition-colors cursor-pointer hover:text-secondary"
+                      className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         move(index, index - 1);
                       }}
@@ -170,7 +170,7 @@ const CreateModule = () => {
                       as={AiOutlineArrowDown}
                       w={6}
                       h={6}
-                      className="transition-colors cursor-pointer hover:text-secondary"
+                      className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         move(index, index + 1);
                       }}

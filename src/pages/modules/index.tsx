@@ -13,7 +13,7 @@ const Modules = () => {
         <title>Modulos • CEOS</title>
         <meta name="description" content="CEOS Capacitacao" />
       </Head>
-      <main className="container flex flex-col gap-4 p-4 mx-auto h-max">
+      <main className="container mx-auto flex h-max flex-col gap-4 p-4">
         <UnfinishedUserModules />
         <CompletedUserModules />
         <AllModules />
