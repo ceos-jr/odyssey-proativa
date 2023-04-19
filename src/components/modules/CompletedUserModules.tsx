@@ -19,9 +19,7 @@ const CompletedUserModules = () => {
       ) : (
         <>
           {" "}
-          <Heading as="h1" size="2xl">
-            Módulos completados
-          </Heading>
+          <Heading as="h1">Módulos completados</Heading>
           {compUserMod.data.length === 0 ? (
             <Text>Nenhum módulo completado foi encontrado</Text>
           ) : (

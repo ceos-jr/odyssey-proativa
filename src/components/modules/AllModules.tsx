@@ -32,9 +32,7 @@ const AllModules = () => {
         <>
           <div className="flex flex-col justify-between gap-2 sm:flex-row">
             {" "}
-            <Heading as="h1" size="2xl">
-              Todos os Modulos
-            </Heading>
+            <Heading as="h1">Todos os Modulos</Heading>
             {session?.user?.role === Roles.Admin && (
               <NextLink href="/modules/create">
                 {" "}
