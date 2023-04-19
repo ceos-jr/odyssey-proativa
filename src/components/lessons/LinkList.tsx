@@ -27,13 +27,13 @@ const LinkList = ({ links }: LinkListProps) => {
               >
                 <ListIcon
                   as={BsGlobe}
-                  className="transition-colors group-hover:text-accent"
+                  className="group-hover:text-accent transition-colors"
                 />
                 <div className="flex flex-col">
                   <Heading
                     as="h4"
                     size="md"
-                    className="transition-colors group-hover:text-accent"
+                    className="group-hover:text-accent transition-colors"
                   >
                     {link.name}
                   </Heading>

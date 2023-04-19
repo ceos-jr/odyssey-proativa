@@ -16,10 +16,9 @@ const poppins = Poppins({
 });
 
 const colors = {
-  primary: "#2196f2",
-  secondary: "#ffc107",
-  terciary: "#2860ff",
-  accent: "#ff9100",
+  primary: "#2a3756",
+  secondary: "#fad20a",
+  terciary: "#2d3e50",
 };
 
 const theme = extendTheme({
