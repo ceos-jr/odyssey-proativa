@@ -138,4 +138,14 @@ export const moduleRouter = router({
         data: { readed: input.readed },
       });
     }),
+  getUserModSuggestions: adminProcedure
+    .input(z.string())
+    .query(({ ctx, input }) => {
+      return ctx.prisma.modSuggestion.findMany({
+        where: { userId: input },
+        include: { module: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      });
+    }),
 });

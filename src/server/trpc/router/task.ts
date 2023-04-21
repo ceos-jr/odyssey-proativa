@@ -1,7 +1,9 @@
 import { TasksFormSchema } from "@components/lessons/TaskForm";
+import { TaskStatus } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { router, adminProcedure } from "../trpc";
+import { router, adminProcedure, protectedProcedure } from "../trpc";
 
 export const taskRouter = router({
   createTask: adminProcedure
@@ -42,4 +44,38 @@ export const taskRouter = router({
   deleteTask: adminProcedure.input(z.string()).mutation(({ ctx, input }) => {
     return ctx.prisma.task.delete({ where: { id: input } });
   }),
+  lastTasksByUser: protectedProcedure
+    .input(z.string().optional())
+    .query(({ ctx, input }) => {
+      if (input && ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      const userId = input ? input : ctx.session.user.id;
+
+      return ctx.prisma.userTaskProgress.findMany({
+        where: { userId },
+        include: { task: { select: { name: true } } },
+        orderBy: { completedAt: "desc" },
+        take: 5,
+      });
+    }),
+  totalTasksByUser: protectedProcedure
+    .input(z.string().optional())
+    .query(({ ctx, input }) => {
+      if (input && ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      const userId = input ? input : ctx.session.user.id;
+      return ctx.prisma.userTaskProgress.count({
+        where: { userId },
+      });
+    }),
+  finTasksByUser: protectedProcedure
+    .input(z.string().optional())
+    .query(({ ctx, input }) => {
+      if (input && ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      const userId = input ? input : ctx.session.user.id;
+      return ctx.prisma.userTaskProgress.count({
+        where: { userId, status: TaskStatus.COMPLETED },
+      });
+    }),
 });
