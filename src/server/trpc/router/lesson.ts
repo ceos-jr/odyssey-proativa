@@ -1,10 +1,15 @@
 import { LessonWUtils } from "src/pages/lessons/[lessonId]/edit";
 import { z } from "zod";
 
-import { router, publicProcedure, adminProcedure } from "../trpc";
+import {
+  router,
+  publicProcedure,
+  adminProcedure,
+  protectedProcedure,
+} from "../trpc";
 
 export const lessonRouter = router({
-  getLesson: publicProcedure
+  getLesson: protectedProcedure
     .input(z.object({ lessonId: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.lesson.findUnique({

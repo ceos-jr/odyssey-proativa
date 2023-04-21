@@ -5,6 +5,7 @@ import UnfinishedUserModules from "@components/modules/UnfinishedUserModules";
 import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import CompletedUserModules from "@components/modules/CompletedUserModules";
+import { Roles } from "@utils/constants";
 
 const Modules = () => {
   return (
@@ -37,7 +38,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         permanent: false,
       },
     };
-  } else {
-    return { props: {} };
-  }
+  } else if (session.user?.role === Roles.Guest) {
+    return {
+      redirect: {
+        destination: "/guest",
+        permanent: false,
+      },
+    };
+  } else return { props: {} };
 };

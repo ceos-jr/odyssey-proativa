@@ -4,6 +4,7 @@ import { getServerAuthSession } from "src/server/common/get-server-auth-session"
 import Stats from "@components/home/Stats";
 import MostRecentModules from "@components/home/MostRecentModules";
 import { type GetServerSideProps } from "next";
+import { Roles } from "@utils/constants";
 
 const Home = () => {
   return (
@@ -35,7 +36,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         permanent: false,
       },
     };
-  } else {
-    return { props: {} };
-  }
+  } else if (session.user?.role === Roles.Guest) {
+    return {
+      redirect: {
+        destination: "/guest",
+        permanent: false,
+      },
+    };
+  } else return { props: {} };
 };

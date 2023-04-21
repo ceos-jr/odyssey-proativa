@@ -45,7 +45,7 @@ model User {
   image           String?
   accounts        Account[]
   sessions        Session[]
-  role            Role                 @default(MEMBER)
+  role            Role                 @default(GUEST)
   achievements    Achievement[]
   modulesProgress UserModuleProgress[]
   lessonsProgress UserLessonProgress[]
@@ -211,6 +211,7 @@ model LesSuggestion {
 enum Role {
   ADMIN
   MEMBER
+  GUEST
   UNAUTHENTICATED
 }
 

@@ -103,6 +103,16 @@ async function main() {
     update: {},
     where: { email: mU.MEMBER.email },
   });
+  await prisma.user.upsert({
+    create: {
+      id: mU.GUEST.id,
+      name: mU.GUEST.name,
+      email: mU.GUEST.email,
+      role: "GUEST",
+    },
+    update: {},
+    where: { email: mU.GUEST.email },
+  });
   console.log("creating modules");
   await prisma.module.createMany({ data: modules });
   console.log("creating lessons");

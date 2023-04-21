@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_MOCK_NEXT_AUTH: false
+        NEXT_PUBLIC_MOCK_NEXT_AUTH: true
         DATABASE_URL: postgres://capacitacao:senha@localhost:5432/odyssey?schema=public
         NEXTAUTH_SECRET: bigsecrethere
         NEXTAUTH_URL: http://localhost
@@ -16,9 +16,9 @@ services:
       - "3000:3000"
     image: odyssey
     environment:
-      - DATABASE_URL=postgres://capacitacao:senha@localhost:5432/odyssey?schema=public
+      - DATABASE_URL=postgres://capacitacao:senha@db:5432/odyssey?schema=public
       - NEXTAUTH_SECRET=bigsecrethere
-      - NEXTAUTH_URL=http://localhost
+      - NEXTAUTH_URL=http://localhost:3000
       - GITHUB_CLIENT_ID=123123123
       - GITHUB_CLIENT_SECRET=123123123123
   db:

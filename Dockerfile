@@ -1,8 +1,8 @@
 ##### DEPENDENCIES
-FROM node:18-alpine3.17 as base
+FROM --platform=linux/amd64 node:18.16.0-alpine3.17 as base
 
 FROM base AS deps
-RUN apk add --no-cache libc6-compat openssl1.1-compat
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install Prisma Client - remove if not using Prisma
