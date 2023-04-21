@@ -1,7 +1,7 @@
 import AdminStats from "@components/admin/AdminStats";
 import GuestUsers from "@components/admin/GuestUsers";
-import LessonSuggestions from "@components/admin/LessonSuggestions";
-import ModulesSuggestions from "@components/admin/ModulesSuggestions";
+import AllLessonsSuggestions from "@components/admin/AllLessonsSuggestions";
+import AllModulesSuggestions from "@components/admin/AllModulesSuggestions";
 import MemberList from "@components/admin/MemberList";
 import UserSubmissions from "@components/admin/UserSubmissions";
 import DashboardLayout from "@components/Layout/DashboardLayout";
@@ -22,8 +22,8 @@ const Admin = () => {
         <GuestUsers />
         <MemberList />
         <UserSubmissions />
-        <ModulesSuggestions />
-        <LessonSuggestions />
+        <AllModulesSuggestions />
+        <AllLessonsSuggestions />
       </main>
     </>
   );
