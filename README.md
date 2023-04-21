@@ -1,33 +1,40 @@
 # Odyssey-proativa
 
 ## Intial setup
+
 First of all, you must perform these 4 steps so that it is possible to run the project on your machine:
+
 - Create an `.env` file in the repository's base directory following the directions in the `.env-example` file.
 - Create a empty `mock-role.txt` file in the repository's base directory.
 - Change your `node` version to `18.12.0`.
-    - [A good way to set your node version is using nvm.](https://www.treinaweb.com.br/blog/instalando-e-gerenciando-varias-versoes-do-node-js-com-nvm)
+  - [A good way to set your node version is using nvm.](https://www.treinaweb.com.br/blog/instalando-e-gerenciando-varias-versoes-do-node-js-com-nvm)
 - Run the command `npm install`.
 
-
 ## Database setup
+
 To configure your database, run these commands:
+
 - ```bash
-docker compose up db
-```
-- ```bash 
+  docker compose up db
+  ```
+
+````
+- ```bash
 docker compose start db
-```
+````
+
 - ```bash
-npx prisma db push
-```
+  npx prisma db push
+  ```
+
+````
 - ```bash
 npx prisma db seed
-```
-
+````
 
 ## Running the project
-If you've already done the initial configuration, just run the `npm run dev` command and see the platform running on `http://localhost:3000`. 
 
+If you've already done the initial configuration, just run the `npm run dev` command and see the platform running on `http://localhost:3000`.
 
 ## About the project stack
 
@@ -58,5 +65,3 @@ Also checkout these awesome tutorials on `create-t3-app`.
 #### How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://beta.create.t3.gg/en/deployment/vercel) and [Docker](https://beta.create.t3.gg/en/deployment/docker) for more information.
-
-
