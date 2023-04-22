@@ -13,9 +13,10 @@ const useCustomToast = () => {
     });
   };
 
-  const showSuccessToast = (title: string) => {
+  const showSuccessToast = (title: string, description?: string) => {
     toast({
       title: title,
+      description: description,
       status: "success",
       duration: 2000,
       isClosable: true,
