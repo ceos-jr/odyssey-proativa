@@ -5,22 +5,22 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_MOCK_NEXT_AUTH: true
-        DATABASE_URL: postgres://capacitacao:senha@localhost:5432/odyssey?schema=public
-        NEXTAUTH_SECRET: bigsecrethere
-        NEXTAUTH_URL: http://localhost
-        GOOGLE_CLIENT_ID: "123123123"
-        GOOGLE_CLIENT_SECRET: "123123123123"
+        NEXT_PUBLIC_MOCK_NEXT_AUTH: "${NEXT_PUBLIC_MOCK_NEXT_AUTH:-true}"
+        DATABASE_URL: "${DATABASE_URL:-postgres://capacitacao:senha@db:5432/odyssey?schema=public}"
+        NEXTAUTH_SECRET: "${NEXTAUTH_SECRET:-bigsecretgeneratedrandonly}"
+        NEXTAUTH_URL: "${NEXTAUTH_URL:-http://localhost:3000}"
+        GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-123123123123123jb}"
+        GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-123412341234123412341234}"
     working_dir: /app
     ports:
       - "3000:3000"
     image: odyssey
     environment:
-      - DATABASE_URL=postgres://capacitacao:senha@db:5432/odyssey?schema=public
-      - NEXTAUTH_SECRET=bigsecrethere
-      - NEXTAUTH_URL=http://localhost:3000
-      - GOOGLE_CLIENT_ID=123123123
-      - GOOGLE_CLIENT_SECRET=123123123123
+      DATABASE_URL: "${DATABASE_URL:-postgres://capacitacao:senha@db:5432/odyssey?schema=public}"
+      NEXTAUTH_SECRET: "${NEXTAUTH_SECRET:-bigsecretgeneratedrandonly}"
+      NEXTAUTH_URL: "${NEXTAUTH_URL:-http://localhost:3000}"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-123123123123123jb}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-123412341234123412341234}"
   db:
     image: postgres
     ports:
