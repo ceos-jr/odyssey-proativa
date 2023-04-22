@@ -3,11 +3,15 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { router, adminProcedure, protectedProcedure } from "../trpc";
-import { type GradeFrequency } from "./admin";
 
 export type CumulativeAvg = {
   date_alias: string;
   cumulative_avg: number;
+};
+
+export type GradeFrequency = {
+  grade_bin: number;
+  count: number;
 };
 
 export const gradesRouter = router({

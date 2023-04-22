@@ -19,21 +19,22 @@ const User = () => {
   const { data: modules } = trpc.admin.getUserModuleList.useQuery(userId, {
     refetchOnWindowFocus: false,
   });
-  const { data: lastTasks } = trpc.admin.getUserLastTasks.useQuery(userId, {
+  const { data: lastTasks } = trpc.task.lastTasksByUser.useQuery(userId, {
     refetchOnWindowFocus: false,
   });
-  const { data: totalTasks } = trpc.admin.getUserTotalTasks.useQuery(userId, {
-    refetchOnWindowFocus: false,
-  });
-  const { data: finishedTasksCount } =
-    trpc.admin.getUserFinishedTasksCount.useQuery(userId, {
-      refetchOnWindowFocus: false,
-    });
 
-  const { data: gradeDistribution } =
-    trpc.admin.getUserGradeDistribution.useQuery(userId, {
+  const { data: tasksCount } = trpc.task.totalAndUnfCountByUser.useQuery(
+    userId,
+    {
       refetchOnWindowFocus: false,
-    });
+    }
+  );
+  const { data: gradeDistribution } = trpc.grades.gradeDistByUser.useQuery(
+    userId,
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   const { data: uModSugg } = trpc.module.getUserModSuggestions.useQuery(
     userId,
@@ -84,8 +85,8 @@ const User = () => {
         <SubscribedModulesTable modules={modules} />
         <LastTasks
           tasks={lastTasks}
-          finishedCount={finishedTasksCount}
-          totalCount={totalTasks}
+          finishedCount={tasksCount?.finished}
+          totalCount={tasksCount?.total}
         />
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <GradeDistribution grades={gradeDistribution} />

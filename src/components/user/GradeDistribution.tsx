@@ -1,5 +1,5 @@
 import { Heading, Skeleton, Text } from "@chakra-ui/react";
-import { type GradeFrequency } from "@trpc/router/admin";
+import { type GradeFrequency } from "@trpc/router/grades";
 import {
   BarChart,
   Bar,

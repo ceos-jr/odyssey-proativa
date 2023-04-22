@@ -3,11 +3,6 @@ import { z } from "zod";
 
 import { router, adminProcedure } from "../trpc";
 
-export type GradeFrequency = {
-  grade_bin: number;
-  count: number;
-};
-
 export const adminRouter = router({
   getUserCount: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.user.count({
@@ -106,52 +101,5 @@ export const adminRouter = router({
         where: { userId: input },
         include: { module: { select: { name: true } } },
       });
-    }),
-  getUserLastTasks: adminProcedure.input(z.string()).query(({ ctx, input }) => {
-    return ctx.prisma.userTaskProgress.findMany({
-      where: { userId: input },
-      include: { task: { select: { name: true } } },
-      orderBy: { completedAt: "desc" },
-      take: 5,
-    });
-  }),
-  getUserTotalTasks: adminProcedure
-    .input(z.string())
-    .query(({ ctx, input }) => {
-      return ctx.prisma.userTaskProgress.count({
-        where: { userId: input },
-      });
-    }),
-  getUserFinishedTasksCount: adminProcedure
-    .input(z.string())
-    .query(({ ctx, input }) => {
-      return ctx.prisma.userTaskProgress.count({
-        where: { userId: input, status: TaskStatus.Completed },
-      });
-    }),
-  getUserGradeDistribution: adminProcedure
-    .input(z.string())
-    .query(({ ctx, input }) => {
-      return ctx.prisma.$queryRaw<GradeFrequency[]>`
-SELECT
-  bins.grade_bin,
-  COALESCE(grade_counts.grade_count, 0) AS count
-FROM (
-  SELECT generate_series(0, 4) AS grade_bin
-) AS bins
-LEFT JOIN (
-  SELECT
-    (width_bucket(grade, 0, 5.001, 5) - 1) * 1 AS grade_bin,
-    COUNT(*) AS grade_count
-  FROM
-    "UserTaskProgress"
-  WHERE
-    "userId" = ${input}
-  GROUP BY
-    grade_bin
-) AS grade_counts ON bins.grade_bin = grade_counts.grade_bin
-ORDER BY
-  bins.grade_bin ASC
-    `;
     }),
 });

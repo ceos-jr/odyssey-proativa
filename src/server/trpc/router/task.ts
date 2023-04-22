@@ -5,6 +5,11 @@ import { z } from "zod";
 
 import { router, adminProcedure, protectedProcedure } from "../trpc";
 
+type TotalAndUnfCountByUser = {
+  total: bigint;
+  finished: bigint;
+};
+
 export const taskRouter = router({
   createTask: adminProcedure
     .input(TasksFormSchema)
@@ -57,6 +62,25 @@ export const taskRouter = router({
         orderBy: { completedAt: "desc" },
         take: 5,
       });
+    }),
+  totalAndUnfCountByUser: protectedProcedure
+    .input(z.string().optional())
+    .query(async ({ ctx, input }) => {
+      if (input && ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      const userId = input ? input : ctx.session.user.id;
+
+      const data = await ctx.prisma.$queryRaw<TotalAndUnfCountByUser[]>`
+        SELECT 
+          COUNT(*) AS total, 
+          COUNT(CASE WHEN status::text = ${TaskStatus.COMPLETED}::text THEN 1 ELSE NULL END) AS finished
+        FROM "UserTaskProgress"
+        WHERE "userId" = ${userId}
+      `;
+      return {
+        total: Number(data[0]?.total),
+        finished: Number(data[0]?.finished),
+      };
     }),
   totalTasksByUser: protectedProcedure
     .input(z.string().optional())
