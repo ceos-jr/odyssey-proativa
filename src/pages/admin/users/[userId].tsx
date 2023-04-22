@@ -91,7 +91,6 @@ const User = () => {
           <GradeDistribution grades={gradeDistribution} />
           <GradesProgress />
         </div>
-
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <UserSuggestions title="Sugestão aos Módulos" data={uModSugg} />
           <UserSuggestions title="Sugestão aos Tópicos" data={uLesSugg} />

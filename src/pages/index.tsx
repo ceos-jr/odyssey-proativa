@@ -5,8 +5,18 @@ import Stats from "@components/home/Stats";
 import MostRecentModules from "@components/home/MostRecentModules";
 import { type GetServerSideProps } from "next";
 import { Roles } from "@utils/constants";
+import LastTasks from "@components/user/LastTasks";
+import { trpc } from "@utils/trpc";
+import GradeDistribution from "@components/user/GradeDistribution";
+import GradesProgress from "@components/user/GradesProgress";
 
 const Home = () => {
+  const { data: tasks } = trpc.task.lastTasksByUser.useQuery();
+  const { data: tasksCount } = trpc.task.totalTasksByUser.useQuery();
+  const { data: finCount } = trpc.task.finTasksByUser.useQuery();
+  const { data: gradeDist } = trpc.grades.gradeDistByUser.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
   return (
     <>
       <Head>
@@ -16,6 +26,15 @@ const Home = () => {
       <main className="flex h-max flex-col gap-4 p-4">
         <Stats />
         <MostRecentModules />
+        <LastTasks
+          tasks={tasks}
+          totalCount={tasksCount}
+          finishedCount={finCount}
+        />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <GradeDistribution grades={gradeDist} />
+          <GradesProgress />
+        </div>
       </main>
     </>
   );
