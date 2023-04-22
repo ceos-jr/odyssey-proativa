@@ -10,6 +10,9 @@ import LastTasks from "@components/user/LastTasks";
 import GradeDistribution from "@components/user/GradeDistribution";
 import UserSuggestions from "@components/user/UserSuggestions";
 import GradesProgress from "@components/user/GradesProgress";
+import { getServerAuthSession } from "src/server/common/get-server-auth-session";
+import { type GetServerSideProps } from "next";
+import { Roles } from "@utils/constants";
 
 const User = () => {
   const userId = useRouter().query.userId as string;
@@ -105,4 +108,23 @@ export default User;
 
 User.getLayout = function getLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerAuthSession(context);
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  } else if (session.user?.role !== Roles.Admin) {
+    return {
+      redirect: {
+        destination: "/401",
+        permanent: false,
+      },
+    };
+  } else return { props: {} };
 };
