@@ -72,7 +72,7 @@ const GuestUsers = () => {
   const [username, setUsername] = useState("");
 
   return (
-    <>
+    <div className="flex flex-col gap-8 rounded-lg bg-white p-8 shadow-lg">
       {!guests.data ? (
         <>
           <Skeleton height="30px" />
@@ -84,7 +84,7 @@ const GuestUsers = () => {
           {guests.data.length === 0 ? (
             <Text>Nenhum membro pendente a ser aprovado</Text>
           ) : (
-            <TableContainer className="rounded-lg bg-white shadow-lg">
+            <TableContainer>
               <Table>
                 <Thead>
                   <Tr>
@@ -145,7 +145,7 @@ const GuestUsers = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 

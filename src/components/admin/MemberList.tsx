@@ -72,7 +72,7 @@ const MemberList = () => {
   const cancelRef = React.useRef(null);
 
   return (
-    <>
+    <div className="flex flex-col gap-8 rounded-lg bg-white p-8 shadow-lg">
       {!allMembers.data ? (
         <>
           <Skeleton height="30px" />
@@ -122,7 +122,7 @@ const MemberList = () => {
               confirmação pendente
             </Text>
           ) : (
-            <TableContainer className="rounded-lg bg-white shadow-lg">
+            <TableContainer>
               <Table>
                 <Thead>
                   <Tr>
@@ -206,7 +206,7 @@ const MemberList = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 
