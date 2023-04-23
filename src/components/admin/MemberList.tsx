@@ -32,8 +32,9 @@ import { BsThreeDots, BsTrash } from "react-icons/bs";
 import React, { useState } from "react";
 import { Roles } from "@utils/constants";
 import { AiOutlineEye } from "react-icons/ai";
+import NextLink from "next/link";
 
-const UserMembers = () => {
+const MemberList = () => {
   const toast = useToast();
   const utils = trpc.useContext();
   const allMembers = trpc.admin.getAllMembers.useQuery();
@@ -184,14 +185,16 @@ const UserMembers = () => {
                                 Delete User
                               </MenuItem>
                             )}
-                            <MenuItem
-                              icon={<AiOutlineEye />}
-                              onClick={() => {
-                                console.log("change me daddy");
+                            <NextLink
+                              href={{
+                                pathname: "/admin/users/[userId]",
+                                query: { userId: mem.id },
                               }}
                             >
-                              Ver usuário
-                            </MenuItem>
+                              <MenuItem icon={<AiOutlineEye />}>
+                                Ver usuário
+                              </MenuItem>
+                            </NextLink>
                           </MenuList>
                         </Menu>
                       </Td>
@@ -207,4 +210,4 @@ const UserMembers = () => {
   );
 };
 
-export default UserMembers;
+export default MemberList;

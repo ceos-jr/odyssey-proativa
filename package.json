@@ -38,6 +38,7 @@
     "react-hook-form": "^7.39.2",
     "react-icons": "^4.6.0",
     "react-markdown": "^8.0.3",
+    "recharts": "^2.5.0",
     "remark-gfm": "^3.0.1",
     "sharp": "^0.32.0",
     "superjson": "1.9.1",

@@ -14,7 +14,6 @@ import {
   Thead,
   Tr,
   Skeleton,
-  useToast,
 } from "@chakra-ui/react";
 import { trpc } from "@utils/trpc";
 import { FaUserCircle } from "react-icons/fa";
@@ -22,71 +21,55 @@ import NextImage from "next/image";
 import { BsFillHandThumbsDownFill, BsThreeDots } from "react-icons/bs";
 import React, { useState } from "react";
 import { BsFillHandThumbsUpFill } from "react-icons/bs";
+import useCustomToast from "@hooks/useCustomToast";
 
 const GuestUsers = () => {
-  const toast = useToast();
   const utils = trpc.useContext();
   const guests = trpc.admin.getGuests.useQuery();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
 
   const aproveUser = trpc.admin.aproveGuest.useMutation({
-    async onMutate() {
+    async onMutate(aproveId) {
       await utils.admin.getGuests.cancel();
       const prevData = utils.admin.getGuests.getData();
-      const filtData = prevData?.filter((user) => user.id !== delUser.id);
+      const filtData = prevData?.filter((user) => user.id !== aproveId);
       utils.admin.getGuests.setData(filtData);
       return { prevData };
     },
     onError(err, _, ctx) {
       utils.admin.getGuests.setData(ctx?.prevData);
-      toast({
-        title: "Não foi possível aprovar o usuário",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível aprovar o usuário");
     },
     onSuccess() {
-      toast({
-        title: "Usuário aprovado com sucesso.",
-        description: `O usuário ${delUser.name} foi aprovado.`,
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      });
+      utils.admin.getAllMembers.refetch();
+      showSuccessToast(
+        "Usuário aprovado com sucesso.",
+        `O usuário ${username} foi aprovado.`
+      );
     },
   });
 
   const delUserMut = trpc.admin.delUser.useMutation({
-    async onMutate() {
+    async onMutate(delId) {
       await utils.admin.getGuests.cancel();
       const prevData = utils.admin.getGuests.getData();
-      const filtData = prevData?.filter((user) => user.id !== delUser.id);
+      const filtData = prevData?.filter((user) => user.id !== delId);
       utils.admin.getGuests.setData(filtData);
       return { prevData };
     },
     onError(err, _, ctx) {
       utils.admin.getGuests.setData(ctx?.prevData);
-      toast({
-        title: "Não foi possível desaprovar o usuário",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível desaprovar o usuário");
     },
     onSuccess() {
-      toast({
-        title: "Usuário desaprovado com sucesso.",
-        description: `O usuário ${delUser.name} foi desaprovado.`,
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      });
+      showSuccessToast(
+        "Usuário desaprovado com sucesso.",
+        `O usuário ${username} foi desaprovado.`
+      );
     },
   });
 
-  const [delUser, setDelUser] = useState({ name: "", id: "" });
+  const [username, setUsername] = useState("");
 
   return (
     <>
@@ -136,11 +119,8 @@ const GuestUsers = () => {
                             <MenuItem
                               icon={<BsFillHandThumbsUpFill />}
                               onClick={() => {
-                                setDelUser({
-                                  name: mem.name as string,
-                                  id: mem.id,
-                                });
-                                aproveUser.mutateAsync(delUser.id);
+                                setUsername(mem.name as string);
+                                aproveUser.mutateAsync(mem.id);
                               }}
                             >
                               Aprovar
@@ -148,11 +128,8 @@ const GuestUsers = () => {
                             <MenuItem
                               icon={<BsFillHandThumbsDownFill />}
                               onClick={() => {
-                                setDelUser({
-                                  name: mem.name as string,
-                                  id: mem.id,
-                                });
-                                delUserMut.mutateAsync(delUser.id);
+                                setUsername(mem.name as string);
+                                delUserMut.mutateAsync(mem.id);
                               }}
                             >
                               Desaprovar

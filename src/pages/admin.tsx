@@ -1,8 +1,8 @@
 import AdminStats from "@components/admin/AdminStats";
 import GuestUsers from "@components/admin/GuestUsers";
-import LessonSuggestions from "@components/admin/LessonSuggestions";
-import ModulesSuggestions from "@components/admin/ModulesSuggestions";
-import UserMembers from "@components/admin/UserMembers";
+import AllLessonsSuggestions from "@components/admin/AllLessonsSuggestions";
+import AllModulesSuggestions from "@components/admin/AllModulesSuggestions";
+import MemberList from "@components/admin/MemberList";
 import UserSubmissions from "@components/admin/UserSubmissions";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import { Roles } from "@utils/constants";
@@ -20,10 +20,10 @@ const Admin = () => {
       <main className="flex h-max flex-col gap-4 p-4">
         <AdminStats />
         <GuestUsers />
-        <UserMembers />
+        <MemberList />
         <UserSubmissions />
-        <ModulesSuggestions />
-        <LessonSuggestions />
+        <AllModulesSuggestions />
+        <AllLessonsSuggestions />
       </main>
     </>
   );

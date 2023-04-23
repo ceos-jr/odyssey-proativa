@@ -88,4 +88,18 @@ export const adminRouter = router({
   delModule: adminProcedure.input(z.string()).mutation(({ ctx, input }) => {
     return ctx.prisma.module.delete({ where: { id: input } });
   }),
+  //TODO:VAMO DIVIDIR AQUI
+  getUser: adminProcedure.input(z.string()).query(({ ctx, input }) => {
+    return ctx.prisma.user.findUnique({
+      where: { id: input },
+    });
+  }),
+  getUserModuleList: adminProcedure
+    .input(z.string())
+    .query(({ ctx, input }) => {
+      return ctx.prisma.userModuleProgress.findMany({
+        where: { userId: input },
+        include: { module: { select: { name: true } } },
+      });
+    }),
 });

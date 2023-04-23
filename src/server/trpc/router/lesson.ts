@@ -60,4 +60,14 @@ export const lessonRouter = router({
         data: { readed: input.readed },
       });
     }),
+  getUserLesSuggestions: adminProcedure
+    .input(z.string())
+    .query(({ ctx, input }) => {
+      return ctx.prisma.lesSuggestion.findMany({
+        where: { userId: input },
+        include: { lesson: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      });
+    }),
 });

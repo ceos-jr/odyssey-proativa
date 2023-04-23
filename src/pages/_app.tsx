@@ -15,7 +15,7 @@ const poppins = Poppins({
   subsets: ["latin"],
 });
 
-const colors = {
+export const colors = {
   primary: "#2a3756",
   secondary: "#fad20a",
   terciary: "#2d3e50",
