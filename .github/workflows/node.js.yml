@@ -9,8 +9,8 @@ env:
   DATABASE_URL: "postgres://jonathan:pass@localhost:5432/capacitacao"
   NEXTAUTH_SECRET: "dummysecret"
   NEXTAUTH_URL: "http://localhost:3000"
-  GITHUB_CLIENT_ID: 123
-  GITHUB_CLIENT_SECRET: 123
+  GOOGLE_CLIENT_ID: 123
+  GOOGLE_CLIENT_SECRET: 123
 
 jobs:
   build:

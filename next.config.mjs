@@ -15,7 +15,11 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["img.youtube.com", "avatars.githubusercontent.com"],
+    domains: [
+      "img.youtube.com",
+      "avatars.githubusercontent.com",
+      "lh3.googleusercontent.com",
+    ],
   },
 };
 
