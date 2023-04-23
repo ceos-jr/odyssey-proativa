@@ -6,7 +6,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  useToast,
 } from "@chakra-ui/react";
 import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
 import DashboardLayout from "@components/Layout/DashboardLayout";
@@ -22,6 +21,7 @@ import { type Control, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { BiReset } from "react-icons/bi";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
+import useCustomToast from "@hooks/useCustomToast";
 
 export const LessonWUtils = z.object({
   id: z.string(),
@@ -80,24 +80,13 @@ const Edit = () => {
     mode: "all",
   });
 
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
   const mutation = trpc.lesson.updateLessonWUtils.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível editar o tópico",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível editar o tópico");
     },
     onSuccess() {
-      toast({
-        title: "O tópico foi atualizado com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("O tópico foi atualizado com sucesso");
       router.push(`/lessons/${lessonId}`);
     },
   });

@@ -42,7 +42,7 @@ const UserSubmissions = () => {
   const taskModal = useDisclosure();
   const cancelRef = useRef(null);
   return (
-    <>
+    <div className="flex flex-col gap-8 rounded-lg bg-white p-8 shadow-lg">
       {!lastSubmissions.data ? (
         <UserSubmissionSkeleton />
       ) : (
@@ -70,11 +70,11 @@ const UserSubmissions = () => {
           />
           <Heading>Envio dos usuários</Heading>
           {lastSubmissions.data.length === 0 ? (
-            <div className="flex h-32 items-center justify-center rounded-lg bg-white shadow-lg">
+            <div className="flex h-32 items-center justify-center">
               <Text>Nenhuma submissão recente foi encontrada</Text>
             </div>
           ) : (
-            <TableContainer className="rounded-lg bg-white shadow-lg">
+            <TableContainer>
               <Table>
                 <Thead>
                   <Tr>
@@ -161,7 +161,7 @@ const UserSubmissions = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 

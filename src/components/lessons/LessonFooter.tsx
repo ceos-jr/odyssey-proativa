@@ -1,4 +1,5 @@
-import { Button, useToast } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import useCustomToast from "@hooks/useCustomToast";
 import { type RouterTypes, trpc } from "@utils/trpc";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -9,26 +10,16 @@ type OutputProcedure = NonNullable<
 >;
 
 const LessonFooter = (props: OutputProcedure) => {
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
   const router = useRouter();
   const [posting, setPosting] = useState(false);
   const compLesson = trpc.user.compLesson.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível finalizar o tópico",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível finalizar o tópico");
     },
     onSuccess() {
-      toast({
-        title: "O tópico foi finalizado com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("O tópico foi finalizado com sucesso");
       if (props.next) router.push(`/lessons/${props.next}`);
     },
     onSettled() {
@@ -37,21 +28,10 @@ const LessonFooter = (props: OutputProcedure) => {
   });
   const finishModule = trpc.user.finishModule.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível concluir o módulo",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível concluir o módulo");
     },
     onSuccess() {
-      toast({
-        title: "O módulo foi concluido com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("O módulo foi concluido com sucesso");
       router.push(`/modules/${props.moduleId}`);
     },
     onSettled() {

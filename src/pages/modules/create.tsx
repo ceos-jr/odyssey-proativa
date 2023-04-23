@@ -6,7 +6,6 @@ import {
   Heading,
   Icon,
   Input,
-  useToast,
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import Head from "next/head";
@@ -21,6 +20,7 @@ import {
 } from "react-icons/ai";
 import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
+import useCustomToast from "@hooks/useCustomToast";
 
 export const FormSchema = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
@@ -56,24 +56,14 @@ const CreateModule = () => {
   });
 
   const router = useRouter();
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
   const createModWLessons = trpc.module.createModWLessons.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível criar o módulo",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível criar o módulo");
     },
     onSuccess() {
-      toast({
-        title: "O módulo foi criado com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("O módulo foi criado com sucesso");
       router.push("/modules");
     },
   });

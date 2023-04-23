@@ -6,7 +6,6 @@ import {
   AlertDialogFooter,
   AlertDialogContent,
   AlertDialogOverlay,
-  useToast,
   Button,
   Text,
   NumberInput,
@@ -15,6 +14,7 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
 } from "@chakra-ui/react";
+import useCustomToast from "@hooks/useCustomToast";
 import { trpc } from "@utils/trpc";
 import { useState } from "react";
 import { AiOutlineSend } from "react-icons/ai";
@@ -38,7 +38,7 @@ const SendGrade = ({
   onClose,
   cancelRef,
 }: SendGradeProps) => {
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
   const utils = trpc.useContext();
   const mutation = trpc.admin.attributeGrade.useMutation({
     async onMutate(data) {
@@ -51,22 +51,13 @@ const SendGrade = ({
     },
     onError(err, _, ctx) {
       utils.admin.getLatestSubmissions.setData(ctx?.prevData);
-      toast({
-        title: "Não foi possível atribuir uma nota",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível atribuir uma nota");
     },
     onSuccess() {
-      toast({
-        title: "A nota do usuário foi atualizada com sucesso",
-        description: `A atividade do ${username} teve uma nota atribuida.`,
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      });
+      showSuccessToast(
+        "A nota do usuário foi atualizada com sucesso",
+        `A atividade do ${username} teve uma nota atribuida.`
+      );
     },
   });
   const [grade, setGrade] = useState(3);

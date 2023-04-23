@@ -10,9 +10,9 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  useToast,
 } from "@chakra-ui/react";
 import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
+import useCustomToast from "@hooks/useCustomToast";
 import { type Task } from "@prisma/client";
 import { trpc } from "@utils/trpc";
 import { useState } from "react";
@@ -33,26 +33,18 @@ const SubmitTaskAlert = ({
   cancelRef,
   initialData,
 }: SubmitTaskAlertProps) => {
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
   const utils = trpc.useContext();
   const mutation = trpc.user.submitTask.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível submeter a atividade",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível submeter a atividade");
     },
     onSuccess() {
-      toast({
-        title: "A atividade foi submetida com sucesso",
-        description: `A atividade ${task?.name} foi submetida.`,
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      });
+      showSuccessToast(
+        "A atividade foi submetida com sucesso",
+        `A atividade ${task?.name} foi submetida.`
+      );
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       utils.user.getTasks4Less.refetch(task!.lessonId);
     },

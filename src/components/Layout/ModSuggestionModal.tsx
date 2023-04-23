@@ -12,9 +12,9 @@ import {
   ModalHeader,
   ModalOverlay,
   Textarea,
-  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import useCustomToast from "@hooks/useCustomToast";
 import { trpc } from "@utils/trpc";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -51,24 +51,14 @@ const ModSuggestionModal = ({
     mode: "onBlur",
   });
 
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
   const createSugg = trpc.user.createModSugg.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível enviar a sugestão",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível enviar a sugestão");
     },
     onSuccess() {
-      toast({
-        title: "A sugestão foi enviada com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("A sugestão foi enviada com sucesso");
     },
   });
 
