@@ -36,7 +36,10 @@ type ModSugg = RouterTypes["admin"]["getModSuggestions"]["output"][0];
 type LessSugg = RouterTypes["admin"]["getLessSuggestions"]["output"][0];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isModule = (x: any): x is ModSugg => "module" in x;
+const isModule = (x: any): x is ModSugg => {
+  if (x) return "module" in x;
+  return false;
+};
 
 interface ISuggestionTableProps {
   suggestions: ModSugg[] | LessSugg[];
