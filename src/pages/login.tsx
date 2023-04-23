@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-undef */
 import { signIn } from "next-auth/react";
-import { AiFillGithub } from "react-icons/ai";
+import { FcGoogle } from "react-icons/fc";
 import { Text } from "@chakra-ui/react";
 import Head from "next/head";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
@@ -23,11 +23,13 @@ const Login = () => {
           height={100}
           width={500}
         />
-        <AiFillGithub
-          className="h-16 w-16 cursor-pointer transition-colors hover:text-secondary"
-          onClick={() => signIn("github")}
-        />
-        <Text>Login com o Github</Text>
+        <button
+          className="flex items-center justify-center gap-2 rounded-lg border-2 border-gray-100 px-4 py-2 shadow-lg transition-all hover:scale-110 hover:bg-primary hover:text-white"
+          onClick={() => signIn("google")}
+        >
+          <FcGoogle className="h-10 w-10" />
+          <Text>Login com o Google</Text>
+        </button>
         <ChangeRoleFooter />
       </div>
     </>

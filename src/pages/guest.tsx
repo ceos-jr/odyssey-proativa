@@ -3,6 +3,9 @@ import ChangeRoleFooter from "@components/Layout/ChangeRoleFooter";
 import Head from "next/head";
 import Image from "next/image";
 import LogoExtended from "../../public/logo_extended.png";
+import { type GetServerSideProps } from "next";
+import { getServerAuthSession } from "src/server/common/get-server-auth-session";
+import { Roles } from "@utils/constants";
 
 const Guest = () => {
   return (
@@ -27,3 +30,22 @@ const Guest = () => {
 };
 
 export default Guest;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerAuthSession(context);
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  } else if (session.user?.role !== Roles.Guest) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  } else return { props: {} };
+};
