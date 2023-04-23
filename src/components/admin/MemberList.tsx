@@ -23,7 +23,6 @@ import {
   AlertDialogContent,
   useDisclosure,
   AlertDialogOverlay,
-  useToast,
 } from "@chakra-ui/react";
 import { trpc } from "@utils/trpc";
 import { FaUserCircle } from "react-icons/fa";
@@ -33,9 +32,11 @@ import React, { useState } from "react";
 import { Roles } from "@utils/constants";
 import { AiOutlineEye } from "react-icons/ai";
 import NextLink from "next/link";
+import useCustomToast from "@hooks/useCustomToast";
 
 const MemberList = () => {
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
   const utils = trpc.useContext();
   const allMembers = trpc.admin.getAllMembers.useQuery();
   const delUserMut = trpc.admin.delUser.useMutation({
@@ -48,22 +49,13 @@ const MemberList = () => {
     },
     onError(err, _, ctx) {
       utils.admin.getAllMembers.setData(ctx?.prevData);
-      toast({
-        title: "Não foi possível deletar o usuário",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível deletar o usuário");
     },
     onSuccess() {
-      toast({
-        title: "Usuário deletado com sucesso.",
-        description: `O usuário ${delUser.name} foi deletado da capacitação.`,
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      });
+      showSuccessToast(
+        "Usuário deletado com sucesso.",
+        `O usuário ${delUser.name} foi deletado da capacitação.`
+      );
     },
   });
 

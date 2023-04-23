@@ -13,7 +13,6 @@ import {
   FormErrorMessage,
   FormControl,
   Textarea,
-  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -21,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { type RouterTypes, trpc } from "@utils/trpc";
 import { type Task } from "@prisma/client";
+import useCustomToast from "@hooks/useCustomToast";
 
 export const TasksFormSchema = z.object({
   id: z.string(),
@@ -59,6 +59,8 @@ const TaskForm = ({
     mode: "onBlur",
   });
 
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+
   useEffect(() => {
     if (initialValues) {
       const tempData: TaskFormType = {
@@ -71,25 +73,13 @@ const TaskForm = ({
     }
   }, [initialValues]);
 
-  const toast = useToast();
   const utils = trpc.useContext();
   const createTask = trpc.task.createTask.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível criar a atividade",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível criar a atividade");
     },
     onSuccess() {
-      toast({
-        title: "A atividade foi criada com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("A atividade foi criada com sucesso");
       utils.lesson.getLessTasks.refetch({ lessonId });
     },
   });
@@ -108,21 +98,10 @@ const TaskForm = ({
     },
     onError(err, _, ctx) {
       utils.lesson.getLessTasks.setData(ctx?.prevData, { lessonId });
-      toast({
-        title: "Não foi possível atualizar a atividade",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível atualizar a atividade");
     },
     onSuccess() {
-      toast({
-        title: "A atividade foi atualizada com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("A atividade foi atualizada com sucesso");
     },
   });
 

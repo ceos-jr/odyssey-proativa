@@ -5,12 +5,12 @@ import {
   Skeleton,
   SkeletonText,
   Button,
-  useToast,
   useDisclosure,
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import ModSuggestionModal from "@components/Layout/ModSuggestionModal";
 import LessonsList from "@components/modules/LessonsList";
+import useCustomToast from "@hooks/useCustomToast";
 import { Role } from "@prisma/client";
 import { trpc } from "@utils/trpc";
 import { useSession } from "@utils/useSession";
@@ -22,7 +22,7 @@ import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
 const UniqueModule = () => {
   const { data: session } = useSession();
   const [posting, setPosting] = useState(false);
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
 
@@ -34,41 +34,19 @@ const UniqueModule = () => {
   const { data: userRel } = trpc.module.getUserModStats.useQuery({ moduleId });
   const delModule = trpc.admin.delModule.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível deletear o módulo",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível deletar o módulo");
     },
     onSuccess() {
-      toast({
-        title: "O módulo foi deletado com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("O módulo foi deletado com sucesso");
       router.push("/modules");
     },
   });
   const subsToModule = trpc.module.subsToModule.useMutation({
     onError(err) {
-      toast({
-        title: "Não foi possível se inscrever no módulo",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível se inscrever no módulo");
     },
     onSuccess() {
-      toast({
-        title: "Você foi inscrito com sucesso no módulo",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("Você foi inscrito com sucesso no módulo");
       utils.module.getUserModStats.refetch({ moduleId });
     },
     onSettled() {
@@ -85,21 +63,10 @@ const UniqueModule = () => {
     },
     onError(err, _, ctx) {
       utils.module.getUserModStats.setData(ctx?.prevData);
-      toast({
-        title: "Não foi possível se desincrever do módulo",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível se desincrever do módulo");
     },
     onSuccess() {
-      toast({
-        title: "Você foi desenscrevido com sucesso no módulo",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("Você foi desenscrevido com sucesso no módulo");
     },
     onSettled() {
       setPosting(false);

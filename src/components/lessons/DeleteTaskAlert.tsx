@@ -7,8 +7,8 @@ import {
   AlertDialogFooter,
   AlertDialogContent,
   AlertDialogOverlay,
-  useToast,
 } from "@chakra-ui/react";
+import useCustomToast from "@hooks/useCustomToast";
 import { trpc } from "@utils/trpc";
 import React from "react";
 
@@ -28,7 +28,7 @@ const DeleteTaskAlert = ({
   lessonId,
 }: DeleteTaskAlertProps) => {
   const cancelRef = React.useRef(null);
-  const toast = useToast();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
 
   const utils = trpc.useContext();
   const deleteTask = trpc.task.deleteTask.useMutation({
@@ -42,21 +42,10 @@ const DeleteTaskAlert = ({
     },
     onError(err, _, ctx) {
       utils.lesson.getLessTasks.setData(ctx?.prevData, { lessonId });
-      toast({
-        title: "Não foi possível deletar a atividade",
-        description: `Erro: ${err.message}`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
+      showErrorToast(err.message, "Não foi possível deletar a atividade");
     },
     onSuccess() {
-      toast({
-        title: "A atividade foi deletada com sucesso",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showSuccessToast("A atividade foi deletada com sucesso");
     },
   });
 
