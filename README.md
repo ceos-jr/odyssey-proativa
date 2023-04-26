@@ -20,7 +20,7 @@ To configure your database, run these commands:
 
 - ```bash
   docker compose start db
-  ````
+  ```
 
 - ```bash
   npx prisma db push
@@ -32,9 +32,9 @@ To configure your database, run these commands:
 
 ## Running the project
 
-If you've already done the initial configuration, just run the `npm run dev` command and see the platform running on `http://localhost:3000`. 
+If you've already done the initial configuration, just run the `npm run dev` command and see the platform running on `http://localhost:3000`.
 
-  - If you are going to use login functionality with google, set the environment variable NEXT_PUBLIC_MOCK_NEXT_AUTH to `false`.
+- If you are going to use login functionality with google, set the environment variable NEXT_PUBLIC_MOCK_NEXT_AUTH to `false`.
 
 ## About the project stack
 

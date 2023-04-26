@@ -33,8 +33,8 @@ export const adminRouter = router({
     return ctx.prisma.user.count({
       where: { NOT: { role: Roles.Guest } },
       /*
-        *-> Nessa contagem usuarios com role do estado de role "GUEST" não ser considerados.
-      */
+       *-> Nessa contagem usuarios com role do estado de role "GUEST" não ser considerados.
+       */
     });
   }),
 
@@ -59,8 +59,8 @@ export const adminRouter = router({
     return ctx.prisma.user.findMany({
       where: { role: Roles.Guest },
       /*
-        *-> Nessa contagem usuarios com role do estado de role "GUEST" são únicos considerados.
-      */
+       *-> Nessa contagem usuarios com role do estado de role "GUEST" são únicos considerados.
+       */
     });
   }),
   getModCount: adminProcedure.query(({ ctx }) => {
@@ -145,7 +145,7 @@ export const adminRouter = router({
   aproveGuest: adminProcedure
     .input(z.string())
     .mutation(({ ctx, input: id }) => {
-    /*
+      /*
     - aproveGuest: Pede ao banco de dados para atualizar* o estado de role de um usuario** de
       "Guest" para "MEMBER".
 
