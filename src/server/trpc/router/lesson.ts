@@ -10,7 +10,6 @@ import {
   protectedProcedure,
 } from "../trpc";
 
-
 /* lessonRouter é um objeto com os endpoints getLesson, getLessTasks etc. para lidar com as requisições relacionadas às aulas */
 export const lessonRouter = router({
   /* O endpoint getLesson recebe um parâmetro lessonId como entrada e usa a função findUnique do Prisma para buscar uma lição com base nesse ID. Ele retorna uma lição específica e é uma função pública (pode ser acessada por qualquer usuário) */
@@ -23,7 +22,7 @@ export const lessonRouter = router({
       });
     }),
 
-    /* O endpoint getLessTasks recebe lessonId como entrada e usa a função findMany do Prisma para buscar todas as tarefas relacionadas a uma lição com base no ID. Ele retorna as tarefas de uma lição específicas e é uma função pública. */
+  /* O endpoint getLessTasks recebe lessonId como entrada e usa a função findMany do Prisma para buscar todas as tarefas relacionadas a uma lição com base no ID. Ele retorna as tarefas de uma lição específicas e é uma função pública. */
   getLessTasks: publicProcedure
     .input(z.object({ lessonId: z.string() }))
     .query(({ ctx, input }) => {
@@ -32,7 +31,7 @@ export const lessonRouter = router({
       });
     }),
 
-    /* A rota updateLessonWUtils é atribuída à função 'mutation' do objeto adminProcedure (só pode ser acessada pelo administrador). Esse endpoint vai atualizar a lição (nome, texto, vídeos, links e projetos) e as operações createMany criam vários registros ligados a esses campos de uma só vez. */
+  /* A rota updateLessonWUtils é atribuída à função 'mutation' do objeto adminProcedure (só pode ser acessada pelo administrador). Esse endpoint vai atualizar a lição (nome, texto, vídeos, links e projetos) e as operações createMany criam vários registros ligados a esses campos de uma só vez. */
   updateLessonWUtils: adminProcedure
     .input(LessonWUtils)
     .mutation(({ input, ctx }) => {
@@ -52,7 +51,7 @@ export const lessonRouter = router({
         }),
       ]);
     }),
-    /* Esse trecho define um endpoint que é uma operação de consulta ('query') permitida apenas para o administrador e atualizará as informações de vídeo. */
+  /* Esse trecho define um endpoint que é uma operação de consulta ('query') permitida apenas para o administrador e atualizará as informações de vídeo. */
   updateVideo: adminProcedure.input(LessonWUtils).query(({ input, ctx }) => {
     return ctx.prisma.lesson.update({
       where: { id: input.id },
