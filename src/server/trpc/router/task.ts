@@ -1,4 +1,4 @@
-import { TasksFormSchema } from "@components/lessons/TaskForm";
+import { TasksFormSchema } from "@utils/schemas";
 import { TaskStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
