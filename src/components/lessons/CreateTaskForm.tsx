@@ -15,43 +15,28 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { type RouterTypes, trpc } from "@utils/trpc";
-import { type Task } from "@prisma/client";
+import { trpc } from "@utils/trpc";
 import useCustomToast from "@hooks/useCustomToast";
-
-export const TasksFormSchema = z.object({
-  id: z.string(),
-  lessonId: z.string(),
-  name: z.string().min(1, { message: "O nome da atividade é obrigatório" }),
-  richText: z
-    .string()
-    .min(1, { message: "O conteúdo da atividade é necessário" }),
-});
+import { TasksFormSchema } from "@utils/schemas";
 
 export type TaskFormType = z.infer<typeof TasksFormSchema>;
 
-interface EditAddTaskFormProps {
+interface CreateTaskFormProps {
   isOpen: boolean;
   onClose: () => void;
-  initialValues?: RouterTypes["lesson"]["getLessTasks"]["output"][0] | null;
   lessonId: string;
-  setFormData: React.Dispatch<React.SetStateAction<Task | null | undefined>>;
 }
 
-const TaskForm = ({
+const CreateTaskForm = ({
   isOpen,
   onClose,
-  initialValues,
   lessonId,
-  setFormData,
-}: EditAddTaskFormProps) => {
+}: CreateTaskFormProps) => {
   const {
     handleSubmit,
     register,
-    reset,
     formState: { errors },
   } = useForm<TaskFormType>({
     resolver: zodResolver(TasksFormSchema),
@@ -60,18 +45,6 @@ const TaskForm = ({
   });
 
   const { showErrorToast, showSuccessToast } = useCustomToast();
-
-  useEffect(() => {
-    if (initialValues) {
-      const tempData: TaskFormType = {
-        id: initialValues.id,
-        name: initialValues.name,
-        richText: initialValues.richText,
-        lessonId: lessonId,
-      };
-      reset(tempData);
-    }
-  }, [initialValues]);
 
   const utils = trpc.useContext();
   const createTask = trpc.task.createTask.useMutation({
@@ -83,31 +56,9 @@ const TaskForm = ({
       utils.lesson.getLessTasks.refetch({ lessonId });
     },
   });
-  const updateTask = trpc.task.updateTask.useMutation({
-    async onMutate(data) {
-      await utils.lesson.getLessTasks.cancel({ lessonId });
-      const prevData = utils.lesson.getLessTasks.getData({
-        lessonId,
-      }) as Task[];
-      const filteredData = prevData.filter((task) => task.id !== data.id);
-      const dummyData: Task = { ...data, createdAt: new Date() };
-      utils.lesson.getLessTasks.setData([...filteredData, dummyData], {
-        lessonId,
-      });
-      return { prevData };
-    },
-    onError(err, _, ctx) {
-      utils.lesson.getLessTasks.setData(ctx?.prevData, { lessonId });
-      showErrorToast(err.message, "Não foi possível atualizar a atividade");
-    },
-    onSuccess() {
-      showSuccessToast("A atividade foi atualizada com sucesso");
-    },
-  });
 
   const onSubmit = (data: TaskFormType) => {
-    initialValues ? updateTask.mutate(data) : createTask.mutate(data);
-    setFormData(null);
+    createTask.mutate(data);
   };
 
   return (
@@ -115,9 +66,7 @@ const TaskForm = ({
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>
-          {initialValues
-            ? `Editando Atividade ${initialValues.name}`
-            : "Criando atividade"}
+          Criar Atividade
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -151,14 +100,14 @@ const TaskForm = ({
             Fechar
           </Button>
           <Button
-            colorScheme="red"
+            colorScheme="whatsapp"
             type="submit"
             form="form"
             onClick={() => {
               onClose();
             }}
           >
-            {initialValues ? "Atualizar" : "Criar"}
+            Criar
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -166,4 +115,4 @@ const TaskForm = ({
   );
 };
 
-export default TaskForm;
+export default CreateTaskForm;

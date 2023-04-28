@@ -17,19 +17,27 @@ import { AiOutlinePlus } from "react-icons/ai";
 import React, { useState } from "react";
 import { type RouterTypes, trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
-import TaskForm from "@components/lessons/TaskForm";
+import CreateTaskForm from "@components/lessons/CreateTaskForm";
 import DeleteTaskAlert from "@components/lessons/DeleteTaskAlert";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
+import EditTaskForm from "@components/lessons/EditTaskForm";
 
 const CreateTask = () => {
   const lessonId = useRouter().query.lessonId as string;
   const tasks = trpc.lesson.getLessTasks.useQuery({ lessonId });
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenEdit,
+    onOpen: onOpenEdit,
+    onClose: onCloseEdit,
+  } = useDisclosure();
   const {
     isOpen: isOpenDel,
     onOpen: onOpenDel,
     onClose: onCloseDel,
   } = useDisclosure();
+
   const [formData, setFormData] = useState<
     RouterTypes["lesson"]["getLessTasks"]["output"][0] | null
   >();
@@ -58,17 +66,24 @@ const CreateTask = () => {
               <Button
                 leftIcon={<AiOutlinePlus />}
                 colorScheme="whatsapp"
-                onClick={onOpen}
+                onClick={() => {
+                  setFormData(null)
+                  onOpen()
+                }}
               >
                 Nova Atividade
               </Button>
             </div>
-            <TaskForm
+            <CreateTaskForm
               isOpen={isOpen}
               onClose={onClose}
               lessonId={lessonId}
+            />
+            <EditTaskForm
+              isOpen={isOpenEdit}
+              onClose={onCloseEdit}
+              lessonId={lessonId}
               initialValues={formData}
-              setFormData={setFormData}
             />
             <DeleteTaskAlert
               isOpen={isOpenDel}
@@ -99,7 +114,7 @@ const CreateTask = () => {
                       <Button
                         onClick={() => {
                           setFormData(task);
-                          onOpen();
+                          onOpenEdit();
                         }}
                         colorScheme="gray"
                       >
