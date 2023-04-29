@@ -10,8 +10,10 @@ import {
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import ModSuggestionModal from "@components/Layout/ModSuggestionModal";
 import LessonsList from "@components/modules/LessonsList";
+import SingleModSuggestionList from "@components/modules/SingleModSuggestionList";
 import useCustomToast from "@hooks/useCustomToast";
 import { Role } from "@prisma/client";
+import { Roles } from "@utils/constants";
 import { trpc } from "@utils/trpc";
 import { useSession } from "@utils/useSession";
 import Head from "next/head";
@@ -137,6 +139,9 @@ const UniqueModule = () => {
             </div>
             <Text className="my-4">{moduleData?.description}</Text>
             <LessonsList lessons={moduleData.lessons} userModRel={userRel} />
+            {session?.user?.role === Roles.Admin ? (
+              <SingleModSuggestionList moduleId={moduleId} />
+            ) : null}
           </>
         )}
       </main>
