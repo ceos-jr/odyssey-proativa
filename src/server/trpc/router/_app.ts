@@ -4,6 +4,7 @@ import { authRouter } from "./auth";
 import { gradesRouter } from "./grades";
 import { lessonRouter } from "./lesson";
 import { moduleRouter } from "./modules";
+import { moduleSuggestion } from "./mod_sug";
 import { taskRouter } from "./task";
 import { userRouter } from "./user";
 
@@ -15,6 +16,7 @@ export const appRouter = router({
   admin: adminRouter,
   task: taskRouter,
   grades: gradesRouter,
+  modSug: moduleSuggestion,
 });
 
 // export type definition of API
