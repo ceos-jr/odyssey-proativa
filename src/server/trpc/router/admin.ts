@@ -149,8 +149,8 @@ export const adminRouter = router({
     - aproveGuest: Pede ao banco de dados para atualizar* o estado de role de um usuario** de
       "Guest" para "MEMBER".
 
-      *-> Nesse caso atualizar o estado de role de um usuario é uma "mutation" do prisma, ou seja uma operação 
-        que muda valores no banco de dados.  
+      *-> Nesse caso atualizar é uma "mutation" do prisma, ou seja uma operação que muda valores
+     no banco de dados.  
     */
       return ctx.prisma.user.update({
         data: { role: Roles.Member },
@@ -170,8 +170,8 @@ export const adminRouter = router({
       /*
         - attributeGrade: Pede ao banco de dados para atualizar* o progresso** de uma ativiade de um usuario**. 
 
-        *-> Nesse caso atualizar o o progresso de atividade de um usuario é uma "mutation" do prisma, ou seja uma 
-          operação que muda valores no banco de dados.  
+        *-> Nesse caso atualizar é uma "mutation" do prisma, ou seja uma operação que muda valores
+     no banco de dados.  
       */
       return ctx.prisma.userTaskProgress.update({
         where: {
