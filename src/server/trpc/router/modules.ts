@@ -53,7 +53,7 @@ export const moduleRouter = router({
               name: true,
               tasks: { select: { id: true } },
             },
-            orderBy: { index: "asc" }, 
+            orderBy: { index: "asc" },
           },
         },
         /*
@@ -187,7 +187,8 @@ export const moduleRouter = router({
         * -> Nesse caso criar e atualizar são operações de "mutation" do prisma, ou seja, operações que mudam valores
           no banco de dados.
       */
-      const resp = await ctx.prisma.module.create({ // 1ª passo ocorre aqui 
+      const resp = await ctx.prisma.module.create({
+        // 1ª passo ocorre aqui
         data: {
           name: input.name,
           description: input.description,
@@ -198,9 +199,10 @@ export const moduleRouter = router({
           },
         },
         select: { lessons: true }, // informa que os tópicos devem ser retornados.
-      }); 
+      });
 
-      const data = resp.lessons.map((less, i, arr) => { // 2ª passo ocorre aqui 
+      const data = resp.lessons.map((less, i, arr) => {
+        // 2ª passo ocorre aqui
         /*
           -> As operações nesse escopo não afetam o banco de dados, logo chamaremos
             qualquer tópico trabalhado aqui de tópico_local para ficar mais claro.
@@ -226,7 +228,8 @@ export const moduleRouter = router({
         return { id: less.id, next: less.next, previous: less.previous }; // retorna para variavel data.
       });
 
-      return ctx.prisma.$transaction(// 3ª passo ocorre aqui 
+      return ctx.prisma.$transaction(
+        // 3ª passo ocorre aqui
         /* 
           - $transaction: É uma forma de transacionar dados com banco de maneira que ou todas as operçôes requisitadas
             são um sucesso ou todas são um fracasso. Impedindo que informações interdepentes fiquem com valor não esperado
@@ -258,7 +261,7 @@ export const moduleRouter = router({
   getUserModSuggestions: adminProcedure
     .input(z.string())
     .query(({ ctx, input }) => {
-       /*
+      /*
       - getUserModSuggestions: Pede ao banco de dados para encontar sugestões aos 
         modulos de um usuario específico**.
           -> Esse processo é exclusivo para administradores.
