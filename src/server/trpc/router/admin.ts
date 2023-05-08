@@ -157,7 +157,7 @@ export const adminRouter = router({
       where: { id: input },
     });
 
-    if (userToVerify.role !== Roles.Admin) { // Impede que um usuario que é admin seja deletado.
+    if (userToVerify?.role !== Roles.Admin) { // Impede que um usuario que é admin seja deletado.
       return ctx.prisma.user.delete({
         where: { id: input },
         /*

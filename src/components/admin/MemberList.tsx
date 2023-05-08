@@ -45,12 +45,12 @@ const MemberList = () => {
     async onMutate(userId) {
       await utils.admin.getAllMembers.cancel();
       const prevData = utils.admin.getAllMembers.getData();
-      const filtData = prevData?.forEach((user) => {
+      prevData?.forEach((user) => {
         if (user.id === userId) {
-          user.role = 'ADMIN';
+          user.role = "ADMIN";
         }
     });
-      utils.admin.getAllMembers.setData(filtData);
+      utils.admin.getAllMembers.setData(prevData);
       return { prevData };
     },
     onError(err, _, ctx) {
