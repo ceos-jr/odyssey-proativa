@@ -34,7 +34,6 @@ import { AiOutlineEye } from "react-icons/ai";
 import NextLink from "next/link";
 import useCustomToast from "@hooks/useCustomToast";
 
-
 const MemberList = () => {
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
@@ -49,7 +48,7 @@ const MemberList = () => {
         if (user.id === userId) {
           user.role = "ADMIN";
         }
-    });
+      });
       utils.admin.getAllMembers.setData(prevData);
       return { prevData };
     },
@@ -87,7 +86,10 @@ const MemberList = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [delUser, setDelUser] = useState({ name: "", id: "" });
-  const [promoteUserToAdmin, setPromoteUserToAdmin] = useState({ name: "", id: "" });
+  const [promoteUserToAdmin, setPromoteUserToAdmin] = useState({
+    name: "",
+    id: "",
+  });
   const cancelRef = React.useRef(null);
 
   return (
@@ -108,7 +110,7 @@ const MemberList = () => {
             isCentered
           >
             <AlertDialogOverlay />
-        
+
             <AlertDialogContent>
               <AlertDialogHeader>
                 Deletar usuário {delUser.name}?
@@ -190,7 +192,7 @@ const MemberList = () => {
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />
                           <MenuList>
-                          {mem.role === Roles.Member && (
+                            {mem.role === Roles.Member && (
                               <MenuItem
                                 icon={<FaUserCircle />}
                                 onClick={() => {
@@ -198,7 +200,7 @@ const MemberList = () => {
                                     name: mem.name as string,
                                     id: mem.id,
                                   });
-                                  promoteUserToAdminMut.mutate(mem.id)
+                                  promoteUserToAdminMut.mutate(mem.id);
                                 }}
                               >
                                 Transformar em Admin
