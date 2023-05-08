@@ -34,11 +34,37 @@ import { AiOutlineEye } from "react-icons/ai";
 import NextLink from "next/link";
 import useCustomToast from "@hooks/useCustomToast";
 
+
 const MemberList = () => {
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
   const utils = trpc.useContext();
   const allMembers = trpc.admin.getAllMembers.useQuery();
+
+  const promoteUserToAdminMut = trpc.admin.PromoteToAdmin.useMutation({
+    async onMutate() {
+      await utils.admin.getAllMembers.cancel();
+      const prevData = utils.admin.getAllMembers.getData();
+      const filtData = prevData?.filter((user) => {
+        if (user.id === promoteUserToAdmin.id) {
+          user.role = 'admin';
+        }
+    });
+      utils.admin.getAllMembers.setData(filtData);
+      return { prevData };
+    },
+    onError(err, _, ctx) {
+      utils.admin.getAllMembers.setData(ctx?.prevData);
+      showErrorToast(err.message, "Não foi possível promover o usuário");
+    },
+    onSuccess() {
+      showSuccessToast(
+        "Usuário agora é administrador",
+        `O usuário ${promoteUserToAdmin.name} foi promovido a administrador.`
+      );
+    },
+  });
+
   const delUserMut = trpc.admin.delUser.useMutation({
     async onMutate() {
       await utils.admin.getAllMembers.cancel();
@@ -61,6 +87,7 @@ const MemberList = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [delUser, setDelUser] = useState({ name: "", id: "" });
+  const [promoteUserToAdmin, setPromoteUserToAdmin] = useState({ name: "", id: "" });
   const cancelRef = React.useRef(null);
 
   return (
@@ -81,7 +108,7 @@ const MemberList = () => {
             isCentered
           >
             <AlertDialogOverlay />
-
+        
             <AlertDialogContent>
               <AlertDialogHeader>
                 Deletar usuário {delUser.name}?
@@ -163,6 +190,20 @@ const MemberList = () => {
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />
                           <MenuList>
+                          {mem.role === Roles.Member && (
+                              <MenuItem
+                                icon={<FaUserCircle />}
+                                onClick={() => {
+                                  setPromoteUserToAdmin({
+                                    name: mem.name as string,
+                                    id: mem.id,
+                                  });
+                                  promoteUserToAdminMut.mutate(mem.id)
+                                }}
+                              >
+                                Transformar em Admin
+                              </MenuItem>
+                            )}
                             {mem.role !== Roles.Admin && (
                               <MenuItem
                                 icon={<BsTrash />}

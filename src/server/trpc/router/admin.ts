@@ -1,7 +1,7 @@
 import { Roles, TaskStatus } from "@utils/constants";
 import { z } from "zod";
 import { router, adminProcedure } from "../trpc";
-
+import { TRPCError } from "@trpc/server";
 /* Imports:
   Roles, TaskStatus from @utils/constants
     - @utils/constants: é onde são guardadas constantes simples da aplicação.
@@ -18,13 +18,24 @@ import { router, adminProcedure } from "../trpc";
     - router: Define os endpoints da aplicação. 
     - adminProcedure: Define o procedimento de admin, nesse caso ele confere se a sessão do usuario é valida 
       e se o usuario tem a role de "ADMIN" para permitir o acesso.
- */
+
+  TRPCError from "@trpc/server": 
+    - É usado para retornar um erro no servidor TRPC.
+  */
 
 export const adminRouter = router({
   /* adminRouter: Aqui são definidos os endpoints assosciados ao Admin.
     ~ Para entender melhor as requisições feitas ao banco de dados olhe o arquivo schema.prisma em 
       "../../../../prisma/schema.prisma, nele a estrura dos dados é definida."
   */
+
+  PromoteToAdmin: adminProcedure.input(z.string())
+  .mutation(({ ctx, input: id }) => {
+    return ctx.prisma.user.update({
+      data: { role: Roles.Admin },
+      where: { id: id }
+    });
+  }),
 
   getUserCount: adminProcedure.query(({ ctx }) => {
     /*
@@ -126,21 +137,33 @@ export const adminRouter = router({
       */
     });
   }),
-  delUser: adminProcedure.input(z.string()).mutation(({ ctx, input }) => {
+  delUser: adminProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
     /*
     - delUser: Pede que o banco de dados delete* um usuario**.
 
     *-> Nesse caso deletar é uma "mutation" do prisma, ou seja uma operação que muda valores
      no banco de dados.  
     */
-    return ctx.prisma.user.delete({
+    const verifyValidation = await ctx.prisma.user.findUnique({
       where: { id: input },
-      /*
-        **-> Nesse caso o usuario deletado é aquele que possui o id com valor igual a input***.
-
-        ***-> input é um atributo fornecido a esse procedimiento que possui o tipo z.string().
-      */
     });
+
+    if (verifyValidation.user?.role) {
+      if (verifyValidation.user.role !== Roles.Admin) {
+        return ctx.prisma.user.delete({
+          where: { id: input },
+          /*
+            **-> Nesse caso o usuario deletado é aquele que possui o id com valor igual a input***.
+
+            ***-> input é um atributo fornecido a esse procedimiento que possui o tipo z.string().
+          */
+        });
+      } else {
+        throw new TRPCError({ code: "Um Administrador não pode ser removido." });
+      }
+    } else {
+      throw new TRPCError({ code: "???" });
+    }
   }),
   aproveGuest: adminProcedure
     .input(z.string())
