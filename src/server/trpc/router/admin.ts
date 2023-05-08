@@ -31,9 +31,18 @@ export const adminRouter = router({
 
   PromoteToAdmin: adminProcedure.input(z.string())
   .mutation(({ ctx, input: id }) => {
+    /*
+    - PromoteToAdmin: Pede para o banco de dados a atualizar* a posição de um usuario específico**.
+
+    * -> atualizar é uma "mutation" do prisma, mais específicamente um "update".
+
+    **-> Nesse caso o usuario específico é aquele que tem id igual ao input.
+    */
+
     return ctx.prisma.user.update({
       data: { role: Roles.Admin },
       where: { id: id }
+
     });
   }),
 
@@ -148,7 +157,7 @@ export const adminRouter = router({
       where: { id: input },
     });
 
-    if (userToVerify.role !== Roles.Admin) {
+    if (userToVerify.role !== Roles.Admin) { // Impede que um usuario que é admin seja deletado.
       return ctx.prisma.user.delete({
         where: { id: input },
         /*
