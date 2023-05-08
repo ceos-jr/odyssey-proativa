@@ -4,7 +4,7 @@
 // z: pacote que define os esquemas de validação dos objetos (garante que estejam no formato esperado pela aplicação)
 import { TaskStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod"; 
+import { z } from "zod";
 
 import { router, adminProcedure, protectedProcedure } from "../trpc";
 
@@ -14,7 +14,7 @@ import { router, adminProcedure, protectedProcedure } from "../trpc";
 // {number} cumulative_avg - A média cumulativa da turma naquele dia.
 
 export type CumulativeAvg = {
-  date_alias: string; 
+  date_alias: string;
   cumulative_avg: number;
 };
 
@@ -38,7 +38,6 @@ export type GradeFrequency = {
 // Duas rotas para distribuição de notas:
 // {Function} gradeDist - Retorna um array de distribuição de notas de todas as tasks completadas
 // {Function} gradeDistByUser - Retorna um array de distribuição de notas das tasks completadas de um usuário específico.
-
 
 // As notas são obtidas da tabela "UserTaskProgress", que contém o progresso do usuário em tarefas relacionadas ao curso.
 // As notas são filtradas pela coluna "status", que contém o estado da tarefa (completa ou incompleta), e pela coluna "completedAt", que contém a data em que a tarefa foi concluída.
@@ -81,7 +80,7 @@ export const gradesRouter = router({
         "completedAt" ASC;
     `;
     }),
-    //Disponível para usuário autenticado
+  //Disponível para usuário autenticado
   avg30Days: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       SELECT 
@@ -118,9 +117,9 @@ export const gradesRouter = router({
         "completedAt" ASC;
     `;
     }),
-    // A distribuição das notas é calculada usando a função width_bucket do SQL, que agrupa os valores em intervalos de tamanho fixo.
+  // A distribuição das notas é calculada usando a função width_bucket do SQL, que agrupa os valores em intervalos de tamanho fixo.
 
-    //Disponível apenas para admin
+  //Disponível apenas para admin
   gradeDist: adminProcedure.input(z.string().optional()).query(({ ctx }) => {
     return ctx.prisma.$queryRaw<GradeFrequency[]>`
       SELECT
@@ -176,5 +175,3 @@ export const gradesRouter = router({
     `;
     }),
 });
-
-
