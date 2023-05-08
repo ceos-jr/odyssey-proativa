@@ -1,8 +1,10 @@
+/*Importações: TasksFormSchema é o formulário responsável pela entrega das Tasks. TaskStatus é o dado utilizado para verificar o estado da Task. TRPCError é o tratamento de erro do tRPC que será utilizado nos endpoints. 'z' é uma biblioteca para validação de dados que valida os parâmetros dos endpoints.*/
 import { TasksFormSchema } from "@components/lessons/TaskForm";
 import { TaskStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+/*Importações: Funções e tipos definidos pelo tRPC que vão ser utilizados nos endpoints. */
 import { router, adminProcedure, protectedProcedure } from "../trpc";
 
 type TotalAndUnfCountByUser = {
@@ -10,6 +12,7 @@ type TotalAndUnfCountByUser = {
   finished: bigint;
 };
 
+/*O endpoint taskRouter é utilizado somente pelo admin para criar novas tasks. Dentro do método 'mutation', que é assíncrono, ele espera o banco de dados criar a task usando o método 'create' do Prisma.*/
 export const taskRouter = router({
   createTask: adminProcedure
     .input(TasksFormSchema)
@@ -22,11 +25,13 @@ export const taskRouter = router({
         },
       });
 
+      /*Dentro da rota Task, 'users' pega todos os usuários referente à uma lição específica utilizando o método 'findMany' do Prisma. */
       const users = await ctx.prisma.userLessonProgress.findMany({
         where: { lessonId: input.lessonId },
         select: { userId: true },
       });
 
+      /*O retorno do método 'mutation' mapeia todos os usuários encontrados em 'users' cria a task baseada no seu progresso, utilizando o método 'createMany' do Prisma.*/
       return ctx.prisma.userTaskProgress.createMany({
         data: users.map((user) => ({
           lessonId: input.lessonId,
@@ -35,6 +40,8 @@ export const taskRouter = router({
         })),
       });
     }),
+
+  /*O método updateTask é utilizado somente pelo o admin para atualizar uma Task. Para isso, é utilizado o método 'update' do Prisma.*/
   updateTask: adminProcedure
     .input(TasksFormSchema)
     .mutation(({ ctx, input }) => {
@@ -46,9 +53,13 @@ export const taskRouter = router({
         },
       });
     }),
+
+  /*O método deleteTask é utilizado somente pelo admin para deletar uma task. Ele faz a validação dos dados pela biblioteca 'zod' e então deleta a Task com o ID específico.*/
   deleteTask: adminProcedure.input(z.string()).mutation(({ ctx, input }) => {
     return ctx.prisma.task.delete({ where: { id: input } });
   }),
+
+  /*O método lastTasksByUser é responsável por retornar a última Task realizada pelo usuário. Caso o usuário não seja o Admin, o trpc jogará um erro.*/
   lastTasksByUser: protectedProcedure
     .input(z.string().optional())
     .query(({ ctx, input }) => {
@@ -63,6 +74,8 @@ export const taskRouter = router({
         take: 5,
       });
     }),
+
+  /*O método totalAndUnfCountByUser retorna o total de tasks e o total de tasks não finalizadas por usuário. Caso o usuário não seja o Admin, o trpc jogará um erro. */
   totalAndUnfCountByUser: protectedProcedure
     .input(z.string().optional())
     .query(async ({ ctx, input }) => {
@@ -82,6 +95,8 @@ export const taskRouter = router({
         finished: Number(data[0]?.finished),
       };
     }),
+
+  /*O método totalTasksByUser retorna o total de tasks por usuário, utilizando o método count do Prisma. Caso o usuário não seja um Admin, o trpc jogará um erro.*/
   totalTasksByUser: protectedProcedure
     .input(z.string().optional())
     .query(({ ctx, input }) => {
@@ -92,6 +107,8 @@ export const taskRouter = router({
         where: { userId },
       });
     }),
+
+  /*O método finTasksByUser retorna o total de tasks finalizadas. O método 'count' do Prisma adiciona as tasks com o status 'COMPLETO'. Caso o usuário não seja o Admin, o trpc jogará um erro.*/
   finTasksByUser: protectedProcedure
     .input(z.string().optional())
     .query(({ ctx, input }) => {
