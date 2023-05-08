@@ -144,25 +144,21 @@ export const adminRouter = router({
     *-> Nesse caso deletar é uma "mutation" do prisma, ou seja uma operação que muda valores
      no banco de dados.  
     */
-    const verifyValidation = await ctx.prisma.user.findUnique({
+    const userToVerify = await ctx.prisma.user.findUnique({
       where: { id: input },
     });
 
-    if (verifyValidation.user?.role) {
-      if (verifyValidation.user.role !== Roles.Admin) {
-        return ctx.prisma.user.delete({
-          where: { id: input },
-          /*
-            **-> Nesse caso o usuario deletado é aquele que possui o id com valor igual a input***.
+    if (userToVerify.role !== Roles.Admin) {
+      return ctx.prisma.user.delete({
+        where: { id: input },
+        /*
+          **-> Nesse caso o usuario deletado é aquele que possui o id com valor igual a input***.
 
-            ***-> input é um atributo fornecido a esse procedimiento que possui o tipo z.string().
-          */
-        });
-      } else {
-        throw new TRPCError({ code: "Um Administrador não pode ser removido." });
-      }
+          ***-> input é um atributo fornecido a esse procedimiento que possui o tipo z.string().
+        */
+      });
     } else {
-      throw new TRPCError({ code: "???" });
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     }
   }),
   aproveGuest: adminProcedure

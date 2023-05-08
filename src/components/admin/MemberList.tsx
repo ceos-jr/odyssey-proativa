@@ -42,12 +42,12 @@ const MemberList = () => {
   const allMembers = trpc.admin.getAllMembers.useQuery();
 
   const promoteUserToAdminMut = trpc.admin.PromoteToAdmin.useMutation({
-    async onMutate() {
+    async onMutate(userId) {
       await utils.admin.getAllMembers.cancel();
       const prevData = utils.admin.getAllMembers.getData();
-      const filtData = prevData?.filter((user) => {
-        if (user.id === promoteUserToAdmin.id) {
-          user.role = 'admin';
+      const filtData = prevData?.forEach((user) => {
+        if (user.id === userId) {
+          user.role = 'ADMIN';
         }
     });
       utils.admin.getAllMembers.setData(filtData);
