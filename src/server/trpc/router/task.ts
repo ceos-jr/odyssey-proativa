@@ -24,13 +24,13 @@ export const taskRouter = router({
           richText: input.richText,
         },
       });
-      
+
       /*Dentro da rota Task, 'users' pega todos os usuários referente à uma lição específica utilizando o método 'findMany' do Prisma. */
       const users = await ctx.prisma.userLessonProgress.findMany({
         where: { lessonId: input.lessonId },
         select: { userId: true },
       });
-      
+
       /*O retorno do método 'mutation' mapeia todos os usuários encontrados em 'users' cria a task baseada no seu progresso, utilizando o método 'createMany' do Prisma.*/
       return ctx.prisma.userTaskProgress.createMany({
         data: users.map((user) => ({
@@ -40,7 +40,7 @@ export const taskRouter = router({
         })),
       });
     }),
-  
+
   /*O método updateTask é utilizado somente pelo o admin para atualizar uma Task. Para isso, é utilizado o método 'update' do Prisma.*/
   updateTask: adminProcedure
     .input(TasksFormSchema)
@@ -74,8 +74,8 @@ export const taskRouter = router({
         take: 5,
       });
     }),
-  
-    /*O método totalAndUnfCountByUser retorna o total de tasks e o total de tasks não finalizadas por usuário. Caso o usuário não seja o Admin, o trpc jogará um erro. */
+
+  /*O método totalAndUnfCountByUser retorna o total de tasks e o total de tasks não finalizadas por usuário. Caso o usuário não seja o Admin, o trpc jogará um erro. */
   totalAndUnfCountByUser: protectedProcedure
     .input(z.string().optional())
     .query(async ({ ctx, input }) => {
@@ -107,7 +107,7 @@ export const taskRouter = router({
         where: { userId },
       });
     }),
-  
+
   /*O método finTasksByUser retorna o total de tasks finalizadas. O método 'count' do Prisma adiciona as tasks com o status 'COMPLETO'. Caso o usuário não seja o Admin, o trpc jogará um erro.*/
   finTasksByUser: protectedProcedure
     .input(z.string().optional())
