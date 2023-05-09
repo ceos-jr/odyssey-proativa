@@ -39,6 +39,31 @@ const MemberList = () => {
 
   const utils = trpc.useContext();
   const allMembers = trpc.admin.getAllMembers.useQuery();
+
+  const promoteUserToAdminMut = trpc.admin.PromoteToAdmin.useMutation({
+    async onMutate(userId) {
+      await utils.admin.getAllMembers.cancel();
+      const prevData = utils.admin.getAllMembers.getData();
+      prevData?.forEach((user) => {
+        if (user.id === userId) {
+          user.role = "ADMIN";
+        }
+      });
+      utils.admin.getAllMembers.setData(prevData);
+      return { prevData };
+    },
+    onError(err, _, ctx) {
+      utils.admin.getAllMembers.setData(ctx?.prevData);
+      showErrorToast(err.message, "Não foi possível promover o usuário");
+    },
+    onSuccess() {
+      showSuccessToast(
+        "Usuário agora é administrador",
+        `O usuário ${promoteUserToAdmin.name} foi promovido a administrador.`
+      );
+    },
+  });
+
   const delUserMut = trpc.admin.delUser.useMutation({
     async onMutate() {
       await utils.admin.getAllMembers.cancel();
@@ -61,6 +86,10 @@ const MemberList = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [delUser, setDelUser] = useState({ name: "", id: "" });
+  const [promoteUserToAdmin, setPromoteUserToAdmin] = useState({
+    name: "",
+    id: "",
+  });
   const cancelRef = React.useRef(null);
 
   return (
@@ -163,6 +192,20 @@ const MemberList = () => {
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />
                           <MenuList>
+                            {mem.role === Roles.Member && (
+                              <MenuItem
+                                icon={<FaUserCircle />}
+                                onClick={() => {
+                                  setPromoteUserToAdmin({
+                                    name: mem.name as string,
+                                    id: mem.id,
+                                  });
+                                  promoteUserToAdminMut.mutate(mem.id);
+                                }}
+                              >
+                                Transformar em Admin
+                              </MenuItem>
+                            )}
                             {mem.role !== Roles.Admin && (
                               <MenuItem
                                 icon={<BsTrash />}
