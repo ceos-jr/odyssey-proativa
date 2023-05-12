@@ -4,13 +4,16 @@ import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import { Roles } from "@utils/constants";
 import { useSession } from "@utils/useSession";
-
+import { trpc } from "@utils/trpc";
 
 const Tasks = () => {
     
     const {data} = useSession();
     console.log(data);
     
+    const allTasks = trpc.task.getTasksByUser.useQuery(data?.user?.id as string);
+    console.log("MASQUEICOOOOO", allTasks.data);
+
     return (
         <>
             <Head>
@@ -18,7 +21,7 @@ const Tasks = () => {
                 <meta name="description" content="Odyssey Proativa" />
             </Head>
             <main className="container mx-auto flex h-max flex-col gap-4 p-4">
-                Hello Masqueico
+                Salamaleico
             </main>
         </>
     );
