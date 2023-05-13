@@ -103,7 +103,7 @@ export const taskRouter = router({
       const userId = input;
       return ctx.prisma.userTaskProgress.findMany({
         where: { userId },
-        include: { task: { select: { name: true } } },
+        include: { task: true },
         orderBy: { completedAt: "desc" },
       })
     }),
