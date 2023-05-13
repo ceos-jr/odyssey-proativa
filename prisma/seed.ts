@@ -1,5 +1,10 @@
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { mockUsers as mU } from "../src/utils/mock-user";
+import createMockedLessonProgress from "./seeds/lessonsProgSeed";
+import createMockedLessons from "./seeds/lessonsSeed";
+import createMockedLesSuggestion from "./seeds/lesSuggSeed";
+import createMockedTaskProgress from "./seeds/tasksProgSeed";
+import createMockedTasks from "./seeds/tasksSeed";
 const prisma = new PrismaClient();
 
 const modules: Prisma.ModuleCreateInput[] = [
@@ -7,48 +12,6 @@ const modules: Prisma.ModuleCreateInput[] = [
     id: "cla8sob6p000008l0dzndfppl",
     name: "css",
     description: "Seja bem vindos ao módulo CSS",
-  },
-];
-
-const lessons: Prisma.LessonCreateManyInput[] = [
-  {
-    id: "cla8ssx1p000308l028yn0hnn",
-    index: 1,
-    name: "Seletores, Especificidade, Cascata e Herança",
-    moduleId: modules[0]?.id as string,
-    richText: "",
-  },
-  {
-    name: "Posicionamento CSS",
-    index: 2,
-    moduleId: modules[0]?.id as string,
-    richText: "",
-  },
-  {
-    name: "Flexbox Layout",
-    index: 3,
-    moduleId: modules[0]?.id as string,
-    richText: "",
-  },
-  {
-    name: "Grid Layout",
-    index: 4,
-    moduleId: modules[0]?.id as string,
-    richText: "",
-  },
-];
-
-const tasks: Prisma.TaskCreateManyInput[] = [
-  {
-    name: "plantar bananeira",
-    richText:
-      "tente se jogar no chao com as duas maos pra baixo, boa sorte kkk",
-    lessonId: lessons[0]?.id as string,
-  },
-  {
-    name: "va pro UFC derrotar o Poatan",
-    richText: "esse aqui que vc precisa de sorte",
-    lessonId: lessons[0]?.id as string,
   },
 ];
 
@@ -66,21 +29,16 @@ const modSugg = [
   },
 ];
 
-const lesSuggestions = [
-  {
-    userId: mU.MEMBER.id as string,
-    lessonId: lessons[0]?.id as string,
-    text: "I expect this on this module",
-  },
-  {
-    userId: mU.MEMBER.id as string,
-    lessonId: lessons[0]?.id as string,
-    text: "This was already readed",
-    readed: true,
-  },
-];
-
 async function main() {
+  console.log("wiping everything");
+  await prisma.module.deleteMany({});
+  await prisma.lesson.deleteMany({});
+  await prisma.task.deleteMany({});
+  await prisma.userLessonProgress.deleteMany({});
+  await prisma.userTaskProgress.deleteMany({});
+  await prisma.modSuggestion.deleteMany({});
+  await prisma.lesSuggestion.deleteMany({});
+
   console.log(`Start seeding ...`);
   console.log("creating users");
   await prisma.user.upsert({
@@ -116,13 +74,29 @@ async function main() {
   console.log("creating modules");
   await prisma.module.createMany({ data: modules });
   console.log("creating lessons");
-  await prisma.lesson.createMany({ data: lessons });
+  await createMockedLessons(prisma, modules[0]?.id as string);
   console.log("creating tasks");
-  await prisma.task.createMany({ data: tasks });
+  await createMockedTasks(prisma, modules[0]?.id as string);
+  console.log("creating lessonsProgress");
+  await createMockedLessonProgress(
+    prisma,
+    modules[0]?.id as string,
+    mU.MEMBER.id
+  );
+  console.log("creating tasksProgress");
+  await createMockedTaskProgress(
+    prisma,
+    modules[0]?.id as string,
+    mU.MEMBER.id
+  );
   console.log("creating modules suggestions");
   await prisma.modSuggestion.createMany({ data: modSugg });
   console.log("creating lessons suggestions");
-  await prisma.lesSuggestion.createMany({ data: lesSuggestions });
+  await createMockedLesSuggestion(
+    prisma,
+    modules[0]?.id as string,
+    mU.MEMBER.id
+  );
 
   console.log(`Seeding finished.`);
 }
