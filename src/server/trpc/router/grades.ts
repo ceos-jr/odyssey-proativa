@@ -44,7 +44,7 @@ export type GradeFrequency = {
 
 export const gradesRouter = router({
   //Disponível para usuário autenticado
-  avg30Days: protectedProcedure.query(({ ctx }) => {
+  avg30Days: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
     WITH intervals AS (
       SELECT
@@ -102,7 +102,7 @@ export const gradesRouter = router({
         intervals;
 `;
     }),
-  avg3Months: protectedProcedure.query(({ ctx }) => {
+  avg3Months: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
@@ -159,7 +159,7 @@ export const gradesRouter = router({
         intervals;
       `;
     }),
-  avg6Months: protectedProcedure.query(({ ctx }) => {
+  avg6Months: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
