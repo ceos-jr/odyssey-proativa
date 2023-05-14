@@ -23,16 +23,6 @@ import {
   import { colors } from "src/pages/_app";
   
   const CustomChart = ({ data }: { data: CumulativeAvg[] }) => {
-    const options = {
-        scales: {
-          y: {
-            ticks: {
-              maxTicksLimit: 6
-            }
-          }
-        }
-      };
-
     return (
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data}>
@@ -41,7 +31,6 @@ import {
           <YAxis padding={{ top: 30, bottom: 30 }} />
           <Tooltip />
           <Line
-            options={options}
             type="monotone"
             dataKey="media"
             stroke={colors.primary}
@@ -56,21 +45,27 @@ import {
     const { data: floatLongTermAvg } = trpc.grades.floatLongTermAvg.useQuery();
 
     const { data: integer1MonthAvg } = trpc.grades.integer1MonthAvg.useQuery();
-
-    if (integer1MonthAvg && floatLongTermAvg) {
+    if (
+        integer1MonthAvg && floatLongTermAvg &&
+        integer1MonthAvg[0]?.media && floatLongTermAvg[0]?.media
+    ) {
         integer1MonthAvg[0].media = floatLongTermAvg[0].media;
-        console.log(integer1MonthAvg[1], floatLongTermAvg);
-    }
+    } 
 
     const { data: integer3MonthAvg } = trpc.grades.integer3MonthAvg.useQuery();
-    if (integer3MonthAvg && floatLongTermAvg) {
+    if (
+        integer3MonthAvg && floatLongTermAvg &&
+        integer3MonthAvg[0]?.media && floatLongTermAvg[0]?.media
+    ) {
         integer3MonthAvg[0].media = floatLongTermAvg[0].media;
-        console.log(integer3MonthAvg[1], floatLongTermAvg);
     }
+
     const { data: integer6MonthAvg } = trpc.grades.integer6MonthAvg.useQuery();
-    if (integer6MonthAvg && floatLongTermAvg) {
+    if (
+        integer6MonthAvg && floatLongTermAvg &&
+        integer6MonthAvg[0]?.media && floatLongTermAvg[0]?.media
+    ) {
         integer6MonthAvg[0].media = floatLongTermAvg[0].media;
-        console.log(integer6MonthAvg[1], floatLongTermAvg);
     }
 
     return (
