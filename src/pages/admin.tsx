@@ -4,6 +4,7 @@ import AllLessonsSuggestions from "@components/admin/AllLessonsSuggestions";
 import AllModulesSuggestions from "@components/admin/AllModulesSuggestions";
 import MemberList from "@components/admin/MemberList";
 import UserSubmissions from "@components/admin/UserSubmissions";
+import FullGradeProgress from "@components/admin/FullGradeProgress";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import { Roles } from "@utils/constants";
 import { type GetServerSideProps } from "next";
@@ -24,6 +25,7 @@ const Admin = () => {
         <UserSubmissions />
         <AllModulesSuggestions />
         <AllLessonsSuggestions />
+        <FullGradeProgress />
       </main>
     </>
   );
