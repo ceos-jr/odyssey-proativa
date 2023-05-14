@@ -30,6 +30,10 @@ export type GradeFrequency = {
 
 // Rota para lidar com procedimentos relacionados às notas
 // {Object} GradesRouter
+// {Function} floatLongTermAvg - retorna a média de todas as notas no formato float.
+// {Function} integer1MonthAvg - retorna as médias do mês anterior separadas em intervalos de 2 dias.
+// {Function} integer3MonthAvg - retorna as médias dos 3 meses anteriores separadas em intervalos de 6 dias.
+// {Function} integer6MonthAvg - retorna as médias dos 3 meses anteriores separadas em intervalos de 12 dias.
 // Quatro rotas que retornam a média das notas nos últimos 7 e 30 dias:
 // {Function} avg7Days - Retorna um array de médias dos últimos 7 dias das tasks completadas
 // {Function} avg7DaysByUser - Retorna um array de médias dos últimos 7 dias das tasks completadas para um usuário específico
@@ -44,6 +48,90 @@ export type GradeFrequency = {
 
 export const gradesRouter = router({
   //Disponível para usuário autenticado
+  floatLongTermAvg: adminProcedure.query(({ ctx }) => {
+    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+    SELECT ROUND(AVG(grade)::numeric, 2) AS media
+    FROM "UserTaskProgress";`;
+  }),
+
+  integer1MonthAvg: adminProcedure.query(({ ctx }) => {
+    /* 
+        O intervalo "BETWEEN NOW() - INTERVAL '33 DAY' AND NOW() - INTERVAL '1 DAY'" é assim 
+      para que o gráfico não passe do momento atual, pois ele tem amplitude de 2 dias, ou seja,
+      caso eum intervalo comece no último dia ele poderá conter até 1 dia futuro.
+    */
+
+    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+      WITH intervals AS (
+        SELECT 
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '2 day' AS interval_start,
+          AVG(grade) as media
+        FROM "UserTaskProgress"
+        WHERE
+          status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '33 DAY' AND NOW() - INTERVAL '1 DAY'
+        GROUP BY interval_start 
+        ORDER BY interval_start ASC
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        media
+      FROM
+        intervals;
+    `;
+  }),
+
+  integer3MonthAvg: adminProcedure.query(({ ctx }) => {
+    /* 
+        O intervalo "BETWEEN NOW() - INTERVAL '97 DAY' AND NOW() - INTERVAL '5 DAY'" é assim 
+      para que o gráfico não passe do momento atual, pois ele tem amplitude de 6 dias, ou seja,
+      caso eum intervalo comece no último dia ele poderá conter até 5 dias futuros.
+    */
+    
+    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+      WITH intervals AS (
+        SELECT date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 day' AS interval_start,
+          ROUND(AVG(grade)::numeric, 2) AS media
+          FROM "UserTaskProgress"
+        WHERE
+        status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '97 DAY' AND NOW() - INTERVAL '5 DAY'
+        GROUP BY interval_start
+        ORDER BY interval_start ASC
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        media
+      FROM
+        intervals;
+    `;
+  }),
+
+  integer6MonthAvg: adminProcedure.query(({ ctx }) => {
+    /* 
+        O intervalo "BETWEEN NOW() - INTERVAL '192 DAY' AND NOW() - INTERVAL '11 DAY'" é assim 
+      para que o gráfico não passe do momento atual, pois ele tem amplitude de 12 dias, ou seja,
+      caso eum intervalo comece no último dia ele poderá conter até 11 dias futuros.
+    */
+    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+    WITH intervals AS (
+      SELECT date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 day' AS interval_start,
+      AVG(grade) AS avg_grade
+      FROM "UserTaskProgress"
+      WHERE
+      status::text = ${TaskStatus.COMPLETED}::text
+        AND "completedAt" BETWEEN NOW() - INTERVAL '192 DAY' AND NOW() - INTERVAL '11 DAY'
+      GROUP BY interval_start
+      ORDER BY interval_start ASC
+    )
+    SELECT
+      to_char(interval_start, 'DD/MM') AS date_alias,
+      avg_grade as media
+    FROM
+      intervals;
+  `;
+  }),
+
   avg30Days: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
     WITH intervals AS (
@@ -59,7 +147,7 @@ export const gradesRouter = router({
       GROUP BY
         interval_start
       ORDER BY
-        interval_start ASC
+        interval_start DESC
       LIMIT 15
     )
     SELECT
@@ -117,8 +205,8 @@ export const gradesRouter = router({
         GROUP BY
           interval_start
         ORDER BY
-          interval_start ASC
-        LIMIT 15
+          interval_start DESC
+        LIMIT 45
       )
       SELECT
         to_char(interval_start, 'DD/MM') AS date_alias,
@@ -170,12 +258,12 @@ export const gradesRouter = router({
           "UserTaskProgress"
         WHERE
           status::text = ${TaskStatus.COMPLETED}::text
-          AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH ' AND NOW()
         GROUP BY
           interval_start
         ORDER BY
-          interval_start ASC
-        LIMIT 15
+          interval_start DESC
+        LIMIT 90
       )
       SELECT
         to_char(interval_start, 'DD/MM') AS date_alias,
