@@ -87,7 +87,7 @@ export const gradesRouter = router({
       para que o gráfico não passe do momento atual, pois ele tem amplitude de 6 dias, ou seja,
       caso eum intervalo comece no último dia ele poderá conter até 5 dias futuros.
     */
-    
+
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 day' AS interval_start,
