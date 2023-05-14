@@ -11,11 +11,11 @@ import { router, adminProcedure, protectedProcedure } from "../trpc";
 // Representa a média cumulativa de uma turma  em um determinado dia
 // {Object} CumulativeAvg
 // {string} date_alias - O dia representado em formato de string.
-// {number} cumulative_avg - A média cumulativa da turma naquele dia.
+// {number} media - A média cumulativa da turma naquele dia.
 
 export type CumulativeAvg = {
   date_alias: string;
-  cumulative_avg: number;
+  media: number;
 };
 
 // Representa a frequência de notas dentro de um intervalo de valores.
@@ -43,56 +43,30 @@ export type GradeFrequency = {
 // As notas são filtradas pela coluna "status", que contém o estado da tarefa (completa ou incompleta), e pela coluna "completedAt", que contém a data em que a tarefa foi concluída.
 
 export const gradesRouter = router({
-  // Disponível apenas para admin
-  avg7Days: adminProcedure.input(z.string().optional()).query(({ ctx }) => {
-    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
-      SELECT 
-        to_char("completedAt", 'DD/MM') AS date_alias, 
-        AVG(grade) OVER (ORDER BY "completedAt" ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as cumulative_avg 
-      FROM 
-        "UserTaskProgress"
-      WHERE 
-        status::text = ${TaskStatus.COMPLETED}::text AND
-        "completedAt" BETWEEN NOW() - INTERVAL '7 DAY' AND NOW()
-      ORDER BY 
-        "completedAt" ASC;
-    `;
-  }),
   //Disponível para usuário autenticado
-  avg7DaysByUser: protectedProcedure
-    .input(z.string().optional())
-    .query(({ ctx, input }) => {
-      if (input && ctx.session.user.role !== "ADMIN")
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      const userId = input ? input : ctx.session.user.id;
-
-      return ctx.prisma.$queryRaw<CumulativeAvg[]>`
-      SELECT 
-        to_char("completedAt", 'DD/MM') AS date_alias, 
-        AVG(grade) OVER (ORDER BY "completedAt" ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as cumulative_avg
-      FROM 
-        "UserTaskProgress"
-      WHERE 
-        "userId" = ${userId} AND 
-        status::text = ${TaskStatus.COMPLETED}::text AND
-        "completedAt" BETWEEN NOW() - INTERVAL '7 DAY' AND NOW()
-      ORDER BY 
-        "completedAt" ASC;
-    `;
-    }),
-  //Disponível para usuário autenticado
-  avg30Days: protectedProcedure.query(({ ctx }) => {
+  avg30Days: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
-      SELECT 
-        to_char("completedAt", 'DD/MM') AS date_alias, 
-        AVG(grade) OVER (ORDER BY "completedAt" ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) as cumulative_avg
-      FROM 
+    WITH intervals AS (
+      SELECT
+        date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '2 day' AS interval_start,
+        SUM(grade) as sum_grade,
+        COUNT(grade) as count_grade
+      FROM
         "UserTaskProgress"
-      WHERE 
-        status::text = ${TaskStatus.COMPLETED}::text AND
-        "completedAt" BETWEEN NOW() - INTERVAL '30 DAY' AND NOW()
-      ORDER BY 
-        "completedAt" ASC;
+      WHERE
+        status::text = ${TaskStatus.COMPLETED}::text
+        AND "completedAt" BETWEEN NOW() - INTERVAL '30 DAY' AND NOW()
+      GROUP BY
+        interval_start
+      ORDER BY
+        interval_start ASC
+      LIMIT 15
+    )
+    SELECT
+      to_char(interval_start, 'DD/MM') AS date_alias,
+      ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+    FROM
+      intervals;
     `;
   }),
   //Disponível para usuário autenticado
@@ -104,18 +78,143 @@ export const gradesRouter = router({
       const userId = input ? input : ctx.session.user.id;
 
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
-      SELECT 
-        to_char("completedAt", 'DD/MM') AS date_alias, 
-        AVG(grade) OVER (ORDER BY "completedAt" ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) as cumulative_avg
-      FROM 
-        "UserTaskProgress"
-      WHERE 
-        "userId" = ${userId} AND 
-        status::text = ${TaskStatus.COMPLETED}::text AND
-        "completedAt" BETWEEN NOW() - INTERVAL '30 DAY' AND NOW()
-      ORDER BY 
-        "completedAt" ASC;
-    `;
+      WITH intervals AS (
+        SELECT
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '2 day' AS interval_start,
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
+        FROM
+          "UserTaskProgress"
+        WHERE
+          "userId" = ${userId}
+          AND status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '30 DAY' AND NOW()
+        GROUP BY
+          interval_start
+        ORDER BY
+          interval_start ASC
+        LIMIT 15
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+      FROM
+        intervals;
+`;
+    }),
+  avg3Months: adminProcedure.query(({ ctx }) => {
+    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+      WITH intervals AS (
+        SELECT
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 days' AS interval_start,
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
+        FROM
+          "UserTaskProgress"
+        WHERE
+          status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
+        GROUP BY
+          interval_start
+        ORDER BY
+          interval_start ASC
+        LIMIT 15
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+      FROM
+        intervals;
+      `;
+  }),
+  avg3MonthsByUser: protectedProcedure
+    .input(z.string().optional())
+    .query(({ ctx, input }) => {
+      if (input && ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      const userId = input ? input : ctx.session.user.id;
+
+      return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+      WITH intervals AS (
+        SELECT
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 days' AS interval_start,
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
+        FROM
+          "UserTaskProgress"
+        WHERE
+          "userId" = ${userId}
+          AND status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
+        GROUP BY
+          interval_start
+        ORDER BY
+          interval_start ASC
+        LIMIT 15
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+      FROM
+        intervals;
+      `;
+    }),
+  avg6Months: adminProcedure.query(({ ctx }) => {
+    return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+      WITH intervals AS (
+        SELECT
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 days' AS interval_start,
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
+        FROM
+          "UserTaskProgress"
+        WHERE
+          status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
+        GROUP BY
+          interval_start
+        ORDER BY
+          interval_start ASC
+        LIMIT 15
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+      FROM
+        intervals;
+      `;
+  }),
+  avg6MonthsByUser: protectedProcedure
+    .input(z.string().optional())
+    .query(({ ctx, input }) => {
+      if (input && ctx.session.user.role !== "ADMIN")
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      const userId = input ? input : ctx.session.user.id;
+
+      return ctx.prisma.$queryRaw<CumulativeAvg[]>`
+      WITH intervals AS (
+        SELECT
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 days' AS interval_start,
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
+        FROM
+          "UserTaskProgress"
+        WHERE
+          "userId" = ${userId}
+          AND status::text = ${TaskStatus.COMPLETED}::text
+          AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
+        GROUP BY
+          interval_start
+        ORDER BY
+          interval_start ASC
+        LIMIT 15
+      )
+      SELECT
+        to_char(interval_start, 'DD/MM') AS date_alias,
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+      FROM
+        intervals;
+      `;
     }),
   // A distribuição das notas é calculada usando a função width_bucket do SQL, que agrupa os valores em intervalos de tamanho fixo.
 
