@@ -65,17 +65,19 @@ export const gradesRouter = router({
       WITH intervals AS (
         SELECT 
           date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '2 day' AS interval_start,
-          AVG(grade) as media
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
         FROM "UserTaskProgress"
         WHERE
           status::text = ${TaskStatus.COMPLETED}::text
           AND "completedAt" BETWEEN NOW() - INTERVAL '33 DAY' AND NOW() - INTERVAL '1 DAY'
-        GROUP BY interval_start 
+        GROUP BY 
+          interval_start
         ORDER BY interval_start ASC
       )
       SELECT
         to_char(interval_start, 'DD/MM') AS date_alias,
-        media
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
       FROM
         intervals;
     `;
@@ -90,9 +92,11 @@ export const gradesRouter = router({
 
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
-        SELECT date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 day' AS interval_start,
-          ROUND(AVG(grade)::numeric, 2) AS media
-          FROM "UserTaskProgress"
+        SELECT 
+          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 day' AS interval_start,
+          SUM(grade) as sum_grade,
+          COUNT(grade) as count_grade
+        FROM "UserTaskProgress"
         WHERE
         status::text = ${TaskStatus.COMPLETED}::text
           AND "completedAt" BETWEEN NOW() - INTERVAL '97 DAY' AND NOW() - INTERVAL '5 DAY'
@@ -101,7 +105,7 @@ export const gradesRouter = router({
       )
       SELECT
         to_char(interval_start, 'DD/MM') AS date_alias,
-        media
+        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
       FROM
         intervals;
     `;
@@ -115,8 +119,10 @@ export const gradesRouter = router({
     */
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
     WITH intervals AS (
-      SELECT date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 day' AS interval_start,
-      AVG(grade) AS avg_grade
+      SELECT 
+        date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 day' AS interval_start,
+        SUM(grade) as sum_grade,
+        COUNT(grade) as count_grade
       FROM "UserTaskProgress"
       WHERE
       status::text = ${TaskStatus.COMPLETED}::text
@@ -126,7 +132,7 @@ export const gradesRouter = router({
     )
     SELECT
       to_char(interval_start, 'DD/MM') AS date_alias,
-      avg_grade as media
+      ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
     FROM
       intervals;
   `;
