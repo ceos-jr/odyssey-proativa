@@ -1,6 +1,5 @@
 import {
 	Table,
-	TableContainer,
 	Thead,
 	Tr,
 	Th,
@@ -13,7 +12,9 @@ import {
 	MenuButton,
 	MenuItem,
 	MenuList,
+	Text,
 	Heading,
+	Tab, TabList, TabPanel, TabPanels, Tabs
 } from "@chakra-ui/react";
 import Head from "next/head";
 import DashboardLayout from "@components/Layout/DashboardLayout";
@@ -26,6 +27,7 @@ import { AiOutlineEye, AiOutlineSend } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import ShowTaskModal from "@components/lessons/ShowTaskModal";
 import SubmitTaskAlert from "@components/lessons/SubmitTaskAlert";
+import UserTasksList from "@components/tasks/UserTasksList";
 import { trpc, type RouterTypes } from "@utils/trpc";
 import React, { useState } from "react";
 
@@ -33,30 +35,23 @@ type TasksType = NonNullable<
 	RouterTypes["lesson"]["getLesson"]["output"]
 >["tasks"];
 
+type TasksProgress = NonNullable<
+	RouterTypes["task"]["getTasksByUser"]["output"]
+>;
 
 const Tasks = () => {
 	const { data } = useSession();
-	const [task, setTask] = useState<TasksType[0] | null>(null);
-	const sendTaskAle = useDisclosure();
-	const taskModal = useDisclosure();
-	const cancelRef = React.useRef(null);
 
 	const allTasks = trpc.task.getTasksByUser.useQuery(data?.user?.id as string);
-	const tasksProgress = allTasks.data;
+	const tasksProgress = allTasks.data || [] as TasksProgress;
 
-	const getTaskStatus = (taskId: string) => {
-		return tasksProgress?.find((uTask) => uTask.taskId === taskId)
-			?.status as TaskStatus;
-	};
+	const filterProgresses = (status: TaskStatus) => {
+		return tasksProgress.filter((progress) => progress.status === status);
+	}
 
-	const getGrade = (taskId: string) => {
-		return tasksProgress?.find((uTask) => uTask.taskId === taskId)?.grade;
-	};
-
-
-	const getSubmitedText = (taskId: string) => {
-		return tasksProgress?.find((uTask) => uTask.taskId === taskId)?.richText;
-	};
+	const pending = filterProgresses(TaskStatus.Notsubmitted);
+	const submitted = filterProgresses(TaskStatus.Submitted);
+	const completed = filterProgresses(TaskStatus.Completed);
 
 	return (
 		<>
@@ -66,81 +61,50 @@ const Tasks = () => {
 			</Head>
 			<main className="container mx-auto flex h-max flex-col gap-4 p-4">
 				<Heading>Atividades</Heading>
-				<ShowTaskModal
-					task={task}
-					isOpen={taskModal.isOpen}
-					onClose={taskModal.onClose}
-				/>
-				<SubmitTaskAlert
-					isOpen={sendTaskAle.isOpen}
-					onClose={sendTaskAle.onClose}
-					task={task}
-					cancelRef={cancelRef}
-					initialData={getSubmitedText(task?.id ?? "")}
-				/>
 				{tasksProgress && (
-					<TableContainer className="rounded-lg bg-white shadow-lg">
-						<Table>
-							<Thead>
-								<Tr>
-									<Th>Nome</Th>
-									<Th>Status</Th>
-									<Th isNumeric>Nota</Th>
-									<Th isNumeric>Ações</Th>
-								</Tr>
-							</Thead>
-							<Tbody>
-								{tasksProgress.map((progress) => (
-									<Tr key={progress.taskId}>
-										<Td>{progress.task.name}</Td>
-										<Td>
-											{tasksProgress &&
-												getTaskStatus(progress.taskId) === TaskStatus.Completed ? (
-												<Badge colorScheme="green">Completado</Badge>
-											) : getTaskStatus(progress.taskId) === TaskStatus.Submitted ? (
-												<Badge colorScheme="purple">Submetido</Badge>
-											) : (
-												<Badge colorScheme="red">Pendente</Badge>
-											)}
-										</Td>
-										<Td isNumeric>
-											{getGrade(progress.taskId) !== null ? getGrade(progress.taskId) : "sem nota"}
-										</Td>
-										<Td isNumeric>
-											<Menu>
-												<MenuButton as={IconButton} icon={<BsThreeDots />} />
-												<MenuList>
-													<MenuItem
-														icon={<AiOutlineSend />}
-														isDisabled={
-															getTaskStatus(progress.taskId) === TaskStatus.Completed
-																? true
-																: false
-														}
-														onClick={() => {
-															setTask(progress.task);
-															sendTaskAle.onOpen();
-														}}
-													>
-														Enviar Solução
-													</MenuItem>
-													<MenuItem
-														icon={<AiOutlineEye />}
-														onClick={() => {
-															setTask(progress.task);
-															taskModal.onOpen();
-														}}
-													>
-														Visualizar Atividade
-													</MenuItem>
-												</MenuList>
-											</Menu>
-										</Td>
-									</Tr>
-								))}
-							</Tbody>
-						</Table>
-					</TableContainer>
+					<Tabs
+						colorScheme="twitter"
+						variant="soft-rounded"
+						bgColor="white"
+						rounded="lg"
+						p="4"
+						className="shadow-lg"
+					>
+						<TabList>
+							<Tab>Pendentes</Tab>
+							<Tab>Submetidas</Tab>
+							<Tab>Concluídas</Tab>
+						</TabList>
+						<TabPanels>
+							<TabPanel>
+								{
+									pending.length == 0 ? (
+										<div className="flex flex-col items-center justify-center">
+											<Text>Nenhuma atividade pendente</Text>
+										</div>
+									) : <UserTasksList tasksProgress={pending} />
+								}
+							</TabPanel>
+							<TabPanel>
+								{
+									submitted.length == 0 ? (
+										<div className="flex flex-col items-center justify-center">
+											<Text>Nenhuma atividade submetida</Text>
+										</div>
+									) : <UserTasksList tasksProgress={submitted} />
+								}
+							</TabPanel>
+							<TabPanel>
+								{
+									completed.length == 0 ? (
+										<div className="flex flex-col items-center justify-center">
+											<Text>Nenhuma atividade concluída</Text>
+										</div>
+									) : <UserTasksList tasksProgress={completed} />
+								}
+							</TabPanel>
+						</TabPanels>
+					</Tabs>
 				)}
 			</main>
 		</>
