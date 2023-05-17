@@ -1,21 +1,4 @@
-import {
-	Table,
-	Thead,
-	Tr,
-	Th,
-	Td,
-	Tbody,
-	Badge,
-	useDisclosure,
-	IconButton,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
-	Text,
-	Heading,
-	Tab, TabList, TabPanel, TabPanels, Tabs
-} from "@chakra-ui/react";
+import { Text, Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import Head from "next/head";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import { type GetServerSideProps } from "next";
@@ -23,17 +6,9 @@ import { getServerAuthSession } from "src/server/common/get-server-auth-session"
 import { Roles } from "@utils/constants";
 import { useSession } from "@utils/useSession";
 import { TaskStatus } from "@utils/constants";
-import { AiOutlineEye, AiOutlineSend } from "react-icons/ai";
-import { BsThreeDots } from "react-icons/bs";
-import ShowTaskModal from "@components/lessons/ShowTaskModal";
-import SubmitTaskAlert from "@components/lessons/SubmitTaskAlert";
 import UserTasksList from "@components/tasks/UserTasksList";
 import { trpc, type RouterTypes } from "@utils/trpc";
-import React, { useState } from "react";
-
-type TasksType = NonNullable<
-	RouterTypes["lesson"]["getLesson"]["output"]
->["tasks"];
+import React from "react";
 
 type TasksProgress = NonNullable<
 	RouterTypes["task"]["getTasksByUser"]["output"]
