@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import NextImage from "next/image";
 import { FaUserCircle } from "react-icons/fa";
 import SubscribedModulesTable from "@components/user/SubscribedModulesTable";
-import LastTasks from "@components/user/LastTasks";
+import TasksTab from "@components/user/TasksTab";
 import GradeDistribution from "@components/user/GradeDistribution";
 import UserSuggestions from "@components/user/UserSuggestions";
 import GradesProgress from "@components/user/GradesProgress";
@@ -22,7 +22,7 @@ const User = () => {
   const { data: modules } = trpc.admin.getUserModuleList.useQuery(userId, {
     refetchOnWindowFocus: false,
   });
-  const { data: lastTasks } = trpc.task.lastTasksByUser.useQuery(userId, {
+  const { data: tasks } = trpc.task.getTasksByUser.useQuery(userId, {
     refetchOnWindowFocus: false,
   });
 
@@ -86,8 +86,8 @@ const User = () => {
           </>
         )}
         <SubscribedModulesTable modules={modules} />
-        <LastTasks
-          tasks={lastTasks}
+        <TasksTab
+          tasks={tasks}
           finishedCount={tasksCount?.finished}
           totalCount={tasksCount?.total}
         />
@@ -101,6 +101,7 @@ const User = () => {
         </div>
       </main>
     </>
+    
   );
 };
 
