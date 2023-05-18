@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { type CumulativeAvg } from "@trpc/router/grades";
 import { trpc } from "@utils/trpc";
-import { useRouter } from "next/router";
 import {
   CartesianGrid,
   LineChart,
@@ -42,15 +41,15 @@ const CustomChart = ({ data }: { data: CumulativeAvg[] }) => {
 };
 
 const GradesProgress = () => {
-  const { data: avg30Days } = trpc.grades.avg30Days.useQuery({
+  const { data: avg30Days } = trpc.grades.avg30Days.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
-  const { data: avg3Months } = trpc.grades.avg3Months.useQuery({
+  const { data: avg3Months } = trpc.grades.avg3Months.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
-  const { data: avg6Months } = trpc.grades.avg6Months.useQuery({
+  const { data: avg6Months } = trpc.grades.avg6Months.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
   return (
