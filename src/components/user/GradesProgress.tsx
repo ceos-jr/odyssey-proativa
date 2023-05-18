@@ -32,7 +32,7 @@ const CustomChart = ({ data }: { data: CumulativeAvg[] }) => {
         <Tooltip />
         <Line
           type="monotone"
-          dataKey="cumulative_avg"
+          dataKey="media"
           stroke={colors.primary}
           activeDot={{ r: 8 }}
         />
@@ -43,10 +43,15 @@ const CustomChart = ({ data }: { data: CumulativeAvg[] }) => {
 
 const GradesProgress = () => {
   const userId = useRouter().query.userId as string;
-  const { data: avg7 } = trpc.grades.avg7DaysByUser.useQuery(userId, {
+  const { data: avg30Days } = trpc.grades.avg30DaysByUser.useQuery(userId, {
     refetchOnWindowFocus: false,
   });
-  const { data: avg30 } = trpc.grades.avg30DaysByUser.useQuery(userId, {
+
+  const { data: avg3Months } = trpc.grades.avg3MonthsByUser.useQuery(userId, {
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: avg6Months } = trpc.grades.avg6MonthsByUser.useQuery(userId, {
     refetchOnWindowFocus: false,
   });
   return (
@@ -54,26 +59,30 @@ const GradesProgress = () => {
       <div>
         <Heading>Progresso das Notas</Heading>
       </div>
-      {!avg7 || !avg30 ? (
+      {!avg30Days || !avg3Months || !avg6Months ? (
         <>
           <Skeleton height="10px" />
           <Skeleton height="10px" />
           <Skeleton height="10px" />
         </>
-      ) : avg30.length === 0 ? (
+      ) : avg6Months.length === 0 ? (
         <Text>Nenhuma nota registrada</Text>
       ) : (
         <Tabs variant="soft-rounded" colorScheme="green">
           <TabList>
-            <Tab>Últimos 7 dias</Tab>
             <Tab>Últimos 30 dias</Tab>
+            <Tab>Últimos 3 meses</Tab>
+            <Tab>Últimos 6 meses</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
-              <CustomChart data={avg7} />
+              <CustomChart data={avg30Days} />
             </TabPanel>
             <TabPanel>
-              <CustomChart data={avg30} />
+              <CustomChart data={avg3Months} />
+            </TabPanel>
+            <TabPanel>
+              <CustomChart data={avg6Months} />
             </TabPanel>
           </TabPanels>
         </Tabs>
