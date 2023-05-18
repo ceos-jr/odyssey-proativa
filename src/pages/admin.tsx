@@ -9,8 +9,14 @@ import { Roles } from "@utils/constants";
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
+import AllGradesProgress from "@components/admin/AllGradesProgress";
+import AllGradeDistribution from "@components/admin/AllGradeDistribution";
+import { trpc } from "@utils/trpc";
 
 const Admin = () => {
+  const { data: gradeDist } = trpc.grades.gradeDist.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
   return (
     <>
       <Head>
@@ -24,6 +30,8 @@ const Admin = () => {
         <UserSubmissions />
         <AllModulesSuggestions />
         <AllLessonsSuggestions />
+        <AllGradesProgress />
+        <AllGradeDistribution grades={gradeDist} />
       </main>
     </>
   );
