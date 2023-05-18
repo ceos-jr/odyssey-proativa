@@ -30,7 +30,7 @@ const Admin = () => {
         <UserSubmissions />
         <AllModulesSuggestions />
         <AllLessonsSuggestions />
-        <AllGradesProgress/>
+        <AllGradesProgress />
         <AllGradeDistribution grades={gradeDist} />
       </main>
     </>
