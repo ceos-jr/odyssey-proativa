@@ -48,25 +48,28 @@ export const gradesRouter = router({
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
     WITH intervals AS (
       SELECT
-        date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '2 day' AS interval_start,
-        SUM(grade) as sum_grade,
-        COUNT(grade) as count_grade
+        date_trunc('day', "completedAt") AS interval_start,
+        SUM(grade) AS grade_sum,
+        COUNT(grade) AS grade_count,
+        ROW_NUMBER() OVER (ORDER BY date_trunc('day', "completedAt") DESC) AS row_num
       FROM
         "UserTaskProgress"
       WHERE
         status::text = ${TaskStatus.COMPLETED}::text
-        AND "completedAt" BETWEEN NOW() - INTERVAL '30 DAY' AND NOW()
+        AND "completedAt" BETWEEN NOW() - INTERVAL '1 MONTH' AND NOW()
       GROUP BY
         interval_start
-      ORDER BY
-        interval_start ASC
-      LIMIT 15
     )
     SELECT
-      to_char(interval_start, 'DD/MM') AS date_alias,
-      ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+      CASE
+        WHEN row_num = 1 THEN to_char(NOW(), 'DD/MM')
+        ELSE to_char(DATE_TRUNC('day', NOW()) - INTERVAL '1 day' * (row_num - 1), 'DD/MM')
+      END AS date_alias,
+      CAST(SUM(grade_sum) OVER (ORDER BY interval_start ASC) / SUM(grade_count) OVER (ORDER BY interval_start ASC) AS numeric(10, 2)) AS media
     FROM
-      intervals;
+      intervals
+    ORDER BY
+      interval_start ASC;
     `;
   }),
   //Disponível para usuário autenticado
@@ -80,35 +83,39 @@ export const gradesRouter = router({
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '2 day' AS interval_start,
-          SUM(grade) as sum_grade,
-          COUNT(grade) as count_grade
+          date_trunc('day', "completedAt") AS interval_start,
+          SUM(grade) AS grade_sum,
+          COUNT(grade) AS grade_count,
+          ROW_NUMBER() OVER (ORDER BY date_trunc('day', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
           "userId" = ${userId}
           AND status::text = ${TaskStatus.COMPLETED}::text
-          AND "completedAt" BETWEEN NOW() - INTERVAL '30 DAY' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '1 MONTH' AND NOW()
         GROUP BY
           interval_start
-        ORDER BY
-          interval_start ASC
-        LIMIT 15
       )
       SELECT
-        to_char(interval_start, 'DD/MM') AS date_alias,
-        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+        CASE
+          WHEN row_num = 1 THEN to_char(NOW(), 'DD/MM')
+          ELSE to_char(DATE_TRUNC('day', NOW()) - INTERVAL '1 day' * (row_num - 1), 'DD/MM')
+        END AS date_alias,
+        CAST(SUM(grade_sum) OVER (ORDER BY interval_start ASC) / SUM(grade_count) OVER (ORDER BY interval_start ASC) AS numeric(10, 2)) AS media
       FROM
-        intervals;
+        intervals
+      ORDER BY
+        interval_start ASC;
 `;
     }),
   avg3Months: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 days' AS interval_start,
-          SUM(grade) as sum_grade,
-          COUNT(grade) as count_grade
+          date_trunc('week', "completedAt") AS interval_start,
+          SUM(grade) AS grade_sum,
+          COUNT(grade) AS grade_count,
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
@@ -116,15 +123,17 @@ export const gradesRouter = router({
           AND "completedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
         GROUP BY
           interval_start
-        ORDER BY
-          interval_start ASC
-        LIMIT 15
       )
       SELECT
-        to_char(interval_start, 'DD/MM') AS date_alias,
-        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+        CASE
+          WHEN row_num = 1 THEN to_char(NOW(), 'DD/MM')
+          ELSE to_char(DATE_TRUNC('week', NOW()) - INTERVAL '1 week' * (row_num - 1), 'DD/MM')
+        END AS date_alias,
+        CAST(SUM(grade_sum) OVER (ORDER BY interval_start ASC) / SUM(grade_count) OVER (ORDER BY interval_start ASC) AS numeric(10, 2)) AS media
       FROM
-        intervals;
+        intervals
+      ORDER BY
+        interval_start ASC;
       `;
   }),
   avg3MonthsByUser: protectedProcedure
@@ -137,9 +146,10 @@ export const gradesRouter = router({
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '6 days' AS interval_start,
-          SUM(grade) as sum_grade,
-          COUNT(grade) as count_grade
+          date_trunc('week', "completedAt") AS interval_start,
+          SUM(grade) AS grade_sum,
+          COUNT(grade) AS grade_count,
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
@@ -148,24 +158,27 @@ export const gradesRouter = router({
           AND "completedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
         GROUP BY
           interval_start
-        ORDER BY
-          interval_start ASC
-        LIMIT 15
       )
       SELECT
-        to_char(interval_start, 'DD/MM') AS date_alias,
-        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+        CASE
+          WHEN row_num = 1 THEN to_char(NOW(), 'DD/MM')
+          ELSE to_char(DATE_TRUNC('week', NOW()) - INTERVAL '1 week' * (row_num - 1), 'DD/MM')
+        END AS date_alias,
+        CAST(SUM(grade_sum) OVER (ORDER BY interval_start ASC) / SUM(grade_count) OVER (ORDER BY interval_start ASC) AS numeric(10, 2)) AS media
       FROM
-        intervals;
+        intervals
+      ORDER BY
+        interval_start ASC;
       `;
     }),
   avg6Months: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 days' AS interval_start,
-          SUM(grade) as sum_grade,
-          COUNT(grade) as count_grade
+          date_trunc('week', "completedAt") AS interval_start,
+          SUM(grade) AS grade_sum,
+          COUNT(grade) AS grade_count,
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
@@ -173,16 +186,18 @@ export const gradesRouter = router({
           AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
         GROUP BY
           interval_start
-        ORDER BY
-          interval_start ASC
-        LIMIT 15
       )
       SELECT
-        to_char(interval_start, 'DD/MM') AS date_alias,
-        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+        CASE
+          WHEN row_num = 1 THEN to_char(NOW(), 'DD/MM')
+          ELSE to_char(DATE_TRUNC('week', NOW()) - INTERVAL '1 week' * (row_num - 1), 'DD/MM')
+        END AS date_alias,
+        CAST(SUM(grade_sum) OVER (ORDER BY interval_start ASC) / SUM(grade_count) OVER (ORDER BY interval_start ASC) AS numeric(10, 2)) AS media
       FROM
-        intervals;
-      `;
+        intervals
+      ORDER BY
+        interval_start ASC;
+  `;
   }),
   avg6MonthsByUser: protectedProcedure
     .input(z.string().optional())
@@ -194,9 +209,10 @@ export const gradesRouter = router({
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('day', "completedAt" - INTERVAL '1 day') + INTERVAL '12 days' AS interval_start,
-          SUM(grade) as sum_grade,
-          COUNT(grade) as count_grade
+          date_trunc('week', "completedAt") AS interval_start,
+          SUM(grade) AS grade_sum,
+          COUNT(grade) AS grade_count,
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
@@ -205,15 +221,17 @@ export const gradesRouter = router({
           AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
         GROUP BY
           interval_start
-        ORDER BY
-          interval_start ASC
-        LIMIT 15
       )
       SELECT
-        to_char(interval_start, 'DD/MM') AS date_alias,
-        ROUND(CAST(SUM(sum_grade) OVER (ORDER BY interval_start ASC) / SUM(count_grade) OVER (ORDER BY interval_start ASC) AS numeric), 2) as media
+        CASE
+          WHEN row_num = 1 THEN to_char(NOW(), 'DD/MM')
+          ELSE to_char(DATE_TRUNC('week', NOW()) - INTERVAL '1 week' * (row_num - 1), 'DD/MM')
+        END AS date_alias,
+        CAST(SUM(grade_sum) OVER (ORDER BY interval_start ASC) / SUM(grade_count) OVER (ORDER BY interval_start ASC) AS numeric(10, 2)) AS media
       FROM
-        intervals;
+        intervals
+      ORDER BY
+        interval_start ASC;
       `;
     }),
   // A distribuição das notas é calculada usando a função width_bucket do SQL, que agrupa os valores em intervalos de tamanho fixo.
