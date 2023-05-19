@@ -23,7 +23,7 @@ import React, { useState } from "react";
 
 type TasksType = NonNullable<
   RouterTypes["lesson"]["getLesson"]["output"]
->["tasks"]
+>["tasks"];
 
 type TasksProgress = NonNullable<
   RouterTypes["task"]["getTasksByUser"]["output"]
@@ -72,8 +72,7 @@ const UserTasksList = ({ tasksProgress }: UserTasksListProps) => {
               <Tr key={progress.taskId}>
                 <Td>{progress.task.name}</Td>
                 <Td>
-                  {tasksProgress &&
-                    progress.status === TaskStatus.Completed ? (
+                  {tasksProgress && progress.status === TaskStatus.Completed ? (
                     <Badge colorScheme="green">Completado</Badge>
                   ) : progress.status === TaskStatus.Submitted ? (
                     <Badge colorScheme="purple">Submetido</Badge>
@@ -115,13 +114,12 @@ const UserTasksList = ({ tasksProgress }: UserTasksListProps) => {
                   </Menu>
                 </Td>
               </Tr>
-            )
-          })
-          }
+            );
+          })}
         </Tbody>
       </Table>
     </>
-  )
-}
+  );
+};
 
 export default UserTasksList;

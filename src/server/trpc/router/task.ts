@@ -5,7 +5,12 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 /*Importações: Funções e tipos definidos pelo tRPC que vão ser utilizados nos endpoints. */
-import { router, adminProcedure, protectedProcedure, publicProcedure } from "../trpc";
+import {
+  router,
+  adminProcedure,
+  protectedProcedure,
+  publicProcedure,
+} from "../trpc";
 
 type TotalAndUnfCountByUser = {
   total: bigint;
@@ -95,19 +100,16 @@ export const taskRouter = router({
         finished: Number(data[0]?.finished),
       };
     }),
-  
-  /*O método getTasksByUser coleta as tarefas do usuário. melhorar a documentação.*/
-  getTasksByUser: publicProcedure
-    .input(z.string())
-    .query(({ ctx, input }) => {
-      const userId = input;
-      return ctx.prisma.userTaskProgress.findMany({
-        where: { userId },
-        include: { task: true },
-        orderBy: { completedAt: "desc" },
-      })
-    }),
 
+  /*O método getTasksByUser coleta as tarefas do usuário. melhorar a documentação.*/
+  getTasksByUser: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+    const userId = input;
+    return ctx.prisma.userTaskProgress.findMany({
+      where: { userId },
+      include: { task: true },
+      orderBy: { completedAt: "desc" },
+    });
+  }),
 
   /*O método totalTasksByUser retorna o total de tasks por usuário, utilizando o método count do Prisma. Caso o usuário não seja um Admin, o trpc jogará um erro.*/
   totalTasksByUser: protectedProcedure

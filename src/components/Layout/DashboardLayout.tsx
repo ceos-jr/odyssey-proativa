@@ -31,7 +31,6 @@ import Logo from "../../../public/logo.png";
 import LogoExtended from "../../../public/logo_extended.png";
 import Image from "next/image";
 
-
 interface LinkItemProps {
   name: string;
   icon: IconType;
@@ -40,7 +39,7 @@ interface LinkItemProps {
 
 const LinkItems: Array<LinkItemProps> = [
   { name: "Home", icon: FiHome, link: "" },
-  {name: "Atividades", icon: FaTasks, link: "tasks"},
+  { name: "Atividades", icon: FaTasks, link: "tasks" },
   { name: "Modulos", icon: AiOutlineBook, link: "modules" },
 ];
 
