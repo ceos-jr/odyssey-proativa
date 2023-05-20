@@ -18,7 +18,7 @@ import {
   MenuList,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiBell, FiChevronDown } from "react-icons/fi";
-import { FaHardHat, FaUserCircle } from "react-icons/fa";
+import { FaHardHat, FaUserCircle, FaTasks } from "react-icons/fa";
 import { AiOutlineBook } from "react-icons/ai";
 import type { IconType } from "react-icons";
 import NextLink from "next/link";
@@ -36,8 +36,10 @@ interface LinkItemProps {
   icon: IconType;
   link: string;
 }
+
 const LinkItems: Array<LinkItemProps> = [
   { name: "Home", icon: FiHome, link: "" },
+  { name: "Atividades", icon: FaTasks, link: "tasks" },
   { name: "Modulos", icon: AiOutlineBook, link: "modules" },
 ];
 
