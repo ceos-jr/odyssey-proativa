@@ -102,14 +102,16 @@ export const taskRouter = router({
     }),
 
   /*O método getTasksByUser coleta as tarefas do usuário. melhorar a documentação.*/
-  getTasksByUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
-    const userId = input;
-    return ctx.prisma.userTaskProgress.findMany({
-      where: { userId },
-      include: { task: true },
-      orderBy: { completedAt: "desc" },
-    });
-  }),
+  getTasksByUser: protectedProcedure
+    .input(z.string())
+    .query(({ ctx, input }) => {
+      const userId = input;
+      return ctx.prisma.userTaskProgress.findMany({
+        where: { userId },
+        include: { task: true },
+        orderBy: { completedAt: "desc" },
+      });
+    }),
 
   /*O método totalTasksByUser retorna o total de tasks por usuário, utilizando o método count do Prisma. Caso o usuário não seja um Admin, o trpc jogará um erro.*/
   totalTasksByUser: protectedProcedure
