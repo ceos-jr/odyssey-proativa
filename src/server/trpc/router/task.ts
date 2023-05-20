@@ -102,7 +102,7 @@ export const taskRouter = router({
     }),
 
   /*O método getTasksByUser coleta as tarefas do usuário. melhorar a documentação.*/
-  getTasksByUser: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+  getTasksByUser: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
     const userId = input;
     return ctx.prisma.userTaskProgress.findMany({
       where: { userId },
