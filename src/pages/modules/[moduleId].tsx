@@ -139,7 +139,9 @@ const UniqueModule = () => {
             </div>
             <Text className="my-6">{moduleData?.description}</Text>
             <Text className="my-2">{moduleData?.body}</Text>
-            <Heading as="h2" className="my-4">Aulas</Heading>
+            <Heading as="h2" className="my-4">
+              Aulas
+            </Heading>
             <LessonsList lessons={moduleData.lessons} userModRel={userRel} />
             {session?.user?.role === Roles.Admin ? (
               <SingleModSuggestionList moduleId={moduleId} />
