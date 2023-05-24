@@ -24,6 +24,7 @@ import useCustomToast from "@hooks/useCustomToast";
 
 export const FormSchema = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
+  body: z.string(),
   description: z.string(),
   lessons: z
     .array(
@@ -95,6 +96,14 @@ const CreateModule = () => {
               {errors.name && (
                 <FormErrorMessage>{errors.name.message}</FormErrorMessage>
               )}
+            </FormControl>
+            <FormControl id="body">
+              <FormLabel>Corpo do Modulo</FormLabel>
+              <Input
+                bgColor="white"
+                placeholder="corpo do seu módulo"
+                {...register("body")}
+              />
             </FormControl>
             <FormControl id="description">
               <FormLabel>Descrição do Modulo</FormLabel>
@@ -176,8 +185,8 @@ const CreateModule = () => {
             })}
             <Button
               variant="solid"
-              colorScheme="red"
-              className=""
+              colorScheme="green"
+              className="my-4 w-1/3"
               type="submit"
             >
               Criar Modulo
