@@ -6,7 +6,7 @@ import {
   SkeletonText,
   Button,
   useDisclosure,
-  TableContainer
+  TableContainer,
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import ModSuggestionModal from "@components/Layout/ModSuggestionModal";
@@ -138,8 +138,8 @@ const UniqueModule = () => {
                   </Button>
                 </div>
               )}
-            </div >
-            <DisplayMarkdown className="my-6" text={moduleData?.body || ""}/>
+            </div>
+            <DisplayMarkdown className="my-6" text={moduleData?.body || ""} />
             <Heading as="h2" className="my-4">
               Aulas
             </Heading>

@@ -9,7 +9,12 @@ import {
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import Head from "next/head";
-import { type Control, useForm, useWatch, useFieldArray } from "react-hook-form";
+import {
+  type Control,
+  useForm,
+  useWatch,
+  useFieldArray,
+} from "react-hook-form";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
 import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -109,14 +114,14 @@ const CreateModule = () => {
             </FormControl>
             <FormControl id="body">
               <FormLabel>Corpo do Modulo (em markdown)</FormLabel>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <AutoResizeTextarea
-                    placeholder="corpo do seu módulo"
-                    bgColor="white"
-                    {...register("body")}
-                  />
-                  <PreviewText control={control} />
-                </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <AutoResizeTextarea
+                  placeholder="corpo do seu módulo"
+                  bgColor="white"
+                  {...register("body")}
+                />
+                <PreviewText control={control} />
+              </div>
             </FormControl>
             <div className="flex justify-between gap-x-4">
               <Heading>Tópicos</Heading>
