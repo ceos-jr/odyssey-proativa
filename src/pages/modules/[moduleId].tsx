@@ -6,9 +6,11 @@ import {
   SkeletonText,
   Button,
   useDisclosure,
+  TableContainer,
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import ModSuggestionModal from "@components/Layout/ModSuggestionModal";
+import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
 import LessonsList from "@components/modules/LessonsList";
 import SingleModSuggestionList from "@components/modules/SingleModSuggestionList";
 import useCustomToast from "@hooks/useCustomToast";
@@ -137,7 +139,10 @@ const UniqueModule = () => {
                 </div>
               )}
             </div>
-            <Text className="my-4">{moduleData?.description}</Text>
+            <DisplayMarkdown className="my-6" text={moduleData?.body || ""} />
+            <Heading as="h2" className="my-4">
+              Aulas
+            </Heading>
             <LessonsList lessons={moduleData.lessons} userModRel={userRel} />
             {session?.user?.role === Roles.Admin ? (
               <SingleModSuggestionList moduleId={moduleId} />
