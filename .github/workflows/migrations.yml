@@ -1,0 +1,27 @@
+name: Deploy to Railway
+
+on:
+  push:
+    paths: ["prisma/**"]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run prisma generate
+        run: npx prisma generate
+
+      - name: Deploy new migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
