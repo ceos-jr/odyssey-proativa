@@ -80,6 +80,7 @@ const UserSubmissions = () => {
                   <Tr>
                     <Th>Usuário</Th>
                     <Th>Atividade</Th>
+                    <Th>Data de submissão</Th>
                     <Th isNumeric>Ações</Th>
                   </Tr>
                 </Thead>
@@ -104,6 +105,7 @@ const UserSubmissions = () => {
                         </div>
                       </Td>
                       <Td>{sub.task.name}</Td>
+                      <Td>{sub.task.createdAt.getDay()}</Td>
                       <Td className="flex justify-end">
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />
