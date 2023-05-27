@@ -44,6 +44,7 @@ export const moduleRouter = router({
         os tópicos e atividades presentes nesse módulo e retorna esse valor.
           -> Esse procedimento é público.
       */
+
       return ctx.prisma.module.findUnique({
         where: { id: input.moduleId },
         include: {
@@ -168,6 +169,29 @@ export const moduleRouter = router({
         },
       });
     }),
+  createEmptyLessonInPrevMod: adminProcedure
+  .input(z.object({ modId: z.string(), newLessonindex: z.Number()}))
+  .mutation(async ({ctx, input}) => {
+    const lessonsCurrentOrder = await ctx.prisma.module.findUnique({
+      where: {
+        id: input.modId
+      },
+      include: {
+        lessons: {
+          index: true,
+          previos: true,
+          next: true
+        }
+      }
+    });
+
+    const lessonsNewOrder = lessonsCurrentOrder.map((lesson, lessonIndex, lessonArray) => {
+      if (!lessonArray[lessonIndex - 1] || !lessonArray[lessonIndex - 1].id) {
+        lessson.previous = lessonArray[lessonIndex].id;
+      }
+    });
+
+  }),
   createModWLessons: adminProcedure
     .input(FormSchema)
     .mutation(async ({ ctx, input }) => {
