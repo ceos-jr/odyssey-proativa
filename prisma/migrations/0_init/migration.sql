@@ -1,5 +1,8 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'TEACHER', 'STUDENT');
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'MEMBER', 'GUEST', 'UNAUTHENTICATED');
+
+-- CreateEnum
+CREATE TYPE "TaskStatus" AS ENUM ('NOTSUBMITTED', 'SUBMITTED', 'COMPLETED');
 
 -- CreateTable
 CREATE TABLE "Account" (
@@ -36,7 +39,7 @@ CREATE TABLE "User" (
     "email" TEXT,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
-    "role" "Role" NOT NULL,
+    "role" "Role" NOT NULL DEFAULT 'GUEST',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -45,21 +48,33 @@ CREATE TABLE "User" (
 CREATE TABLE "UserModuleProgress" (
     "userId" TEXT NOT NULL,
     "moduleId" TEXT NOT NULL,
-    "completed" BOOLEAN NOT NULL DEFAULT false
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastTimeSeen" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "completedAt" TIMESTAMP(3)
 );
 
 -- CreateTable
 CREATE TABLE "UserLessonProgress" (
     "userId" TEXT NOT NULL,
+    "moduleId" TEXT NOT NULL,
     "lessonId" TEXT NOT NULL,
-    "completed" BOOLEAN NOT NULL DEFAULT false
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastTimeSeen" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "completedAt" TIMESTAMP(3)
 );
 
 -- CreateTable
 CREATE TABLE "UserTaskProgress" (
     "userId" TEXT NOT NULL,
     "taskId" TEXT NOT NULL,
-    "completed" BOOLEAN NOT NULL DEFAULT false
+    "lessonId" TEXT NOT NULL,
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "status" "TaskStatus" NOT NULL DEFAULT 'NOTSUBMITTED',
+    "richText" TEXT,
+    "grade" DOUBLE PRECISION,
+    "completedAt" TIMESTAMP(3)
 );
 
 -- CreateTable
@@ -73,6 +88,8 @@ CREATE TABLE "VerificationToken" (
 CREATE TABLE "Module" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "body" TEXT,
+    "description" TEXT,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Module_pkey" PRIMARY KEY ("id")
@@ -92,9 +109,14 @@ CREATE TABLE "Achievement" (
 -- CreateTable
 CREATE TABLE "Lesson" (
     "id" TEXT NOT NULL,
+    "index" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "richText" TEXT NOT NULL,
     "moduleId" TEXT NOT NULL,
+    "previous" TEXT,
+    "next" TEXT,
 
     CONSTRAINT "Lesson_pkey" PRIMARY KEY ("id")
 );
@@ -103,6 +125,7 @@ CREATE TABLE "Lesson" (
 CREATE TABLE "Task" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "richText" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lessonId" TEXT NOT NULL,
 
@@ -110,13 +133,59 @@ CREATE TABLE "Task" (
 );
 
 -- CreateTable
-CREATE TABLE "Suggestion" (
+CREATE TABLE "Video" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "description" TEXT,
+    "lessonId" TEXT NOT NULL,
+
+    CONSTRAINT "Video_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Project" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "richText" TEXT NOT NULL,
+    "lessonId" TEXT NOT NULL,
+
+    CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Link" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "description" TEXT,
+    "lessonId" TEXT NOT NULL,
+
+    CONSTRAINT "Link_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "mod_suggestions" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
     "moduleId" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "readed" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "Suggestion_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "mod_suggestions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "les_suggestions" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT NOT NULL,
+    "lessonId" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "readed" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "les_suggestions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -162,10 +231,16 @@ ALTER TABLE "UserLessonProgress" ADD CONSTRAINT "UserLessonProgress_userId_fkey"
 ALTER TABLE "UserLessonProgress" ADD CONSTRAINT "UserLessonProgress_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "UserLessonProgress" ADD CONSTRAINT "UserLessonProgress_userId_moduleId_fkey" FOREIGN KEY ("userId", "moduleId") REFERENCES "UserModuleProgress"("userId", "moduleId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "UserTaskProgress" ADD CONSTRAINT "UserTaskProgress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserTaskProgress" ADD CONSTRAINT "UserTaskProgress_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserTaskProgress" ADD CONSTRAINT "UserTaskProgress_userId_lessonId_fkey" FOREIGN KEY ("userId", "lessonId") REFERENCES "UserLessonProgress"("userId", "lessonId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Achievement" ADD CONSTRAINT "Achievement_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -177,7 +252,23 @@ ALTER TABLE "Lesson" ADD CONSTRAINT "Lesson_moduleId_fkey" FOREIGN KEY ("moduleI
 ALTER TABLE "Task" ADD CONSTRAINT "Task_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Suggestion" ADD CONSTRAINT "Suggestion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Video" ADD CONSTRAINT "Video_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Suggestion" ADD CONSTRAINT "Suggestion_moduleId_fkey" FOREIGN KEY ("moduleId") REFERENCES "Module"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Project" ADD CONSTRAINT "Project_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Link" ADD CONSTRAINT "Link_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "mod_suggestions" ADD CONSTRAINT "mod_suggestions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "mod_suggestions" ADD CONSTRAINT "mod_suggestions_moduleId_fkey" FOREIGN KEY ("moduleId") REFERENCES "Module"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "les_suggestions" ADD CONSTRAINT "les_suggestions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "les_suggestions" ADD CONSTRAINT "les_suggestions_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

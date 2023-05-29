@@ -215,6 +215,7 @@ export const moduleRouter = router({
         // 1ª passo ocorre aqui
         data: {
           name: input.name,
+          body: input.body,
           description: input.description,
           lessons: {
             createMany: {

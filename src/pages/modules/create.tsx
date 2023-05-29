@@ -9,7 +9,14 @@ import {
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import Head from "next/head";
-import { useFieldArray, useForm } from "react-hook-form";
+import {
+  type Control,
+  useForm,
+  useWatch,
+  useFieldArray,
+} from "react-hook-form";
+import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
+import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -24,6 +31,7 @@ import useCustomToast from "@hooks/useCustomToast";
 
 export const FormSchema = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
+  body: z.string(),
   description: z.string(),
   lessons: z
     .array(
@@ -104,6 +112,17 @@ const CreateModule = () => {
                 {...register("description")}
               />
             </FormControl>
+            <FormControl id="body">
+              <FormLabel>Corpo do Modulo (em markdown)</FormLabel>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <AutoResizeTextarea
+                  placeholder="corpo do seu módulo"
+                  bgColor="white"
+                  {...register("body")}
+                />
+                <PreviewText control={control} />
+              </div>
+            </FormControl>
             <div className="flex justify-between gap-x-4">
               <Heading>Tópicos</Heading>
               <Button
@@ -176,8 +195,8 @@ const CreateModule = () => {
             })}
             <Button
               variant="solid"
-              colorScheme="red"
-              className=""
+              colorScheme="green"
+              className="my-4 w-1/3"
               type="submit"
             >
               Criar Modulo
@@ -190,6 +209,11 @@ const CreateModule = () => {
 };
 
 export default CreateModule;
+
+const PreviewText = ({ control }: { control: Control<FormSchemaType> }) => {
+  const text = useWatch({ control, name: "body" });
+  return <DisplayMarkdown text={text} />;
+};
 
 CreateModule.getLayout = function getLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;

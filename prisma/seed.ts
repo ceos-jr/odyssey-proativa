@@ -11,6 +11,7 @@ const modules: Prisma.ModuleCreateInput[] = [
   {
     id: "cla8sob6p000008l0dzndfppl",
     name: "css",
+    body: "Jonathan galindo's body",
     description: "Seja bem vindos ao módulo CSS",
   },
 ];

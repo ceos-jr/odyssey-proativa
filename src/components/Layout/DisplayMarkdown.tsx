@@ -4,14 +4,15 @@ import remarkGfm from "remark-gfm";
 
 interface DisplayMarkdownProps {
   text: string;
+  className?: string;
 }
 
-const DisplayMarkdown = ({ text }: DisplayMarkdownProps) => {
+const DisplayMarkdown = ({ className, text }: DisplayMarkdownProps) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
-      className="prose prose-lg max-w-none"
+      className={`prose prose-lg max-w-none ${className}`}
     >
       {text}
     </ReactMarkdown>
