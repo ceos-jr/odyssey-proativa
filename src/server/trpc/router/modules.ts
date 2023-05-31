@@ -169,27 +169,102 @@ export const moduleRouter = router({
         },
       });
     }),
-  createEmptyLessonInPrevMod: adminProcedure
-  .input(z.object({ modId: z.string(), newLessonindex: z.Number()}))
-  .mutation(async ({ctx, input}) => {
-    const lessonsCurrentOrder = await ctx.prisma.module.findUnique({
-      where: {
-        id: input.modId
-      },
+  editModule: adminProcedure
+   .input(z.object({ inputModule: FormSchema, modId: z.string() }))
+   .mutation(async ({ctx, input}) => {
+    const inputModule = input.inputModule;
+    const modId = input.modId;
+
+    // console.log(input, modId, {
+    //   where: { id: modId },
+    //   include: {
+    //     lessons: {
+    //       select: {
+    //         id: true,
+    //         name: true,
+    //         tasks: { select: { id: true } },
+    //       },
+    //       orderBy: { index: "asc" },
+    //     },
+    //   },
+    // });
+    
+
+    const currentModule = await ctx.prisma.module.findUnique({
+      where: { id: modId },
       include: {
         lessons: {
-          index: true,
-          previos: true,
-          next: true
-        }
-      }
+          select: {
+            id: true,
+            name: true,
+            tasks: { select: { id: true } },
+          },
+          orderBy: { index: "asc" },
+        },
+      },
     });
 
-    const lessonsNewOrder = lessonsCurrentOrder.map((lesson, lessonIndex, lessonArray) => {
-      if (!lessonArray[lessonIndex - 1] || !lessonArray[lessonIndex - 1].id) {
-        lessson.previous = lessonArray[lessonIndex].id;
-      }
+    console.log(currentModule);
+
+    const lessonsToDelete = [];
+    const lessonsToUptade = [];
+    const lessonsToCreate = [];
+    
+    const currentLessonsId = new Set<string>(
+      currentModule.lessons.map((lesson) => lesson.id)
+    );
+    const editedLessonsId = new Set<string>(
+      inputModule.lessons.map((lesson) => lesson.id)
+    );
+
+    inputModule.lessons.concat(currentModule.lessons).
+      forEach((lesson) => {
+        if (!editedLessonsId.has(lesson.id)) {
+          lessonsToDelete.push(lesson);
+        } else if (!currentLessonsId.has(lesson.id)) {
+          lessonsToCreate.push(lesson);
+        } else {
+          lessonsToUptade.push(lesson);
+        }
     });
+
+    return await ctx.prisma.$transaction(async (tx) => {
+      lessonsToDelete.map((lesson) => {
+        tx.lesson.delete({
+          where: { id: lesson.id }
+        })
+      });
+
+      const resp = await tx.module.update({
+        where: { id: modId },
+        data: {
+          name: inputModule.name,
+          body: inputModule.body,
+          description: inputModule.description,
+          lessons: {
+            createMany: {
+              data: lessonsToCreate
+            }
+          }
+        },
+        select: { lessons: true }
+      });
+
+      resp.lessons.map((lesson, index, array) => {
+        if (array[index - 1]) {
+          lesson.previous = array[index - 1]?.id ?? "";
+        }
+        if (index < array.length) {
+          lesson.next = array[index + 1]?.id ?? "";
+        }
+        return { id: lesson.id, next: lesson.next, previous: lesson.previous };
+      }).map((lesson) => {
+        tx.lesson.update({
+          where: { id: lesson.id },
+          data: { next: lesson.next, previous: lesson.previous }
+        })
+      });
+    })
 
   }),
   createModWLessons: adminProcedure

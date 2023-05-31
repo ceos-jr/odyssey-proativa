@@ -22,6 +22,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
+import NextLink from "next/link";
 
 const UniqueModule = () => {
   const { data: session } = useSession();
@@ -117,8 +118,16 @@ const UniqueModule = () => {
                       onClick={() => delModule.mutate(moduleId)}
                     >
                       Deletar
-                    </Button>
-                  )}
+                    </Button>) && (
+                    <NextLink href={`/modules/${moduleId}/edit`}>
+                      <Button
+                        leftIcon={<AiOutlineDelete />}
+                        colorScheme="blue"
+                      >
+                        Editar
+                      </Button>
+                    </NextLink>)
+                  }
                   <Button
                     onClick={onOpen}
                     leftIcon={<AiOutlineInbox />}
