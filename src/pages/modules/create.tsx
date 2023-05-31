@@ -29,7 +29,7 @@ import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
 import useCustomToast from "@hooks/useCustomToast";
 
-export const FormSchema = z.object({
+export const FormSchemaCreate = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
   body: z.string(),
   description: z.string(),

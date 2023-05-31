@@ -1,4 +1,5 @@
-import { FormSchema } from "src/pages/modules/create";
+import { FormSchemaCreate } from "src/pages/modules/create";
+import { FormSchemaUpdate } from "src/pages/modules/index";
 import { z } from "zod";
 
 import {
@@ -170,25 +171,10 @@ export const moduleRouter = router({
       });
     }),
   editModule: adminProcedure
-   .input(z.object({ inputModule: FormSchema, modId: z.string() }))
+   .input(z.object({ inputModule: FormSchemaUpdate, modId: z.string() }))
    .mutation(async ({ctx, input}) => {
     const inputModule = input.inputModule;
     const modId = input.modId;
-
-    // console.log(input, modId, {
-    //   where: { id: modId },
-    //   include: {
-    //     lessons: {
-    //       select: {
-    //         id: true,
-    //         name: true,
-    //         tasks: { select: { id: true } },
-    //       },
-    //       orderBy: { index: "asc" },
-    //     },
-    //   },
-    // });
-    
 
     const currentModule = await ctx.prisma.module.findUnique({
       where: { id: modId },
@@ -204,36 +190,80 @@ export const moduleRouter = router({
       },
     });
 
-    console.log(currentModule);
+    console.log(currentModule,inputModule);
 
     const lessonsToDelete = [];
     const lessonsToUptade = [];
     const lessonsToCreate = [];
     
-    const currentLessonsId = new Set<string>(
-      currentModule.lessons.map((lesson) => lesson.id)
+    const inInput = new Set<string>(
+      currentModule.lessons.filter((lesson) => lesson?.id ? true : false)
     );
-    const editedLessonsId = new Set<string>(
+
+    const inCurrent = new Set<string>(
       inputModule.lessons.map((lesson) => lesson.id)
     );
 
-    inputModule.lessons.concat(currentModule.lessons).
-      forEach((lesson) => {
-        if (!editedLessonsId.has(lesson.id)) {
-          lessonsToDelete.push(lesson);
-        } else if (!currentLessonsId.has(lesson.id)) {
-          lessonsToCreate.push(lesson);
-        } else {
-          lessonsToUptade.push(lesson);
-        }
-    });
+    currentModule.lessons.forEach((lesson) => {
+      const fmtLesson = {
+        id: lesson.id,
+        name: lesson.name,
+        richText: lesson?.richText ?? "",
+        index: lesson.index ?? 0
+      }
 
-    return await ctx.prisma.$transaction(async (tx) => {
-      lessonsToDelete.map((lesson) => {
+      if (!inInput.has(lesson.id)) {
+        lessonsToDelete.push(fmtLesson);
+        console.log("Está em Current e não está em Input -> Delete \n -->", fmtLesson);
+      }
+
+      if (!inCurrent.has(lesson.id) && !inInput.has(lesson.id)) {
+        console.log("Estranho - não está em Current e não está em Input");
+      }
+    })
+
+    // console.log("União: ", new Set([...inCurrent, ...inInput]));
+
+    inputModule.lessons.forEach((lesson) => {
+      const fmtLesson = {
+        id: lesson.id ?? undefined,
+        name: lesson.name,
+        richText: lesson?.richText ?? "",
+        index: lesson.index ?? 0
+      }
+
+      if (inCurrent.has(lesson.id) && lesson.id) {
+        lessonsToUptade.push(fmtLesson);
+        console.log("Está em Current e está em Input -> Update \n -->", fmtLesson);
+      } else {
+        lessonsToCreate.push(fmtLesson);
+        console.log("Não Está em Current e está em Input -> Create \n -->", fmtLesson);
+      }
+
+      if (!inCurrent.has(lesson.id) && !inInput.has(lesson.id)) {
+        console.log("Estranho - não está em Current e não está em Input");
+      }
+    })
+
+    await ctx.prisma.$transaction(async (tx) => {
+      const deletedLessons = await lessonsToDelete.map(async (lesson) => {
         tx.lesson.delete({
-          where: { id: lesson.id }
+          where: { id: lesson.id },
         })
       });
+
+      console.log("Lessons deletadas: ", deletedLessons);
+
+      const updatedLessons = await lessonsToUptade.map(async (lesson) => {
+        await tx.lesson.update({
+          where: { id: lesson.id },
+          data: { 
+            name: lesson.name,
+          }
+        })
+      });
+
+      console.log("Lessons autalizadas: ", updatedLessons);
 
       const resp = await tx.module.update({
         where: { id: modId },
@@ -242,9 +272,7 @@ export const moduleRouter = router({
           body: inputModule.body,
           description: inputModule.description,
           lessons: {
-            createMany: {
-              data: lessonsToCreate
-            }
+            createMany: { data: lessonsToCreate }
           }
         },
         select: { lessons: true }
@@ -264,11 +292,11 @@ export const moduleRouter = router({
           data: { next: lesson.next, previous: lesson.previous }
         })
       });
-    })
+    });
 
   }),
   createModWLessons: adminProcedure
-    .input(FormSchema)
+    .input(FormSchemaCreate)
     .mutation(async ({ ctx, input }) => {
       /*
       - createModWLessons("Create Module With Lessons"): Cria um módulo com tópicos seguindo os seguintes passos:

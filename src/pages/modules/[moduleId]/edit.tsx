@@ -28,28 +28,14 @@ import {
   import { trpc } from "@utils/trpc";
   import { useRouter } from "next/router";
   import useCustomToast from "@hooks/useCustomToast";
+  import { FormSchemaUpdate } from "src/pages/modules/index";
   
-  export const FormSchema = z.object({
-    name: z.string().min(1, { message: "O nome do módulo é necessário" }),
-    body: z.string(),
-    description: z.string(),
-    lessons: z
-      .array(
-        z.object({
-          name: z.string().min(1, { message: "O nome do tópico é obrigatório" }),
-          richText: z.string(),
-          index: z.number(),
-        })
-      )
-      .min(1, { message: "Você deve incluir pelo menos 1 tópico" }),
-  });
-  
-  type FormSchemaType = z.infer<typeof FormSchema>;
+  type FormSchemaType = z.infer<typeof FormSchemaUpdate>;
   
   const EditModule = () => {
     const router = useRouter();
     const moduleId = useRouter().query.moduleId as string;
-    const { data: moduleData } = trpc.module.getUnique.useQuery(
+    const { data: formS } = trpc.module.getUnique.useQuery(
       {
         moduleId,
       },
@@ -62,20 +48,20 @@ import {
       register,
       formState: { errors },
     } = useForm<FormSchemaType>({
-      resolver: zodResolver(FormSchema),
+      resolver: zodResolver(FormSchemaUpdate),
       defaultValues: { 
-        name: moduleData?.name ?? "",
-        body: moduleData?.body ?? "",
-        description: moduleData?.description ?? "",
-        lessons: moduleData?.lessons?.map((lesson) => {
+        name: formS?.name ?? "",
+        body: formS?.body ?? "",
+        description: formS?.description ?? "",
+        lessons: formS?.lessons?.map((lesson, index) => {
           return {
-            name: lesson?.name ?? "",
-            richText: lesson?.richText ?? "",
-            index: lesson?.index ?? 0
+            id: lesson.id ?? "",
+            name: lesson.name,
+            index: lesson.index ?? index
           }
         }) ?? [{
+          id: "",
           name: "",
-          richText: "",
           index: 0 
         }]
       },
@@ -117,14 +103,14 @@ import {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mx-auto flex max-w-4xl flex-col gap-y-4">
               <Heading>Editar Modulo</Heading>
-              <FormControl id="name" isInvalid={!!errors.name} isRequired>
+              <FormControl id="name" isInvalid={!!errors.name}>
                 <FormLabel>Nome do Modulo</FormLabel>
                 <Input
                   bgColor="white"
                   placeholder="o melhor modulo do mundo"
                   {...register("name")}
                 />
-                {errors.name && (
+                {errors.names && (
                   <FormErrorMessage>{errors.name.message}</FormErrorMessage>
                 )}
               </FormControl>
@@ -155,8 +141,8 @@ import {
                   variant="solid"
                   onClick={() =>
                     append({
+                      id: null,
                       name: "",
-                      richText: "",
                       index: fields.length + 1,
                     })
                   }
@@ -173,7 +159,7 @@ import {
                     key={field.id}
                     id={`lessons_${index}_name`}
                     isInvalid={!!errors.lessons && !!errors.lessons[index]}
-                    isRequired
+                  
                   >
                     <FormLabel>Nome do tópico</FormLabel>
                     <div className="flex justify-between gap-x-4">

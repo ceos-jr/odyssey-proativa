@@ -6,6 +6,7 @@ import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import CompletedUserModules from "@components/modules/CompletedUserModules";
 import { Roles } from "@utils/constants";
+import { z } from "zod";
 
 const Modules = () => {
   return (
@@ -24,6 +25,21 @@ const Modules = () => {
 };
 
 export default Modules;
+
+export const FormSchemaUpdate = z.object({
+  name: z.string().min(1, { message: "O nome do módulo é necessário" }),
+  body: z.string(),
+  description: z.string(),
+  lessons: z
+    .array(
+      z.object({
+        id: z.string().nullable(),
+        name: z.string().min(1, { message: "O nome do tópico é obrigatório" }),
+        index: z.number(),
+      })
+    )
+    .min(1, { message: "Você deve incluir pelo menos 1 tópico" }),
+});
 
 Modules.getLayout = function getLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
