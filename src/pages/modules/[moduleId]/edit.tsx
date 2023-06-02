@@ -110,7 +110,7 @@ import {
                   placeholder="o melhor modulo do mundo"
                   {...register("name")}
                 />
-                {errors.names && (
+                {errors.name && (
                   <FormErrorMessage>{errors.name.message}</FormErrorMessage>
                 )}
               </FormControl>
@@ -209,7 +209,7 @@ import {
                 className="my-4 w-1/3"
                 type="submit"
               >
-                Criar Modulo
+                Editar Modulo
               </Button>
             </div>
           </form>
