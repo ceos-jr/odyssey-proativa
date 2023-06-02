@@ -44,7 +44,7 @@ export const FormSchemaCreate = z.object({
     .min(1, { message: "Você deve incluir pelo menos 1 tópico" }),
 });
 
-type FormSchemaType = z.infer<typeof FormSchema>;
+type FormSchemaType = z.infer<typeof FormSchemaCreate>;
 
 const CreateModule = () => {
   const {
@@ -53,7 +53,7 @@ const CreateModule = () => {
     register,
     formState: { errors },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(FormSchemaCreate),
     defaultValues: { lessons: [{ name: "", richText: "", index: 0 }] },
     mode: "all",
   });
