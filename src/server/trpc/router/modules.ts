@@ -241,7 +241,7 @@ export const moduleRouter = router({
         console.log("Lessons deletadas: ", deletedLessons);
       }
       
-      const editModuleLessons = await Promise.all(inputModule.lessons.map((lesson, realIndex) => { // fazer de uma vez preserva a ordem de input!!!
+      const editModuleLessons = await Promise.all(inputModule.lessons.map(async (lesson, realIndex) => { // fazer de uma vez preserva a ordem de input!!!
         if (currtSet.has(lesson.id) || !lesson.id) { // se está em current então já existe || ainda não possui id 
           console.log("[Update]Name:" + lesson.name)
 
@@ -256,17 +256,36 @@ export const moduleRouter = router({
         } else { // se não está então ainda não existe 
           console.log("[Create]Name:" + lesson.name)
 
-          return transaction.lesson.create({
+          const newLesson = await transaction.lesson.create({
             data: {
               moduleId: modId,
               name: lesson.name,
               richText: "",
-              index: realIndex
-            }
+              index: realIndex,
+            },
           });
+          
+          const allSubsInMod = await transaction.userModuleProgress.findMany({
+            where: { moduleId: modId },
+          });
+          
+          const newLessonsProgress = await Promise.all(allSubsInMod.map((sub) => {
+            const lessonProg = transaction.userLessonProgress.create({
+              data: {
+                userId: sub.userId,
+                moduleId: modId,
+                lessonId: newLesson.id,
+              } 
+            });
+
+            return lessonProg;
+          }));
+
+          console.log("Novas LessonsProgress: ", newLessonsProgress);
+
+          return newLesson;
         }
       }));
-
 
       const updatedModule = await transaction.module.update({
         where: { id: modId },
@@ -282,11 +301,18 @@ export const moduleRouter = router({
         }
       });
 
+
+
       console.log(updatedModule);
 
-      const updatedIndexes = await Promise.all(
-        lessonsStepOrder(updatedModule.lessons).map(async (stepOrder) => {
-          
+      const corrections = await Promise.all(
+        lessonsStepOrder(updatedModule.lessons).map((stepOrder) => {
+          // const userProg = await ctx.prisma.userLessonProgress.findUnique({
+          //   where: {
+          //     userId_lessonId: { userId: ctx.session.user.id, lessonId: input },
+          //   },
+          // });
+
           return transaction.lesson.update({
             where: { id: stepOrder.id },
             data: { 
@@ -296,8 +322,8 @@ export const moduleRouter = router({
           })        
       }));
 
-      console.log(updatedIndexes);
-    })
+      console.log(corrections);
+  });
   }),
   createModWLessons: adminProcedure
     .input(FormSchemaCreate)

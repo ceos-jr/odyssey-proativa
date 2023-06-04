@@ -79,28 +79,6 @@ const EditModule = () => {
     control,
   });
 
-  const swapFields = (fromIndex: number, diff: number) => {
-    const toIndex = fromIndex + diff;
-    const updatedFields = [...fields];
-
-    if (updatedFields[fromIndex] && updatedFields[toIndex]) {
-      const toIndex = fromIndex + diff;
-      
-      const fromField = updatedFields[fromIndex];
-      const toField = updatedFields[toIndex];
-
-      const aux = fromField.index;
-
-      fromField.index = fromField.index + diff;
-      toField.index = aux;
-
-      move(fromIndex, toIndex);
-
-      // update(fromIndex, toField);
-      // update(toIndex, fromField);
-    }
-  }
-
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
   const editModule = trpc.module.editModule.useMutation({
@@ -198,7 +176,7 @@ const EditModule = () => {
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                 >
-                  <FormLabel>Nome do tópico {field.index}</FormLabel>
+                  <FormLabel>Nome do tópico</FormLabel>
                   
                   {console.log("Index: ", field.index, "Name: ", field.name)}
                   <div className="flex justify-between gap-x-4">
@@ -224,7 +202,7 @@ const EditModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        swapFields(index, -1);
+                        move(index, index-1);
                       }}
                     />
                     <Icon
@@ -233,7 +211,7 @@ const EditModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        swapFields(index, +1);
+                        move(index, index+1);
                       }}
                     />
                   </div>
