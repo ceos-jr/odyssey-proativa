@@ -101,6 +101,33 @@ const EditModule = () => {
     editModule.mutate({ inputModule: data, modId: moduleId });
   };
 
+  /* Erro ao recarregar a pagina:
+    "
+    ❌ tRPC failed on module.getUnique: TRPCError: [
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "received": "undefined",
+        "path": [
+          "moduleId"
+        ],
+        "message": "Required"
+      }
+    ]
+    ❌ tRPC failed on module.getUserModStats: TRPCError: [
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "received": "undefined",
+        "path": [
+          "moduleId"
+        ],
+        "message": "Required"
+      }
+    ]
+    "
+  */
+
   return (
     <>
       <Head>

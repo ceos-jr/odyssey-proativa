@@ -191,28 +191,44 @@ export const moduleRouter = router({
       },
     });
 
-    const inputSet = new Set(inputModule.lessons.map(lesson => lesson.id));
-    const currtSet = new Set(currentModule.lessons.map(lesson => lesson.id));
+    const inputSet = new Set(inputModule.lessons.map(lesson => lesson.id)); // id's Input armazendos ~ O(n)
+    const currtSet = new Set(currentModule.lessons.map(lesson => lesson.id)); // id's Current armazendos ~ O(n)
 
-    console.log("INPUT_SET", inputSet);
+    // console.log("INPUT_SET", inputSet); [debug-Pedro]
 
-    // const lessonsToDelete = currentModule.lessons.filter((lesson) => !inputSet.has(lesson.id)); // testar 
-    const lessonsToDelete = currentModule.lessons.filter((lesson) => {
-      if (!inputSet.has(lesson.id)) {
+    const lessonsToDelete = currentModule.lessons.filter((lesson) => { // Se esta em current e nao esta em input -> delete 
+      if (!inputSet.has(lesson.id)) { // O(1) ~ essa e a vatagem do Set 
         return true;
       }
 
       return false;
     });
 
-    const lessonsStepOrder = (lessonsArray) => {
-      console.log(lessonsArray);
+    const lessonsStepOrder = (lessonsArray) => { // Bug!!!
+      // As vezes ao criar uma lesson e colocar ela na 1a posicao ela fica com o valor de .previous errado, 
+      // nao deve ser um problema grande ou estrutura, so nao achei ele antes de dormir 
+      // console.log(lessonsArray); [debug-Pedro]
       return lessonsArray.map((lesson, index) => {
         const stepOrder = { 
           previos: "",
           next: "",
           id: lesson.id
         }
+
+        // Sobre a ordem das lessons: 
+        // L = Lesson em questao, L-1 = Lesson anterior, L+1 = Lesson posterior
+
+        // Para L-1 != null && L+1 != null 
+        //    L-1 <- L -> L+1
+
+        // Para L-1 == null && L+1 != null 
+        //    null <- L -> L+1 (botao subir nao deve funcionar)
+
+        // Para L-1 == null && L+1 != null 
+        //    null <- L -> L+1 (botao subir nao deve funcionar)
+
+        // Para L-1 == null && L+1 == null 
+        //    null <- L -> null (botoes de subir e descer nao devem funcionar)
 
         if (lessonsArray[index-1]) {
           stepOrder.previous = lessonsArray[index-1]?.id ?? "";
@@ -229,23 +245,36 @@ export const moduleRouter = router({
     await ctx.prisma.$transaction(async (transaction) => {
       // check more in: https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/
 
-      if (lessonsToDelete) {
+      if (lessonsToDelete) { 
         const deletedLessons = await Promise.all(lessonsToDelete.map(async (lesson) => {
-          if (lesson?.id) {
+          if (lesson?.id) { // [debug-Pedro] talvez descenessaria
             return transaction.lesson.delete({
               where: { id: lesson.id },
             })
           } 
         }))
 
-        console.log("Lessons deletadas: ", deletedLessons);
+        // console.log("Lessons deletadas: ", deletedLessons);
       }
-      
-      const editModuleLessons = await Promise.all(inputModule.lessons.map(async (lesson, realIndex) => { // fazer de uma vez preserva a ordem de input!!!
-        if (currtSet.has(lesson.id) || !lesson.id) { // se está em current então já existe || ainda não possui id 
-          console.log("[Update]Name:" + lesson.name)
 
-          return transaction.lesson.update({
+      const allSubsInMod = await transaction.userModuleProgress.findMany({  // Inscritos no modulo ~ info usada para cirar cada lessonsProg no proximo map(3a).
+        where: { moduleId: modId },
+      }); 
+      
+      const editModuleLessons = await Promise.all(inputModule.lessons.map(async (lesson, realIndex) => {
+        /* IMPORTANTE
+          Esse map esta assim para preservar a ordem do input, ai nao precisa se preucupar com atributo index do frontend,
+          na verdade pegar esse atributo la do front e jogar no db era a rezao de mtos problemas, la ele serve para gerar 
+          um id temporario para lesson.
+          - Nesse caso realIndex e o index que ele tem naturalmente no inputModule.lessons 
+        */
+        if (
+          currtSet.has(lesson.id)  // O(1) ~ se esta em current entao ja existe 
+          || !lesson.id // [debug-Pedro] talvez descenessaria
+          ) {
+          // console.log("[Update]Name:" + lesson.name) [debug-Pedro]
+
+          return transaction.lesson.update({  
             where: { id: lesson.id },
             data: { 
               name: lesson.name,
@@ -253,10 +282,19 @@ export const moduleRouter = router({
               index: realIndex
             }
           })
-        } else { // se não está então ainda não existe 
-          console.log("[Create]Name:" + lesson.name)
+        } else { // se nao esta em current entao ainda nao existe 
+          
+          // console.log("[Create]Name:" + lesson.name) [debug-Pedro]
 
-          const newLesson = await transaction.lesson.create({
+          /* Importante - passo a passo da lesson
+            1a Criar lesson 
+            2a Encontrar todos os usuarios inscritos no modulo*
+              - fora desse map, se ele ficar aqui dentro fica O(nˆ2)
+            3a Criar lessonProg para todos eles
+          */
+
+
+          const newLesson = await transaction.lesson.create({ // 1a
             data: {
               moduleId: modId,
               name: lesson.name,
@@ -265,11 +303,7 @@ export const moduleRouter = router({
             },
           });
           
-          const allSubsInMod = await transaction.userModuleProgress.findMany({
-            where: { moduleId: modId },
-          });
-          
-          const newLessonsProgress = await Promise.all(allSubsInMod.map((sub) => {
+          const newLessonsProgress = await Promise.all(allSubsInMod.map((sub) => { // 3a 
             const lessonProg = transaction.userLessonProgress.create({
               data: {
                 userId: sub.userId,
@@ -281,13 +315,13 @@ export const moduleRouter = router({
             return lessonProg;
           }));
 
-          console.log("Novas LessonsProgress: ", newLessonsProgress);
+          // console.log("Novas LessonsProgress: ", newLessonsProgress); [debug-Pedro]
 
           return newLesson;
         }
       }));
 
-      const updatedModule = await transaction.module.update({
+      const updatedModule = await transaction.module.update({ // modulo atualizado, com as lessons na ordem usada
         where: { id: modId },
         data: {
           name: inputModule.name,
@@ -303,18 +337,13 @@ export const moduleRouter = router({
 
 
 
-      console.log(updatedModule);
+      // console.log(updatedModule); [debug-Pedro]
 
       const corrections = await Promise.all(
-        lessonsStepOrder(updatedModule.lessons).map((stepOrder) => {
-          // const userProg = await ctx.prisma.userLessonProgress.findUnique({
-          //   where: {
-          //     userId_lessonId: { userId: ctx.session.user.id, lessonId: input },
-          //   },
-          // });
+        lessonsStepOrder(updatedModule.lessons).map((stepOrder) => { // Usar o index como a gente usava antes esta errado
 
           return transaction.lesson.update({
-            where: { id: stepOrder.id },
+            where: { id: stepOrder.id }, // A correção no final era para ajustar que é o anterior e posterior de cada modulo 
             data: { 
               previous: stepOrder.previous,
               next: stepOrder.next
@@ -322,7 +351,7 @@ export const moduleRouter = router({
           })        
       }));
 
-      console.log(corrections);
+      // console.log(corrections); [debug-Pedro]
   });
   }),
   createModWLessons: adminProcedure
