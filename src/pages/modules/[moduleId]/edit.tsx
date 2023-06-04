@@ -14,7 +14,7 @@ import {
   type Control,
   useForm,
   useWatch,
-  useFieldArray,
+  useFieldArray
 } from "react-hook-form";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
 import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
@@ -74,10 +74,32 @@ const EditModule = () => {
     mode: "all",
   });
 
-  const { fields, append, remove, move } = useFieldArray({
+  const { fields, append, remove, move, update } = useFieldArray({
     name: "lessons",
     control,
   });
+
+  const swapFields = (fromIndex: number, diff: number) => {
+    const toIndex = fromIndex + diff;
+    const updatedFields = [...fields];
+
+    if (updatedFields[fromIndex] && updatedFields[toIndex]) {
+      const toIndex = fromIndex + diff;
+      
+      const fromField = updatedFields[fromIndex];
+      const toField = updatedFields[toIndex];
+
+      const aux = fromField.index;
+
+      fromField.index = fromField.index + diff;
+      toField.index = aux;
+
+      move(fromIndex, toIndex);
+
+      // update(fromIndex, toField);
+      // update(toIndex, fromField);
+    }
+  }
 
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
@@ -92,6 +114,8 @@ const EditModule = () => {
   });
 
   const onSubmit = async (data: FormSchemaType) => {
+    console.log(data);
+
     data.lessons.forEach((_, index) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       data.lessons[index]!.index = index + 1;
@@ -155,7 +179,7 @@ const EditModule = () => {
                 variant="solid"
                 onClick={() =>
                   append({
-                    id: null,
+                    id: (fields.length + 1).toString(),
                     name: "",
                     index: fields.length + 1,
                   })
@@ -166,16 +190,17 @@ const EditModule = () => {
             </div>
             {errors.lessons?.message && (
               <div className="text-red-500">{errors.lessons.message}</div>
-            )}
+            )}            
             {fields.map((field, index) => {
               return (
                 <FormControl
                   key={field.id}
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
-
                 >
-                  <FormLabel>Nome do tópico</FormLabel>
+                  <FormLabel>Nome do tópico {field.index}</FormLabel>
+                  
+                  {console.log("Index: ", field.index, "Name: ", field.name)}
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
@@ -199,7 +224,7 @@ const EditModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        move(index, index - 1);
+                        swapFields(index, -1);
                       }}
                     />
                     <Icon
@@ -208,7 +233,7 @@ const EditModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        move(index, index + 1);
+                        swapFields(index, +1);
                       }}
                     />
                   </div>

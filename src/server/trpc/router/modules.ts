@@ -191,77 +191,82 @@ export const moduleRouter = router({
       },
     });
 
-    // console.log("current: ", currentModule)
-    // console.log("input: ", inputModule)
+    const inputSet = new Set(inputModule.lessons.map(lesson => lesson.id));
+    const currtSet = new Set(currentModule.lessons.map(lesson => lesson.id));
 
-    // As lessons criadas possuem Id null
-    // As lessons deletadas são aquelas cujos ids não estão no input module
-    // As lessons modificadas são aquelas cujos ids estão no current module, mas o seu nome é diferente.
+    console.log("INPUT_SET", inputSet);
 
-    const isInInputModule = (id: string) => {
-      const result = inputModule?.lessons.find((lesson) => lesson?.id == id);
+    // const lessonsToDelete = currentModule.lessons.filter((lesson) => !inputSet.has(lesson.id)); // testar 
+    const lessonsToDelete = currentModule.lessons.filter((lesson) => {
+      if (!inputSet.has(lesson.id)) {
+        return true;
+      }
 
-      if (result) return true;
-      
       return false;
+    });
+
+    const lessonsStepOrder = (lessonsArray) => {
+      console.log(lessonsArray);
+      return lessonsArray.map((lesson, index) => {
+        const stepOrder = { 
+          previos: "",
+          next: "",
+          id: lesson.id
+        }
+
+        if (lessonsArray[index-1]) {
+          stepOrder.previous = lessonsArray[index-1]?.id ?? "";
+        }
+
+        if (lessonsArray[index+1]) {
+          stepOrder.next = lessonsArray[index+1]?.id ?? "";
+        }
+
+        return stepOrder;
+      })
     }
-
-    const isEdited = (id: string, name: string) => {
-      const matching = currentModule?.lessons.find((lesson) => lesson?.id == id);
-      
-      if (matching?.name !== name) return true;
-      
-      return false;
-    }
-
-    const lessonsToDelete = currentModule?.lessons.filter((lesson) => !isInInputModule(lesson.id)); 
-    const lessonsToCreate = inputModule.lessons.filter((lesson) => lesson.id === null);
-    const lessonsToUpdate = inputModule.lessons.filter((lesson) => lesson.id !== null && isEdited(lesson?.id, lesson.name));
-
-    // console.log("To delete: ", lessonsToDelete)
-    // console.log("To create: ", lessonsToCreate)
-    // console.log("To update:", lessonsToUpdate)
     
     await ctx.prisma.$transaction(async (transaction) => {
       // check more in: https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/
 
       if (lessonsToDelete) {
         const deletedLessons = await Promise.all(lessonsToDelete.map(async (lesson) => {
-          return transaction.lesson.delete({
-            where: { id: lesson?.id },
-          })
+          if (lesson?.id) {
+            return transaction.lesson.delete({
+              where: { id: lesson.id },
+            })
+          } 
         }))
 
-        // console.log("Lessons deletadas: ", deletedLessons);
+        console.log("Lessons deletadas: ", deletedLessons);
       }
       
-      if (lessonsToUpdate) {
-        const updatedLessons = await Promise.all(lessonsToUpdate.map(async (lesson) => {
+      const editModuleLessons = await Promise.all(inputModule.lessons.map((lesson, realIndex) => { // fazer de uma vez preserva a ordem de input!!!
+        if (currtSet.has(lesson.id) || !lesson.id) { // se está em current então já existe || ainda não possui id 
+          console.log("[Update]Name:" + lesson.name)
+
           return transaction.lesson.update({
-            where: { id: lesson?.id ?? ""},
+            where: { id: lesson.id },
             data: { 
               name: lesson.name,
+              richText: lesson.richText,
+              index: realIndex
             }
           })
-        }))
+        } else { // se não está então ainda não existe 
+          console.log("[Create]Name:" + lesson.name)
 
-        // console.log("Lessons atualizadas: ", updatedLessons);
-      }
-
-      if (lessonsToCreate) {
-        const createdLessons = await Promise.all(lessonsToCreate.map(async (lesson) => {
           return transaction.lesson.create({
             data: {
               moduleId: modId,
               name: lesson.name,
               richText: "",
-              index: lesson.index
+              index: realIndex
             }
           });
-        }))
+        }
+      }));
 
-        // console.log("Lessons criadas: ", createdLessons);
-      }
 
       const updatedModule = await transaction.module.update({
         where: { id: modId },
@@ -277,18 +282,21 @@ export const moduleRouter = router({
         }
       });
 
-      // console.log("Updated Module: ", updatedModule);
+      console.log(updatedModule);
 
-      const updatedIndexes = await Promise.all(updatedModule.lessons.map(async (lesson, index) => {
-        return transaction.lesson.update({
-          where: { id: lesson.id },
-          data: { 
-            index: index + 1,
-          }
-        })        
-      }))
+      const updatedIndexes = await Promise.all(
+        lessonsStepOrder(updatedModule.lessons).map(async (stepOrder) => {
+          
+          return transaction.lesson.update({
+            where: { id: stepOrder.id },
+            data: { 
+              previous: stepOrder.previous,
+              next: stepOrder.next
+            }
+          })        
+      }));
 
-      // console.log("Updated Indexes", updatedIndexes);
+      console.log(updatedIndexes);
     })
   }),
   createModWLessons: adminProcedure
