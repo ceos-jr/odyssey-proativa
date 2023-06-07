@@ -22,7 +22,7 @@ const createMockedLessonProgress = async (
   });
 
   lessons.forEach(async (les, i) => {
-    const taskProg: Prisma.UserLessonProgressUncheckedCreateInput = {
+    const lessonProg: Prisma.UserLessonProgressUncheckedCreateInput = {
       userId: userId,
       moduleId: moduleId,
       startedAt: goodTimeToWork.toDate(),
@@ -30,7 +30,7 @@ const createMockedLessonProgress = async (
       completed: i < 3 ? true : false,
       completedAt: i < 3 ? goodTimeToWork.add(6, "days").toDate() : null,
     };
-    lessonsProgress.push(taskProg);
+    lessonsProgress.push(lessonProg);
   });
 
   const createdTasksProgress = await prisma.userLessonProgress.createMany({

@@ -25,6 +25,7 @@ import { useRef, useState } from "react";
 import SendGrade from "./SendGrade";
 import SeeSubmissionModal from "./SeeSubmissionModal";
 import ShowTaskModal from "@components/lessons/ShowTaskModal";
+import moment from "moment";
 
 type UserSubmissionOutput = Pick<
   RouterTypes["admin"]["getLatestSubmissions"]["output"][0],
@@ -105,7 +106,7 @@ const UserSubmissions = () => {
                         </div>
                       </Td>
                       <Td>{sub.task.name}</Td>
-                      <Td>{sub.task.createdAt.getDay()}</Td>
+                      <Td>{moment(sub.sumittedAt).fromNow()}</Td>
                       <Td className="flex justify-end">
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />

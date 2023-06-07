@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import moment from "moment";
+import { TaskStatus } from "../../src/utils/constants";
 
 const createMockedTaskProgress = async (
   prisma: PrismaClient,
@@ -8,7 +9,7 @@ const createMockedTaskProgress = async (
   userId: string
 ) => {
   let tasksProgress: Prisma.UserTaskProgressCreateManyInput[] = [];
-  let previousCompletedAt = moment();
+  let previoussubmittedAt = moment();
 
   const lessons = await prisma.lesson.findMany({
     where: { moduleId: moduleId },
@@ -19,15 +20,26 @@ const createMockedTaskProgress = async (
 
   lessons.forEach((les) =>
     les.tasks.forEach((task) => {
+      const completedOrSubmitted: {
+        grade?: number,
+        status: TaskStatus | undefined
+      } = counter%3 == 2 ? {
+        grade: faker.number.int({ min: 0, max: 5 }),
+        status: TaskStatus.Completed
+      } : {
+        grade: undefined,
+        status: TaskStatus.Submitted
+      };
+
       const taskProg: Prisma.UserTaskProgressUncheckedCreateInput = {
         userId: userId,
-        grade: faker.number.int({ min: 0, max: 5 }),
+        grade: completedOrSubmitted.grade,
         richText: faker.lorem.paragraphs(1),
-        startedAt: previousCompletedAt.toDate(),
-        completedAt: previousCompletedAt.add(1, "day").toDate(),
+        startedAt: previoussubmittedAt.toDate(),
+        submittedAt: previoussubmittedAt.add(1, "day").toDate(),
         lessonId: les.id,
         taskId: task.id,
-        status: "COMPLETED",
+        status: completedOrSubmitted.status,
       };
       tasksProgress.push(taskProg);
 
@@ -37,7 +49,7 @@ const createMockedTaskProgress = async (
       else if (counter < 20) time = Math.log2(counter * 6);
       else time = Math.log2(counter * 12);
 
-      previousCompletedAt = previousCompletedAt.subtract(time, "days");
+      previoussubmittedAt = previoussubmittedAt.subtract(time, "days");
       counter++;
     })
   );
