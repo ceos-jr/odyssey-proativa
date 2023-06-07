@@ -215,6 +215,8 @@ export const moduleRouter = router({
           id: lesson.id
         }
 
+        const indexFrontEndCorrection = index;
+
         // Sobre a ordem das lessons: 
         // L = Lesson em questao, L-1 = Lesson anterior, L+1 = Lesson posterior
 
@@ -230,12 +232,12 @@ export const moduleRouter = router({
         // Para L-1 == null && L+1 == null 
         //    null <- L -> null (botoes de subir e descer nao devem funcionar)
 
-        if (lessonsArray[index-1]) {
-          stepOrder.previous = lessonsArray[index-1]?.id ?? "";
+        if (lessonsArray[indexFrontEndCorrection-1]) {
+          stepOrder.previous = lessonsArray[indexFrontEndCorrection-1]?.id ?? "";
         }
 
-        if (lessonsArray[index+1]) {
-          stepOrder.next = lessonsArray[index+1]?.id ?? "";
+        if (lessonsArray[indexFrontEndCorrection+1]) {
+          stepOrder.next = lessonsArray[indexFrontEndCorrection+1]?.id ?? "";
         }
 
         return stepOrder;

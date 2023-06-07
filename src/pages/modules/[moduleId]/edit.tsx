@@ -32,6 +32,7 @@ import useCustomToast from "@hooks/useCustomToast";
 import { FormSchemaUpdate } from "src/pages/modules/index";
 import DeleteLessonAlert from "@components/modules/DeleteLessonAlert";
 import { useState } from "react";
+import  createIndexRules  from "@utils/indexRules";
 
 type FormSchemaType = z.infer<typeof FormSchemaUpdate>;
 
@@ -63,7 +64,7 @@ const EditModule = () => {
         return {
           id: lesson.id ?? "",
           name: lesson.name,
-          index: lesson.index ?? index
+          index: lesson.index
         }
       }) ?? [{
         id: "",
@@ -77,6 +78,12 @@ const EditModule = () => {
   const { fields, append, remove, move, update } = useFieldArray({
     name: "lessons",
     control,
+  });
+
+  const fieldsIndexRules = createIndexRules(fields, {
+    maxLength: 10,
+    minLength: 1,
+    lengthToIndexDiff: -1
   });
 
   const { showErrorToast, showSuccessToast } = useCustomToast();
@@ -127,6 +134,42 @@ const EditModule = () => {
     ]
     "
   */
+  const test = () => {
+    Array.range = (start, end) => Array.from({length: (end - start + 1)}, (v, k) => k + start);
+    const min = fieldsIndexRules.minIndex;
+    const max = fieldsIndexRules.getLastIndex();
+    const numStr = (from, to) => (`[${
+      to!=null ? (
+        `GoTo: ${to?.toString()} | f[${to}].name: ${ fields[to]?.name ?? "-"}`
+      ) : "null"
+    }]`);
+    const longLine = Array.range(1, 30).map(num => (num+1)%(max-min+1) + min);
+    console.log(longLine);
+
+    const mat = Array.range(min, max).map((u, _) => 
+      [
+        u, 
+        Array.range(min, max).map((v, _) => fieldsIndexRules.getCircularMove(u,u+v)),
+        Array.range(min, max).map((v, _) => fieldsIndexRules.getCircularMove(u,u-v))
+      ]
+    );
+    
+    console.log(`minIndex: ${min}, lastIndex: ${max}`, min, max);
+    console.log(fields.map((field, index) => [field.name,fieldsIndexRules.indexValidate(index)]));
+    mat.forEach(line => 
+      console.log("name: " + fields[line[0]]?.name + ":",
+       ...line[1].map(u => numStr(line[0],u)), "\n", 
+       ...line[2].map(v => numStr(line[0],v)))
+    );
+
+  };
+
+  const limits = (next) => console.log("index out of limits", {
+    next: next,
+    maxIndex: fieldsIndexRules.maxIndex,
+    minIndex: fieldsIndexRules.minIndex,
+    lastIndex: fieldsIndexRules.getLastIndex()
+  });
 
   return (
     <>
@@ -139,7 +182,7 @@ const EditModule = () => {
           isOpen={isOpen}
           onClose={onClose}
           onClickToDelete={() => {
-            remove(lessonToDelete)
+            remove(lessonToDelete);
             onClose()
           }}
         />
@@ -182,12 +225,16 @@ const EditModule = () => {
                 leftIcon={<AiOutlinePlus />}
                 colorScheme="green"
                 variant="solid"
-                onClick={() =>
-                  append({
-                    id: (fields.length + 1).toString(),
-                    name: "",
-                    index: fields.length + 1,
-                  })
+                onClick={() => {
+                    const newIndex = fieldsIndexRules.getAppendIndex() ?? false;
+                    if (newIndex) {  
+                      append({
+                        id: (newIndex).toString(),
+                        name: "",
+                        index: newIndex,
+                      })
+                    }
+                  }
                 }
               >
                 Novo Tópico
@@ -203,9 +250,9 @@ const EditModule = () => {
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                 >
-                  <FormLabel>Nome do tópico</FormLabel>
+                  <FormLabel>Nome do tópico{field.index}</FormLabel>
                   
-                  {console.log("Index: ", field.index, "Name: ", field.name)}
+                  {/* {console.log("Index: ", field.index, "Name: ", field.name)} */}
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
@@ -217,6 +264,7 @@ const EditModule = () => {
                       colorScheme="red"
                       variant="solid"
                       onClick={() => {
+                        test();
                         setLessonToDelete(index)
                         onOpen();
                       }}
@@ -229,7 +277,16 @@ const EditModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        move(index, index-1);
+                        const next = index - 1;
+                        const moveResult = fieldsIndexRules.getCircularMove(index, next);
+
+                        if (moveResult != null) {
+                          if (next != moveResult) {
+                            limits(next);
+                            test();
+                          }
+                          move(index, moveResult);
+                        } 
                       }}
                     />
                     <Icon
@@ -238,7 +295,16 @@ const EditModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        move(index, index+1);
+                        const next = index + 1;
+                        const moveResult = fieldsIndexRules.getCircularMove(index, next);
+
+                        if (moveResult != null) {
+                          if (next != moveResult) {
+                            limits(next);
+                            test();
+                          }
+                          move(index, moveResult);
+                        } 
                       }}
                     />
                   </div>

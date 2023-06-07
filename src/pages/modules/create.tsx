@@ -28,6 +28,7 @@ import {
 import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
 import useCustomToast from "@hooks/useCustomToast";
+import  createIndexRules  from "@utils/indexRules";
 
 export const FormSchemaCreate = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
@@ -61,6 +62,12 @@ const CreateModule = () => {
   const { fields, append, remove, move } = useFieldArray({
     name: "lessons",
     control,
+  });
+
+  const fieldsIndexRules = createIndexRules(fields, {
+    maxLength: 10,
+    minLength: 1,
+    lengthToIndexDiff: -1
   });
 
   const router = useRouter();
@@ -151,7 +158,7 @@ const CreateModule = () => {
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                   isRequired
                 >
-                  <FormLabel>Nome do tópico</FormLabel>
+                  <FormLabel>Nome do tópico{field.index}</FormLabel>
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
@@ -172,7 +179,9 @@ const CreateModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        move(index, index - 1);
+                        if (fields[index-1]) {
+                          move(index, index - 1);
+                        }
                       }}
                     />
                     <Icon
@@ -181,7 +190,9 @@ const CreateModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        move(index, index + 1);
+                        if (fields[index+1]) {
+                          move(index, index + 1);
+                        }
                       }}
                     />
                   </div>
