@@ -211,7 +211,7 @@ export const adminRouter = router({
         },
         data: {
           grade: input.grade,
-          completedAt: new Date(),
+          // completedAt: new Date(), não vai mais mudar aqui 
           status: TaskStatus.Completed,
         },
         /*
