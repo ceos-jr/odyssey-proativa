@@ -3,6 +3,7 @@ import { adminRouter } from "./admin";
 import { authRouter } from "./auth";
 import { gradesRouter } from "./grades";
 import { lessonRouter } from "./lesson";
+import { lessonSuggestion } from "./lesson_sug";
 import { moduleRouter } from "./modules";
 import { moduleSuggestion } from "./mod_sug";
 import { taskRouter } from "./task";
@@ -17,6 +18,7 @@ export const appRouter = router({
   task: taskRouter,
   grades: gradesRouter,
   modSug: moduleSuggestion,
+  lessSug: lessonSuggestion,
 });
 
 // export type definition of API
