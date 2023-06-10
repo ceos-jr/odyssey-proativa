@@ -46,7 +46,7 @@ const User = () => {
     }
   );
 
-  const { data: uLesSugg } = trpc.lesson.getUserLesSuggestions.useQuery(
+  const { data: uLesSugg } = trpc.lessSug.getUserLesSuggestions.useQuery(
     userId,
     {
       refetchOnWindowFocus: false,
