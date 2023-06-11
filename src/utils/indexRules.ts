@@ -1,33 +1,48 @@
 type Validation<T> = (...args: T[]) => boolean;
 type GetValid<T, R extends NonNullable<any>> = (...args: T[]) => R | null;
 type SafeGetValid<T, R extends NonNullable<any>> = (...args: T[]) => R;
+interface PositionData {
+    prev: number, // -1 -> invalido
+    id: string,
+    onOrigin: boolean,
+    next: number // -1 -> invalido
+  }
+type Handler<T> = (...args: T[]) => void;
 type Optional<T extends NonNullable<any>> = T | null;
-
 interface IndexRules {
+
+  lengthToIndexDiff: number; // numero de elementos ativos
+  data: Array<PositionData>,
+  trash: Array<PositionData>,
+
+  lastIndexUp: number;
+
+  removeValidate: Validation<number>;
+  handleRemove: Validation<number & boolean>;
+  
+  getLengthSum: SafeGetValid<undefined, number>,
+  lengthValidate: Validation<number>;  
   minLength: number;
   maxLength: number;
-  lengthToIndexDiff: number;
+
+  getLastIndex: GetValid<undefined, number>;
   minIndex: number;
   maxIndex: number;
-  array: Array<any>;
-  calcIndexFromLength: SafeGetValid<number, number>;
-  getLastIndex: GetValid<number, number>;
-  lengthValidate: Validation<number>;
   indexValidate: Validation<number>;
-  append: Validation<number>;
+
+  handleAppend: Validation<number>;
   getAppendIndex: GetValid<undefined,number>;
-  shitfAfterRemove: GetValid<number, number[]>;
-  move: Validation<number>;
-  getCircularMove: GetValid<number, number>;
-  getValidSwap: GetValid<[number, number], [number, number]>;
+
+  // move: Validation<number>;
+  getLoopMove: GetValid<number, number>;
 }
 
 const createIndexRules = 
-  (array: Array<any>, 
+  (array: Array<any>, onCreate: boolean,
     opt: {
       maxLength: number,
       minLength:number,
-      lengthToIndexDiff: number
+      lengthToIndexDiff: number,
     } 
   ): IndexRules => {
     const rules: IndexRules = {
@@ -36,123 +51,131 @@ const createIndexRules =
       lengthToIndexDiff: opt.lengthToIndexDiff,
       minIndex: opt.minLength + opt.lengthToIndexDiff,
       maxIndex: opt.maxLength + opt.lengthToIndexDiff,
-      array: array,
+      // length: array.length, // tamanho considerando todos os elementos, (apagados, criados e )
+      lastIndexUp: array.length - 1,
 
-      lengthValidate: function (length: number) {
-        return length >= this.minLength && length <= this.maxLength;
+      trash: Array(),
+      data: array.map((f, i) => { 
+        return {
+          prev: (array[i-1] || array[i-1]===0) ? i-1 : -1,
+          onOrigin: !onCreate ? true : false, 
+          id: f.id ?? i.toString(), 
+          next: (array[i+1] || array[i+1]===0) ? i+1 : -1
+        }
+      }),
+
+      getLengthSum: function () {
+        return this.data.length + this.trash.length;
       },
 
-      indexValidate: function (index: number, rawLastIndex?: number) {
-        const lastIndex = rawLastIndex ?? (array.length + this.lengthToIndexDiff); 
-        return index >= this.minIndex && index <= this.maxIndex && index <= lastIndex;
+      removeValidate: function (index: number) {
+        const posData = this.data[index];
+
+        const catchInvalidInput = posData === null
+        // const catchAlreadyOut = posData!.deleted === true;
+        const catchInvalidIndex = !this.indexValidate(index);
+        const catchLengthBelowMin = this.getLengthSum()-1 < this.minLength;
+
+        return !(catchLengthBelowMin || catchInvalidIndex || catchInvalidInput);
       },
+      
+      handleRemove: function (index: number) {
+        const validRemove = this.removeValidate(index);
+        const auxData = this.data[index];
 
-      calcIndexFromLength: function (length: number) {
-        return length + this.lengthToIndexDiff;
-      },
+        if (auxData && validRemove) {
+          const prevIndex = auxData.prev;
+          const nextIndex = auxData.next;
 
-      getLastIndex: function () {
-        const rawLastIndex = this.calcIndexFromLength(this.array.length); 
+          this.data = this.data.filter((v) => !(v.id === auxData.id));
 
-        return this.indexValidate(rawLastIndex, rawLastIndex) ? rawLastIndex : null;
-      },
+          if (auxData.onOrigin) {
+            this.data[index].onOrigin = false;
+            this.trash.push(this.data[index]);
+          } 
 
-      append: function () {
-        const newLength = this.array.length + 1;
-        return this.lengthValidate(newLength);
-      },
+          if (prevIndex != null && this.data[prevIndex]) {
+            this.data[prevIndex].next = nextIndex;
+          } 
+          
+          if (nextIndex != null && this.data[nextIndex]) {
+            this.data[nextIndex].prev = prevIndex;
+          } 
 
-      getAppendIndex: function () {
-        const newLength = this.array.length + 1;
-        const index = this.calcIndexFromLength(newLength);
-        console.log(index);
-        return (this.lengthValidate(newLength)) ? index : null;
-      },
-
-      shitfAfterRemove: function (index: number) {
-        const next = index + 1;
-        const lastIndex = this.getLastIndex() ?? undefined;
-        if (lastIndex || !this.indexValidate(next, lastIndex!) || !lastIndex) {
-          return null;
+          return true;
         } else {
-          const shitfAfter: number[] = [];
-          let loopNext = next + 1;
-          console.log(loopNext);
-
-          while (this.indexValidate(loopNext, lastIndex)) {
-            shitfAfter.push(loopNext);
-            loopNext = loopNext + 1;
-          }
-  
-          return shitfAfter;
+          return false;
         }
       },
 
-      move: function (from: number, to: number) {
-        return this.indexValidate(from) && this.indexValidate(to);
+      lengthValidate: function (length: number) { // verificar correude
+
+        return length >= this.minLength && length <= this.maxLength;
       },
 
-      getCircularMove: function(from: number, to: number) {
-        const lastIndex = this.getLastIndex();
+      indexValidate: function (index: number) { //verificar corretude
+        return (index >= this.minIndex && index <= this.maxIndex) &&
+          (this.lastIndexUp != null && index <= this.lastIndexUp);
+      },
+
+      getLastIndex: function () {
+        return this.lastIndexUp;
+      },
+
+      handleAppend: function () {
+        const newLength = this.getLengthSum() + 1;
+        return this.lengthValidate(newLength);
+      },
+
+      getAppendIndex: function () { // verificar corretude
+        const validAppend = this.lengthValidate(this.data.length);
+        const currentLastIndex = this.data.length + this.trash.length - 1; 
+        const newLastIndex = this.data.length + this.trash.length;  
+
+        if (validAppend && this.data[currentLastIndex]) {
+          this.data[currentLastIndex].next = newLastIndex;
+
+          this.data.push({
+            prev: this.data[currentLastIndex] ? currentLastIndex : -1,
+            onOrigin: false, 
+            id: newLastIndex.toString(), 
+            next: -1
+          })
+
+          return newLastIndex;
+        } else {
+          return -1;
+        }
+      },
+
+      getLoopMove: function(from: number, to: number) {
+        const lastIndex = this.lastIndexUp;
+        if (!lastIndex) {
+          return null;
+        }
+
         const diff = to - from;
         const [start, end] = [this.minIndex, lastIndex];
-        const loopToEnd = (diff)%(end-start) + start; // to < start  
-        const loopToStart = (diff)%(end-start) + start; // S
+        const loopNorm = (diff)%(end-start); // Percea que end - start representa umm distancia, ou seja é análogo a length. 
+        const loopSignal = (diff > 0 ? 1 : 0); // Ou seja diff > 0 ? (loop p/ inicio) : (loop p/ fim)
 
-        const loopTo = to > 0 ? loopToStart : loopToEnd;
-
-        return lastIndex != null & diff != 0 ? (
+        const loopTo = (loopSignal ? start+loopNorm : end-loopNorm) + this.lengthToIndexDiff; 
+        return diff != 0 ? (
           this.indexValidate(from, lastIndex) ? (
             this.indexValidate(to, lastIndex) == true ? (to) : (loopTo)
           ) : null
         ) : null;
 
-        /* 
-          "->" = +1 (mover para frente é o mesmo que adicionar 1)
-          "->" = -1 (mover para trás é o mesmo que remover 1)
-          (start-1)-a-b-c-d-(end+1) = formato da lista, 
-          index[x] é o index do elemento x, sendo x = a,b,c,d,...
-
-          Movimente padrão:
-            - next = x + i, 
-            - x e next trocam seus valores assim:
-              - aux = index[x],
-              - index[x] = index[next]
-              - index[next] = index[aux]
-
-          Mas quando chegamos nos limites não seguimos essa logica:
-            - movimento (next = d+1) em [(start-1)-a-b-c-d-(end+1)]
-              - d+1 vai para end+1, para impedir isso fazemos um loop:
-              - (start-1)-d-a-b-c-(end+1)
-              - Nesse caso ao invés de index[d] e index[next] simplesmente
-                trocarem seus valores, ocorre uma mundaça geral.
-                - index[d] = index[a], index[c] = index[d], index[b] = index[c], index[a] = index[b]
-
-            - movimento (next = a-1) em [(start-1)-a-b-c-d-(end+1)]
-              - a+1 vai para start-1, para impedir isso fazemos um loop:
-              - (start-1)-b-c-d-a-(end+1)
-              - Nesse caso ao invés de index[a] e index[next] simplesmente
-                trocarem seus valores, ocorre uma mundaça geral.
-                - index[a] = index[d], index[d] = index[c], index[c] = index[b], index[b] = index[a]
-
-            - Generalizando para o formato: (start-1)-v-...-w-...-u-(end+1)
-              - w+k: *k é um valor genérico tal que w+k > u 
-                - l = u-v é o número de posições disponíveis
-                - next = (k mod l) + v 
-                - index[w+k] = index[next]
-        */
+        /** 
+         * Ideia geral: 
+            - Para fazer um loop queremos um ciclo, e para fazer um ciclo usamos modulos:
+              - Exemplo de ciclo com modulos:
+                - Ciclo[k] = k%5 (resto da divisão por 5) 
+                - Ciclo = [0 1 2 3 4 0 1 2 3 4 ...], onde (0 1 2 3 4) se repete pelo infinito. 
+         */
       },
-
-      getValidSwap: function (tupleIndex: [number, number]) {
-        const [u, v] = tupleIndex;
-
-        if (this.indexValidate(u) && this.indexValidate(v)) {
-          return [v, u];
-        } else {
-          return null;
-        }
-      }
     };
+
   return rules;
   };
 

@@ -64,10 +64,10 @@ const CreateModule = () => {
     control,
   });
 
-  const fieldsIndexRules = createIndexRules(fields, {
+  const fieldsIndexRules = createIndexRules(fields, true, {
     maxLength: 10,
     minLength: 1,
-    lengthToIndexDiff: -1
+    lengthToIndexDiff: -1,
   });
 
   const router = useRouter();
@@ -136,13 +136,16 @@ const CreateModule = () => {
                 leftIcon={<AiOutlinePlus />}
                 colorScheme="green"
                 variant="solid"
-                onClick={() =>
-                  append({
-                    name: "",
-                    richText: "",
-                    index: fields.length + 1,
-                  })
-                }
+                onClick={() => {
+                  const newIndex = fieldsIndexRules.getAppendIndex() ?? false;
+                  if (newIndex) {  
+                    append({
+                      richText: "",
+                      name: "",
+                      index: newIndex,
+                    })
+                  }
+                }}
               >
                 Novo Tópico
               </Button>
@@ -156,7 +159,6 @@ const CreateModule = () => {
                   key={field.id}
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
-                  isRequired
                 >
                   <FormLabel>Nome do tópico{field.index}</FormLabel>
                   <div className="flex justify-between gap-x-4">
@@ -169,7 +171,14 @@ const CreateModule = () => {
                       leftIcon={<AiFillDelete />}
                       colorScheme="red"
                       variant="solid"
-                      onClick={() => remove(index)}
+                      onClick={() => {
+                        const lessonToDelete = index;
+                        const handleRemove = fieldsIndexRules.handleRemove(lessonToDelete);
+                        if (handleRemove) {
+                          remove(lessonToDelete);
+                        }
+                        onClose()
+                      }}
                     >
                       Deletar
                     </Button>
@@ -179,9 +188,16 @@ const CreateModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        if (fields[index-1]) {
-                          move(index, index - 1);
-                        }
+                        const next = index - 1;
+                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+
+                        if (moveResult != null) {
+                          // if (next != moveResult) {
+                          //   limits(next);
+                          //   test();
+                          // }
+                          move(index, moveResult);
+                        } 
                       }}
                     />
                     <Icon
@@ -190,9 +206,16 @@ const CreateModule = () => {
                       h={6}
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
-                        if (fields[index+1]) {
-                          move(index, index + 1);
-                        }
+                        const next = index + 1;
+                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+
+                        if (moveResult != null) {
+                          // if (next != moveResult) {
+                          //   limits(next);
+                          //   test();
+                          // }
+                          move(index, moveResult);
+                        } 
                       }}
                     />
                   </div>

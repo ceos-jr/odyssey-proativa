@@ -80,7 +80,7 @@ const EditModule = () => {
     control,
   });
 
-  const fieldsIndexRules = createIndexRules(fields, {
+  const fieldsIndexRules = createIndexRules(fields, false, {
     maxLength: 10,
     minLength: 1,
     lengthToIndexDiff: -1
@@ -108,39 +108,14 @@ const EditModule = () => {
     editModule.mutate({ inputModule: data, modId: moduleId });
   };
 
-  /* Erro ao recarregar a pagina:
-    "
-    ❌ tRPC failed on module.getUnique: TRPCError: [
-      {
-        "code": "invalid_type",
-        "expected": "string",
-        "received": "undefined",
-        "path": [
-          "moduleId"
-        ],
-        "message": "Required"
-      }
-    ]
-    ❌ tRPC failed on module.getUserModStats: TRPCError: [
-      {
-        "code": "invalid_type",
-        "expected": "string",
-        "received": "undefined",
-        "path": [
-          "moduleId"
-        ],
-        "message": "Required"
-      }
-    ]
-    "
-  */
   const test = () => {
     Array.range = (start, end) => Array.from({length: (end - start + 1)}, (v, k) => k + start);
     const min = fieldsIndexRules.minIndex;
     const max = fieldsIndexRules.getLastIndex();
     const numStr = (from, to) => (`[${
       to!=null ? (
-        `GoTo: ${to?.toString()} | f[${to}].name: ${ fields[to]?.name ?? "-"}`
+        `${to?.toString()}`
+        // `GoTo: ${to?.toString()} | f[${to}].name: ${ fields[to]?.name ?? "-"}`
       ) : "null"
     }]`);
     const longLine = Array.range(1, 30).map(num => (num+1)%(max-min+1) + min);
@@ -149,8 +124,8 @@ const EditModule = () => {
     const mat = Array.range(min, max).map((u, _) => 
       [
         u, 
-        Array.range(min, max).map((v, _) => fieldsIndexRules.getCircularMove(u,u+v)),
-        Array.range(min, max).map((v, _) => fieldsIndexRules.getCircularMove(u,u-v))
+        Array.range(min, max).map((v, _) => fieldsIndexRules.getLoopMove(u,u+v+1)),
+        Array.range(min, max).map((v, _) => fieldsIndexRules.getLoopMove(u,u-v-1))
       ]
     );
     
@@ -182,7 +157,10 @@ const EditModule = () => {
           isOpen={isOpen}
           onClose={onClose}
           onClickToDelete={() => {
-            remove(lessonToDelete);
+            const handleRemove = fieldsIndexRules.handleRemove(lessonToDelete);
+            if (handleRemove) {
+              remove(lessonToDelete);
+            }
             onClose()
           }}
         />
@@ -278,7 +256,7 @@ const EditModule = () => {
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         const next = index - 1;
-                        const moveResult = fieldsIndexRules.getCircularMove(index, next);
+                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
 
                         if (moveResult != null) {
                           if (next != moveResult) {
@@ -296,8 +274,9 @@ const EditModule = () => {
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         const next = index + 1;
-                        const moveResult = fieldsIndexRules.getCircularMove(index, next);
-
+                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+                        test();
+                        limits(next);
                         if (moveResult != null) {
                           if (next != moveResult) {
                             limits(next);
