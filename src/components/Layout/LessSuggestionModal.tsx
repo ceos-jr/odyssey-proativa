@@ -53,7 +53,7 @@ const LessSuggestionModal = ({
 
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
-  const createSugg = trpc.user.createLessSugg.useMutation({
+  const createSugg = trpc.lessSug.createLessSugg.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possível enviar a sugestão");
     },

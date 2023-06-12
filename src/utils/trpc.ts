@@ -2,13 +2,21 @@ import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import { type GetInferenceHelpers } from "@trpc/server";
 import superjson from "superjson";
-
 import { type AppRouter } from "../server/trpc/router/_app";
+import {
+  LOCAL_HOST,
+  VERCEL_URL,
+  IN_BROWSER,
+  IN_DEVELOPMENT,
+} from "./constants";
 
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") return ""; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+  // browser should use relative url
+  if (IN_BROWSER) return "";
+  // SSR should use vercel url
+  if (VERCEL_URL) return VERCEL_URL;
+  // dev SSR should use localhost
+  return LOCAL_HOST;
 };
 
 export const trpc = createTRPCNext<AppRouter>({
@@ -18,7 +26,7 @@ export const trpc = createTRPCNext<AppRouter>({
       links: [
         loggerLink({
           enabled: (opts) =>
-            process.env.NODE_ENV === "development" ||
+            IN_DEVELOPMENT ||
             (opts.direction === "down" && opts.result instanceof Error),
         }),
         httpBatchLink({

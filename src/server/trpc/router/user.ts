@@ -1,5 +1,5 @@
 /*Importações: LessSuggestionSchema é o esquema responsável pela sugestões de tarefas. SuggestionFormSchema é o formulário responsável pela sugestão de tarefas. TaskStatus é o dado pra validar o status da tarefa. 'z' é uma biblioteca para validação de dados que valida os parâmetros dos endpoints. */
-import { LessSuggestionSchema } from "@components/Layout/LessSuggestionModal";
+import { SuggestionFormSchema } from "@components/Layout/ModSuggestionModal";
 import { TaskStatus } from "@utils/constants";
 import { z } from "zod";
 
@@ -113,15 +113,14 @@ export const userRouter = router({
         data: { lastTimeSeen: new Date() },
       });
     }),
-  
-  /*O endpoint createLessSugg recebe como parâmetro um formulário referente a sugestão de uma tarefa e utiliza a função 'mutation' para criar essa sugestão por meio do método 'create' do Prisma.
+  /*O endpoint createModSugg recebe como parâmetro um formulário referente a sugestão de um módulo e utiliza a função 'mutation' para criar essa sugestão por meio do método 'create' do Prisma.
   É um processo protegido, afeta apenas o usuário logado. */
-  createLessSugg: protectedProcedure
-    .input(LessSuggestionSchema)
+  createModSugg: protectedProcedure
+    .input(SuggestionFormSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.prisma.lesSuggestion.create({
+      return ctx.prisma.modSuggestion.create({
         data: {
-          lessonId: input.lessonId,
+          moduleId: input.moduleId,
           userId: ctx.session.user.id,
           text: input.text,
         },
