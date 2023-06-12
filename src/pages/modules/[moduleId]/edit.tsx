@@ -99,52 +99,12 @@ const EditModule = () => {
   });
 
   const onSubmit = async (data: FormSchemaType) => {
-    console.log(data);
-
     data.lessons.forEach((_, index) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       data.lessons[index]!.index = index + 1;
     });
     editModule.mutate({ inputModule: data, modId: moduleId });
   };
-
-  const test = () => {
-    Array.range = (start, end) => Array.from({length: (end - start + 1)}, (v, k) => k + start);
-    const min = fieldsIndexRules.minIndex;
-    const max = fieldsIndexRules.getLastIndex();
-    const numStr = (from, to) => (`[${
-      to!=null ? (
-        `${to?.toString()}`
-        // `GoTo: ${to?.toString()} | f[${to}].name: ${ fields[to]?.name ?? "-"}`
-      ) : "null"
-    }]`);
-    const longLine = Array.range(1, 30).map(num => (num+1)%(max-min+1) + min);
-    console.log(longLine);
-
-    const mat = Array.range(min, max).map((u, _) => 
-      [
-        u, 
-        Array.range(min, max).map((v, _) => fieldsIndexRules.getLoopMove(u,u+v+1)),
-        Array.range(min, max).map((v, _) => fieldsIndexRules.getLoopMove(u,u-v-1))
-      ]
-    );
-    
-    console.log(`minIndex: ${min}, lastIndex: ${max}`, min, max);
-    console.log(fields.map((field, index) => [field.name,fieldsIndexRules.indexValidate(index)]));
-    mat.forEach(line => 
-      console.log("name: " + fields[line[0]]?.name + ":",
-       ...line[1].map(u => numStr(line[0],u)), "\n", 
-       ...line[2].map(v => numStr(line[0],v)))
-    );
-
-  };
-
-  const limits = (next) => console.log("index out of limits", {
-    next: next,
-    maxIndex: fieldsIndexRules.maxIndex,
-    minIndex: fieldsIndexRules.minIndex,
-    lastIndex: fieldsIndexRules.getLastIndex()
-  });
 
   return (
     <>
@@ -229,8 +189,6 @@ const EditModule = () => {
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                 >
                   <FormLabel>Nome do tópico{field.index}</FormLabel>
-                  
-                  {/* {console.log("Index: ", field.index, "Name: ", field.name)} */}
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
@@ -242,7 +200,6 @@ const EditModule = () => {
                       colorScheme="red"
                       variant="solid"
                       onClick={() => {
-                        test();
                         setLessonToDelete(index)
                         onOpen();
                       }}
@@ -259,10 +216,6 @@ const EditModule = () => {
                         const moveResult = fieldsIndexRules.getLoopMove(index, next);
 
                         if (moveResult != null) {
-                          if (next != moveResult) {
-                            limits(next);
-                            test();
-                          }
                           move(index, moveResult);
                         } 
                       }}
@@ -275,13 +228,7 @@ const EditModule = () => {
                       onClick={() => {
                         const next = index + 1;
                         const moveResult = fieldsIndexRules.getLoopMove(index, next);
-                        test();
-                        limits(next);
                         if (moveResult != null) {
-                          if (next != moveResult) {
-                            limits(next);
-                            test();
-                          }
                           move(index, moveResult);
                         } 
                       }}

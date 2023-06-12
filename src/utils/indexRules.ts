@@ -33,7 +33,6 @@ interface IndexRules {
   handleAppend: Validation<number>;
   getAppendIndex: GetValid<undefined,number>;
 
-  // move: Validation<number>;
   getLoopMove: GetValid<number, number>;
 }
 
@@ -72,7 +71,6 @@ const createIndexRules =
         const posData = this.data[index];
 
         const catchInvalidInput = posData === null
-        // const catchAlreadyOut = posData!.deleted === true;
         const catchInvalidIndex = !this.indexValidate(index);
         const catchLengthBelowMin = this.getLengthSum()-1 < this.minLength;
 
@@ -108,12 +106,12 @@ const createIndexRules =
         }
       },
 
-      lengthValidate: function (length: number) { // verificar correude
+      lengthValidate: function (length: number) {
 
         return length >= this.minLength && length <= this.maxLength;
       },
 
-      indexValidate: function (index: number) { //verificar corretude
+      indexValidate: function (index: number) { 
         return (index >= this.minIndex && index <= this.maxIndex) &&
           (this.lastIndexUp != null && index <= this.lastIndexUp);
       },
@@ -127,7 +125,7 @@ const createIndexRules =
         return this.lengthValidate(newLength);
       },
 
-      getAppendIndex: function () { // verificar corretude
+      getAppendIndex: function () { 
         const validAppend = this.lengthValidate(this.data.length);
         const currentLastIndex = this.data.length + this.trash.length - 1; 
         const newLastIndex = this.data.length + this.trash.length;  
@@ -156,7 +154,8 @@ const createIndexRules =
 
         const diff = to - from;
         const [start, end] = [this.minIndex, lastIndex];
-        const loopNorm = (diff)%(end-start); // Percea que end - start representa umm distancia, ou seja é análogo a length. 
+        const loopNorm = (diff)%(end-start); /* Percea que end - start representa umm distancia,
+         ou seja é análogo a length e para loopNorm virar um index ele deve receber "+ this.lengthToIndexDiff" */
         const loopSignal = (diff > 0 ? 1 : 0); // Ou seja diff > 0 ? (loop p/ inicio) : (loop p/ fim)
 
         const loopTo = (loopSignal ? start+loopNorm : end-loopNorm) + this.lengthToIndexDiff; 
