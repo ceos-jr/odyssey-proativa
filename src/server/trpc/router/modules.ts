@@ -9,6 +9,12 @@ import {
   adminProcedure,
 } from "../trpc";
 
+interface Lesson {
+  id: string;
+  index: number;
+  name: string;
+}
+
 /* Imports:
   z from zod:
     - zod: zod é uma biblioteca de declaração e validação de tipos TypeScript.
@@ -185,6 +191,7 @@ export const moduleRouter = router({
             id: true,
             name: true,
             index: true,
+            richText: true
           },
           orderBy: { index: "asc" },
         },
@@ -192,9 +199,9 @@ export const moduleRouter = router({
     });
 
     const inputSet = new Set(inputModule.lessons.map(lesson => lesson.id)); // id's Input armazendos ~ O(n)
-    const currtSet = new Set(currentModule.lessons.map(lesson => lesson.id)); // id's Current armazendos ~ O(n)
+    const currtSet = new Set(currentModule?.lessons.map(lesson => lesson.id)); // id's Current armazendos ~ O(n)
 
-    const lessonsToDelete = currentModule.lessons.filter((lesson) => { // Se esta em current e nao esta em input -> delete 
+    const lessonsToDelete = currentModule?.lessons.filter((lesson) => { // Se esta em current e nao esta em input -> delete 
       if (!inputSet.has(lesson.id)) { // O(1) ~ essa e a vatagem do Set 
         return true;
       }
@@ -202,7 +209,7 @@ export const moduleRouter = router({
       return false;
     });
 
-    const lessonsStepOrder = (lessonsArray) => {
+    const lessonsStepOrder = (lessonsArray: Lesson[]) => {
 
       console.log(lessonsArray[0])
       return lessonsArray.map((lesson, index) => {
@@ -269,15 +276,14 @@ export const moduleRouter = router({
           - Nesse caso realIndex e o index que ele tem naturalmente no inputModule.lessons 
         */
         if (
-          currtSet.has(lesson.id)  // O(1) ~ se esta em current entao ja existe 
+          currtSet.has(lesson?.id || "")  // O(1) ~ se esta em current entao ja existe 
           || !lesson.id 
           ) {
 
           return transaction.lesson.update({  
-            where: { id: lesson.id },
+            where: { id: lesson.id || "" },
             data: { 
               name: lesson.name,
-              richText: lesson.richText,
               index: realIndex
             }
           })

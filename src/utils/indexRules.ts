@@ -2,15 +2,15 @@ type Validation<T> = (...args: T[]) => boolean;
 type GetValid<T, R extends NonNullable<any>> = (...args: T[]) => R | null;
 type SafeGetValid<T, R extends NonNullable<any>> = (...args: T[]) => R;
 interface PositionData {
-    prev: number, // -1 -> invalido
-    id: string,
-    onOrigin: boolean,
-    next: number // -1 -> invalido
-  }
+  prev: number, // -1 -> invalido
+  id: string,
+  onOrigin: boolean,
+  next: number // -1 -> invalido
+}
 type Handler<T> = (...args: T[]) => void;
 type Optional<T extends NonNullable<any>> = T | null;
-interface IndexRules {
 
+interface IndexRules {
   lengthToIndexDiff: number; // numero de elementos ativos
   data: Array<PositionData>,
   trash: Array<PositionData>,
@@ -18,7 +18,7 @@ interface IndexRules {
   lastIndexUp: number;
 
   removeValidate: Validation<number>;
-  handleRemove: Validation<number & boolean>;
+  handleRemove: Validation<number>;
   
   getLengthSum: SafeGetValid<undefined, number>,
   lengthValidate: Validation<number>;  
@@ -53,7 +53,7 @@ const createIndexRules =
       // length: array.length, // tamanho considerando todos os elementos, (apagados, criados e )
       lastIndexUp: array.length - 1,
 
-      trash: Array(),
+      trash: [],
       data: array.map((f, i) => { 
         return {
           prev: (array[i-1] || array[i-1]===0) ? i-1 : -1,
@@ -87,17 +87,21 @@ const createIndexRules =
 
           this.data = this.data.filter((v) => !(v.id === auxData.id));
 
-          if (auxData.onOrigin) {
-            this.data[index].onOrigin = false;
-            this.trash.push(this.data[index]);
+          const indexData = this.data[index]
+          const prevData = this.data[prevIndex]
+          const nextData = this.data[nextIndex]
+
+          if (auxData.onOrigin && indexData) {
+            indexData.onOrigin = false;
+            this.trash.push(indexData);
           } 
 
-          if (prevIndex != null && this.data[prevIndex]) {
-            this.data[prevIndex].next = nextIndex;
+          if (prevIndex != null && prevData) {
+            prevData.next = nextIndex;
           } 
           
-          if (nextIndex != null && this.data[nextIndex]) {
-            this.data[nextIndex].prev = prevIndex;
+          if (nextIndex != null && nextData) {
+            nextData.prev = prevIndex;
           } 
 
           return true;
@@ -130,11 +134,13 @@ const createIndexRules =
         const currentLastIndex = this.data.length + this.trash.length - 1; 
         const newLastIndex = this.data.length + this.trash.length;  
 
-        if (validAppend && this.data[currentLastIndex]) {
-          this.data[currentLastIndex].next = newLastIndex;
+        const currentLastData = this.data[currentLastIndex]; 
+
+        if (validAppend && currentLastData) {
+          currentLastData.next = newLastIndex;
 
           this.data.push({
-            prev: this.data[currentLastIndex] ? currentLastIndex : -1,
+            prev: currentLastData ? currentLastIndex : -1,
             onOrigin: false, 
             id: newLastIndex.toString(), 
             next: -1
