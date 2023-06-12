@@ -5,7 +5,7 @@ const useUpdateSuggestion = (userId?: string, moduleId?: string) => {
   const utils = trpc.useContext();
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
-  const changeModGlobally = trpc.module.updSttsOnModSugg.useMutation({
+  const changeModGlobally = trpc.modSug.updSttsOnModSugg.useMutation({
     async onMutate(data) {
       await utils.admin.getModSuggestions.cancel();
       const prevData = utils.admin.getModSuggestions.getData();
@@ -25,19 +25,19 @@ const useUpdateSuggestion = (userId?: string, moduleId?: string) => {
     },
   });
 
-  const changeModForUser = trpc.module.updSttsOnModSugg.useMutation({
+  const changeModForUser = trpc.modSug.updSttsOnModSugg.useMutation({
     async onMutate(data) {
-      await utils.module.getUserModSuggestions.cancel(userId);
-      const prevData = utils.module.getUserModSuggestions.getData(userId);
+      await utils.modSug.getUserModSuggestions.cancel(userId);
+      const prevData = utils.modSug.getUserModSuggestions.getData(userId);
       const updData = prevData;
       updData?.forEach((el) => {
         if (el.id === data.id) el.readed = !el.readed;
       });
-      utils.module.getUserModSuggestions.setData(updData);
+      utils.modSug.getUserModSuggestions.setData(updData);
       return { prevData };
     },
     onError(err, _, ctx) {
-      utils.module.getUserModSuggestions.setData(ctx?.prevData, userId);
+      utils.modSug.getUserModSuggestions.setData(ctx?.prevData, userId);
       showErrorToast(err.message, "Erro ao atualizar a sugestão");
     },
     onSuccess() {

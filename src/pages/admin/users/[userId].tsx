@@ -39,7 +39,7 @@ const User = () => {
     }
   );
 
-  const { data: uModSugg } = trpc.module.getUserModSuggestions.useQuery(
+  const { data: uModSugg } = trpc.modSug.getUserModSuggestions.useQuery(
     userId,
     {
       refetchOnWindowFocus: false,
