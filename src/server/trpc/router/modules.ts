@@ -178,178 +178,189 @@ export const moduleRouter = router({
       });
     }),
   editModule: adminProcedure
-   .input(z.object({ inputModule: FormSchemaUpdate, modId: z.string() }))
-   .mutation(async ({ctx, input}) => {
-    const inputModule = input.inputModule;
-    const modId = input.modId;
+    .input(z.object({ inputModule: FormSchemaUpdate, modId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const inputModule = input.inputModule;
+      const modId = input.modId;
 
-    const currentModule = await ctx.prisma.module.findUnique({
-      where: { id: modId },
-      include: {
-        lessons: {
-          select: {
-            id: true,
-            name: true,
-            index: true,
-            richText: true
+      const currentModule = await ctx.prisma.module.findUnique({
+        where: { id: modId },
+        include: {
+          lessons: {
+            select: {
+              id: true,
+              name: true,
+              index: true,
+              richText: true,
+            },
+            orderBy: { index: "asc" },
           },
-          orderBy: { index: "asc" },
         },
-      },
-    });
+      });
 
-    const inputSet = new Set(inputModule.lessons.map(lesson => lesson.id)); // id's Input armazendos ~ O(n)
-    const currtSet = new Set(currentModule?.lessons.map(lesson => lesson.id)); // id's Current armazendos ~ O(n)
+      const inputSet = new Set(inputModule.lessons.map((lesson) => lesson.id)); // id's Input armazendos ~ O(n)
+      const currtSet = new Set(
+        currentModule?.lessons.map((lesson) => lesson.id)
+      ); // id's Current armazendos ~ O(n)
 
-    const lessonsToDelete = currentModule?.lessons.filter((lesson) => { // Se esta em current e nao esta em input -> delete 
-      if (!inputSet.has(lesson.id)) { // O(1) ~ essa e a vatagem do Set 
-        return true;
-      }
-
-      return false;
-    });
-
-    const lessonsStepOrder = (lessonsArray: Lesson[]) => {
-
-      console.log(lessonsArray[0])
-      return lessonsArray.map((lesson, index) => {
-        const stepOrder = { 
-          previous: "",
-          next: "",
-          id: lesson.id
+      const lessonsToDelete = currentModule?.lessons.filter((lesson) => {
+        // Se esta em current e nao esta em input -> delete
+        if (!inputSet.has(lesson.id)) {
+          // O(1) ~ essa e a vatagem do Set
+          return true;
         }
 
-        const i = index;
+        return false;
+      });
 
-        // Sobre a ordem das lessons: 
-        // L = Lesson em questao, L-1 = Lesson anterior, L+1 = Lesson posterior
+      const lessonsStepOrder = (lessonsArray: Lesson[]) => {
+        console.log(lessonsArray[0]);
+        return lessonsArray.map((lesson, index) => {
+          const stepOrder = {
+            previous: "",
+            next: "",
+            id: lesson.id,
+          };
 
-        // Para L-1 != null && L+1 != null 
-        //    L-1 <- L -> L+1
+          const i = index;
 
-        // Para L-1 == null && L+1 != null 
-        //    null <- L -> L+1 (botao subir nao deve funcionar)
+          // Sobre a ordem das lessons:
+          // L = Lesson em questao, L-1 = Lesson anterior, L+1 = Lesson posterior
 
-        // Para L-1 == null && L+1 != null 
-        //    null <- L -> L+1 (botao subir nao deve funcionar)
+          // Para L-1 != null && L+1 != null
+          //    L-1 <- L -> L+1
 
-        // Para L-1 == null && L+1 == null 
-        //    null <- L -> null (botoes de subir e descer nao devem funcionar)
+          // Para L-1 == null && L+1 != null
+          //    null <- L -> L+1 (botao subir nao deve funcionar)
 
+          // Para L-1 == null && L+1 != null
+          //    null <- L -> L+1 (botao subir nao deve funcionar)
 
-        if (lessonsArray[i-1]
-            && i-1 >= 0) { // array[-1] = ultima posição 
-          stepOrder.previous = lessonsArray[i-1]?.id ?? "";
-        }
+          // Para L-1 == null && L+1 == null
+          //    null <- L -> null (botoes de subir e descer nao devem funcionar)
 
-        if (lessonsArray[i+1]) {
-          stepOrder.next = lessonsArray[i+1]?.id ?? "";
-        }
+          if (lessonsArray[i - 1] && i - 1 >= 0) {
+            // array[-1] = ultima posição
+            stepOrder.previous = lessonsArray[i - 1]?.id ?? "";
+          }
 
-        return stepOrder;
-      })
-    }
-    
-    await ctx.prisma.$transaction(async (transaction) => {
-      // check more in: https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/
+          if (lessonsArray[i + 1]) {
+            stepOrder.next = lessonsArray[i + 1]?.id ?? "";
+          }
 
-      if (lessonsToDelete) { 
-        const deletedLessons = await Promise.all(lessonsToDelete.map(async (lesson) => {
-          if (lesson?.id) { 
-            return transaction.lesson.delete({
-              where: { id: lesson.id },
+          return stepOrder;
+        });
+      };
+
+      await ctx.prisma.$transaction(async (transaction) => {
+        // check more in: https://advancedweb.hu/how-to-use-async-functions-with-array-map-in-javascript/
+
+        if (lessonsToDelete) {
+          const deletedLessons = await Promise.all(
+            lessonsToDelete.map(async (lesson) => {
+              if (lesson?.id) {
+                return transaction.lesson.delete({
+                  where: { id: lesson.id },
+                });
+              }
             })
-          } 
-        }))
+          );
+        }
 
-      }
+        const allSubsInMod = await transaction.userModuleProgress.findMany({
+          // Inscritos no modulo ~ info usada para cirar cada lessonsProg no proximo map(3a).
+          where: { moduleId: modId },
+        });
 
-      const allSubsInMod = await transaction.userModuleProgress.findMany({  // Inscritos no modulo ~ info usada para cirar cada lessonsProg no proximo map(3a).
-        where: { moduleId: modId },
-      }); 
-      
-      const editModuleLessons = await Promise.all(inputModule.lessons.map(async (lesson, realIndex) => {
-        /* IMPORTANTE
+        const editModuleLessons = await Promise.all(
+          inputModule.lessons.map(async (lesson, realIndex) => {
+            /* IMPORTANTE
           Esse map esta assim para preservar a ordem do input, ai nao precisa se preucupar com atributo index do frontend,
           na verdade pegar esse atributo la do front e jogar no db era a rezao de mtos problemas, la ele serve para gerar 
           um id temporario para lesson.
           - Nesse caso realIndex e o index que ele tem naturalmente no inputModule.lessons 
         */
-        if (
-          currtSet.has(lesson?.id || "")  // O(1) ~ se esta em current entao ja existe 
-          || !lesson.id 
-          ) {
+            if (
+              currtSet.has(lesson?.id || "") || // O(1) ~ se esta em current entao ja existe
+              !lesson.id
+            ) {
+              return transaction.lesson.update({
+                where: { id: lesson.id || "" },
+                data: {
+                  name: lesson.name,
+                  index: realIndex,
+                },
+              });
+            } else {
+              // se nao esta em current entao ainda nao existe
 
-          return transaction.lesson.update({  
-            where: { id: lesson.id || "" },
-            data: { 
-              name: lesson.name,
-              index: realIndex
-            }
-          })
-        } else { // se nao esta em current entao ainda nao existe 
-          
-          /* Importante - passo a passo da lesson
+              /* Importante - passo a passo da lesson
             1a Criar lesson 
             2a Encontrar todos os usuarios inscritos no modulo*
               - fora desse map, se ele ficar aqui dentro fica O(nˆ2)
             3a Criar lessonProg para todos eles
           */
 
-          const newLesson = await transaction.lesson.create({ // 1a
-            data: {
-              moduleId: modId,
-              name: lesson.name,
-              richText: "",
-              index: realIndex,
-            },
-          });
-          
-          const newLessonsProgress = await Promise.all(allSubsInMod.map((sub) => { // 3a 
-            const lessonProg = transaction.userLessonProgress.create({
-              data: {
-                userId: sub.userId,
-                moduleId: modId,
-                lessonId: newLesson.id,
-              } 
-            });
+              const newLesson = await transaction.lesson.create({
+                // 1a
+                data: {
+                  moduleId: modId,
+                  name: lesson.name,
+                  richText: "",
+                  index: realIndex,
+                },
+              });
 
-            return lessonProg;
-          }));
+              const newLessonsProgress = await Promise.all(
+                allSubsInMod.map((sub) => {
+                  // 3a
+                  const lessonProg = transaction.userLessonProgress.create({
+                    data: {
+                      userId: sub.userId,
+                      moduleId: modId,
+                      lessonId: newLesson.id,
+                    },
+                  });
 
+                  return lessonProg;
+                })
+              );
 
-          return newLesson;
-        }
-      }));
-
-      const updatedModule = await transaction.module.update({ // modulo atualizado, com as lessons na ordem usada
-        where: { id: modId },
-        data: {
-          name: inputModule.name,
-          body: inputModule.body,
-          description: inputModule.description,
-        },
-        select: { 
-          lessons: {
-            orderBy: { index: "asc" }, 
-          },
-        }
-      });
-
-      const corrections = await Promise.all(
-        lessonsStepOrder(updatedModule.lessons).map((stepOrder) => { // Usar o index como a gente usava antes esta errado
-          console.log(stepOrder);
-          return transaction.lesson.update({
-            where: { id: stepOrder.id }, 
-            data: { 
-              previous: stepOrder.previous,
-              next: stepOrder.next
+              return newLesson;
             }
-          })        
-      }));
+          })
+        );
 
-  });
-  }),
+        const updatedModule = await transaction.module.update({
+          // modulo atualizado, com as lessons na ordem usada
+          where: { id: modId },
+          data: {
+            name: inputModule.name,
+            body: inputModule.body,
+            description: inputModule.description,
+          },
+          select: {
+            lessons: {
+              orderBy: { index: "asc" },
+            },
+          },
+        });
+
+        const corrections = await Promise.all(
+          lessonsStepOrder(updatedModule.lessons).map((stepOrder) => {
+            // Usar o index como a gente usava antes esta errado
+            console.log(stepOrder);
+            return transaction.lesson.update({
+              where: { id: stepOrder.id },
+              data: {
+                previous: stepOrder.previous,
+                next: stepOrder.next,
+              },
+            });
+          })
+        );
+      });
+    }),
   createModWLessons: adminProcedure
     .input(FormSchemaCreate)
     .mutation(async ({ ctx, input }) => {

@@ -28,7 +28,7 @@ import {
 import { trpc } from "@utils/trpc";
 import { useRouter } from "next/router";
 import useCustomToast from "@hooks/useCustomToast";
-import  createIndexRules  from "@utils/indexRules";
+import createIndexRules from "@utils/indexRules";
 
 export const FormSchemaCreate = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
@@ -138,12 +138,12 @@ const CreateModule = () => {
                 variant="solid"
                 onClick={() => {
                   const newIndex = fieldsIndexRules.getAppendIndex() ?? false;
-                  if (newIndex) {  
+                  if (newIndex) {
                     append({
                       richText: "",
                       name: "",
                       index: newIndex,
-                    })
+                    });
                   }
                 }}
               >
@@ -173,7 +173,8 @@ const CreateModule = () => {
                       variant="solid"
                       onClick={() => {
                         const lessonToDelete = index;
-                        const handleRemove = fieldsIndexRules.handleRemove(lessonToDelete);
+                        const handleRemove =
+                          fieldsIndexRules.handleRemove(lessonToDelete);
                         if (handleRemove) {
                           remove(lessonToDelete);
                         }
@@ -188,7 +189,10 @@ const CreateModule = () => {
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         const next = index - 1;
-                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+                        const moveResult = fieldsIndexRules.getLoopMove(
+                          index,
+                          next
+                        );
 
                         if (moveResult != null) {
                           // if (next != moveResult) {
@@ -196,7 +200,7 @@ const CreateModule = () => {
                           //   test();
                           // }
                           move(index, moveResult);
-                        } 
+                        }
                       }}
                     />
                     <Icon
@@ -206,7 +210,10 @@ const CreateModule = () => {
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         const next = index + 1;
-                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+                        const moveResult = fieldsIndexRules.getLoopMove(
+                          index,
+                          next
+                        );
 
                         if (moveResult != null) {
                           // if (next != moveResult) {
@@ -214,7 +221,7 @@ const CreateModule = () => {
                           //   test();
                           // }
                           move(index, moveResult);
-                        } 
+                        }
                       }}
                     />
                   </div>

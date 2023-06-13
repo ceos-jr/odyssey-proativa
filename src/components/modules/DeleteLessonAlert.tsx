@@ -43,11 +43,7 @@ const DeleteLessonAlert = ({
           <Button ref={cancelRef} onClick={onClose}>
             Não
           </Button>
-          <Button
-            colorScheme="red"
-            ml={3}
-            onClick={onClickToDelete}
-          >
+          <Button colorScheme="red" ml={3} onClick={onClickToDelete}>
             Sim
           </Button>
         </AlertDialogFooter>

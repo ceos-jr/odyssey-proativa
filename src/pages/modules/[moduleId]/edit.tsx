@@ -14,7 +14,7 @@ import {
   type Control,
   useForm,
   useWatch,
-  useFieldArray
+  useFieldArray,
 } from "react-hook-form";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
 import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
@@ -32,7 +32,7 @@ import useCustomToast from "@hooks/useCustomToast";
 import { FormSchemaUpdate } from "src/pages/modules/index";
 import DeleteLessonAlert from "@components/modules/DeleteLessonAlert";
 import { useState } from "react";
-import  createIndexRules  from "@utils/indexRules";
+import createIndexRules from "@utils/indexRules";
 
 type FormSchemaType = z.infer<typeof FormSchemaUpdate>;
 
@@ -40,7 +40,7 @@ const EditModule = () => {
   const router = useRouter();
   const moduleId = useRouter().query.moduleId as string;
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [lessonToDelete, setLessonToDelete] = useState<number>(0)
+  const [lessonToDelete, setLessonToDelete] = useState<number>(0);
 
   const { data: formS } = trpc.module.getUnique.useQuery(
     {
@@ -64,13 +64,15 @@ const EditModule = () => {
         return {
           id: lesson.id ?? "",
           name: lesson.name,
-          index: lesson.index
-        }
-      }) ?? [{
-        id: "",
-        name: "",
-        index: 0
-      }]
+          index: lesson.index,
+        };
+      }) ?? [
+        {
+          id: "",
+          name: "",
+          index: 0,
+        },
+      ],
     },
     mode: "all",
   });
@@ -83,7 +85,7 @@ const EditModule = () => {
   const fieldsIndexRules = createIndexRules(fields, false, {
     maxLength: 10,
     minLength: 1,
-    lengthToIndexDiff: -1
+    lengthToIndexDiff: -1,
   });
 
   const { showErrorToast, showSuccessToast } = useCustomToast();
@@ -121,7 +123,7 @@ const EditModule = () => {
             if (handleRemove) {
               remove(lessonToDelete);
             }
-            onClose()
+            onClose();
           }}
         />
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -164,23 +166,22 @@ const EditModule = () => {
                 colorScheme="green"
                 variant="solid"
                 onClick={() => {
-                    const newIndex = fieldsIndexRules.getAppendIndex() ?? false;
-                    if (newIndex) {  
-                      append({
-                        id: (newIndex).toString(),
-                        name: "",
-                        index: newIndex,
-                      })
-                    }
+                  const newIndex = fieldsIndexRules.getAppendIndex() ?? false;
+                  if (newIndex) {
+                    append({
+                      id: newIndex.toString(),
+                      name: "",
+                      index: newIndex,
+                    });
                   }
-                }
+                }}
               >
                 Novo Tópico
               </Button>
             </div>
             {errors.lessons?.message && (
               <div className="text-red-500">{errors.lessons.message}</div>
-            )}            
+            )}
             {fields.map((field, index) => {
               return (
                 <FormControl
@@ -200,7 +201,7 @@ const EditModule = () => {
                       colorScheme="red"
                       variant="solid"
                       onClick={() => {
-                        setLessonToDelete(index)
+                        setLessonToDelete(index);
                         onOpen();
                       }}
                     >
@@ -213,11 +214,14 @@ const EditModule = () => {
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         const next = index - 1;
-                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+                        const moveResult = fieldsIndexRules.getLoopMove(
+                          index,
+                          next
+                        );
 
                         if (moveResult != null) {
                           move(index, moveResult);
-                        } 
+                        }
                       }}
                     />
                     <Icon
@@ -227,10 +231,13 @@ const EditModule = () => {
                       className="cursor-pointer transition-colors hover:text-secondary"
                       onClick={() => {
                         const next = index + 1;
-                        const moveResult = fieldsIndexRules.getLoopMove(index, next);
+                        const moveResult = fieldsIndexRules.getLoopMove(
+                          index,
+                          next
+                        );
                         if (moveResult != null) {
                           move(index, moveResult);
-                        } 
+                        }
                       }}
                     />
                   </div>
@@ -267,4 +274,3 @@ const PreviewText = ({ control }: { control: Control<FormSchemaType> }) => {
 EditModule.getLayout = function getLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
-

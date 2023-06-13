@@ -112,22 +112,23 @@ const UniqueModule = () => {
               ) : (
                 <div className="flex gap-4">
                   {session?.user?.role === Role.ADMIN && (
-                    <Button
-                      leftIcon={<AiOutlineDelete />}
-                      colorScheme="red"
-                      onClick={() => delModule.mutate(moduleId)}
-                    >
-                      Deletar
-                    </Button>) && (
-                    <NextLink href={`/modules/${moduleId}/edit`}>
                       <Button
                         leftIcon={<AiOutlineDelete />}
-                        colorScheme="blue"
+                        colorScheme="red"
+                        onClick={() => delModule.mutate(moduleId)}
                       >
-                        Editar
+                        Deletar
                       </Button>
-                    </NextLink>)
-                  }
+                    ) && (
+                      <NextLink href={`/modules/${moduleId}/edit`}>
+                        <Button
+                          leftIcon={<AiOutlineDelete />}
+                          colorScheme="blue"
+                        >
+                          Editar
+                        </Button>
+                      </NextLink>
+                    )}
                   <Button
                     onClick={onOpen}
                     leftIcon={<AiOutlineInbox />}
