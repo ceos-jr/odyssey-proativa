@@ -66,7 +66,7 @@ const useUpdateSuggestion = (userId?: string, moduleId?: string) => {
     },
   });
 
-  const changeLesGlobally = trpc.lesson.updSttsOnLessSugg.useMutation({
+  const changeLesGlobally = trpc.lessSug.updSttsOnLessSugg.useMutation({
     async onMutate(data) {
       await utils.admin.getLessSuggestions.cancel();
       const prevData = utils.admin.getLessSuggestions.getData();
@@ -86,19 +86,19 @@ const useUpdateSuggestion = (userId?: string, moduleId?: string) => {
     },
   });
 
-  const changeLesForUser = trpc.lesson.updSttsOnLessSugg.useMutation({
+  const changeLesForUser = trpc.lessSug.updSttsOnLessSugg.useMutation({
     async onMutate(data) {
-      await utils.lesson.getUserLesSuggestions.cancel(userId);
-      const prevData = utils.lesson.getUserLesSuggestions.getData(userId);
+      await utils.lessSug.getUserLesSuggestions.cancel(userId);
+      const prevData = utils.lessSug.getUserLesSuggestions.getData(userId);
       const updData = prevData;
       updData?.forEach((el) => {
         if (el.id === data.id) el.readed = !el.readed;
       });
-      utils.lesson.getUserLesSuggestions.setData(updData);
+      utils.lessSug.getUserLesSuggestions.setData(updData);
       return { prevData };
     },
     onError(err, _, ctx) {
-      utils.lesson.getUserLesSuggestions.setData(ctx?.prevData, userId);
+      utils.lessSug.getUserLesSuggestions.setData(ctx?.prevData, userId);
       showErrorToast(err.message, "Erro ao atualizar a sugestão");
     },
     onSuccess() {
