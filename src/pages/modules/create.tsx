@@ -177,7 +177,6 @@ const CreateModule = () => {
                         if (handleRemove) {
                           remove(lessonToDelete);
                         }
-                        onClose()
                       }}
                     >
                       Deletar
