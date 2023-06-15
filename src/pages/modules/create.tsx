@@ -1,33 +1,15 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Icon,
-  Input,
-} from "@chakra-ui/react";
-import DashboardLayout from "@components/Layout/DashboardLayout";
-import Head from "next/head";
-import {
-  type Control,
-  useForm,
-  useWatch,
-  useFieldArray,
-} from "react-hook-form";
-import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
-import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  AiFillDelete,
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiOutlinePlus,
-} from "react-icons/ai";
-import { trpc } from "@utils/trpc";
-import { useRouter } from "next/router";
-import useCustomToast from "@hooks/useCustomToast";
+import { Button, FormControl, FormErrorMessage, FormLabel, Heading, Icon, Input } from '@chakra-ui/react';
+import AutoResizeTextarea from '@components/Layout/AutoResizeTextarea';
+import DashboardLayout from '@components/Layout/DashboardLayout';
+import DisplayMarkdown from '@components/Layout/DisplayMarkdown';
+import { zodResolver } from '@hookform/resolvers/zod';
+import useCustomToast from '@hooks/useCustomToast';
+import { trpc } from '@utils/trpc';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { Control, type, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { AiFillDelete, AiOutlineArrowDown, AiOutlineArrowUp, AiOutlinePlus } from 'react-icons/ai';
+import * as z from 'zod';
 
 export const FormSchema = z.object({
   name: z.string().min(1, { message: "O nome do módulo é necessário" }),
