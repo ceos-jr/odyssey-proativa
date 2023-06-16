@@ -70,7 +70,7 @@ const SubmitTaskAlert = ({
             isRequired
             isInvalid={!!message && message.length < 1}
           >
-            <FormLabel>Messagem</FormLabel>
+            <FormLabel>Mensagem (em Markdown)</FormLabel>
             <AutoResizeTextarea onChange={(e) => setMessage(e.target.value)}>
               {initialData}
             </AutoResizeTextarea>
