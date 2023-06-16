@@ -134,7 +134,7 @@ const TaskForm = ({
               )}
             </FormControl>
             <FormControl id="richText" isRequired isInvalid={!!errors.richText}>
-              <FormLabel>Conteúdo da Atividade em Markdown</FormLabel>
+              <FormLabel>Conteúdo da Atividade (em Markdown)</FormLabel>
               <Textarea
                 placeholder="nome"
                 {...register("richText")}

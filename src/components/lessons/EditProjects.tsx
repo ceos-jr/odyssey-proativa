@@ -74,7 +74,7 @@ const EditProjects = ({
                   }
                   id={`projects_${index}_name`}
                 >
-                  <FormLabel>Nome do project</FormLabel>
+                  <FormLabel>Nome do projeto</FormLabel>
                   <Input
                     placeholder="nome"
                     {...register(`projects.${index}.name` as const)}

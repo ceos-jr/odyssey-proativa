@@ -29,8 +29,8 @@ export const LessonWUtils = z.object({
   richText: z.string().min(1, { message: "O conteúdo do tópico é necessário" }),
   videos: z.array(
     z.object({
-      name: z.string().min(1, { message: "O nome do video é necessário" }),
-      url: z.string().min(1, { message: "O URL do video é necessário" }),
+      name: z.string().min(1, { message: "O nome do vídeo é necessário" }),
+      url: z.string().min(1, { message: "O URL do vídeo é necessário" }),
       description: z.string(),
     })
   ),
@@ -136,7 +136,7 @@ const Edit = () => {
               <Heading>Tópico</Heading>
               <FormControl isInvalid={!!errors.name} isRequired id="name">
                 <div className="flex gap-2">
-                  <FormLabel>Nome do tópico</FormLabel>
+                  <FormLabel>Nome do Tópico</FormLabel>
                   <BiReset
                     className="h-6 w-6 cursor-pointer transition-colors hover:text-secondary"
                     onClick={() => resetField("name")}
@@ -157,7 +157,7 @@ const Edit = () => {
                 id="rich-text"
               >
                 <div className="flex gap-2">
-                  <FormLabel>Conteúdo do tópico (em markdown)</FormLabel>
+                  <FormLabel>Conteúdo do Tópico (em Markdown)</FormLabel>
                   <BiReset
                     className="h-6 w-6 flex-shrink-0 cursor-pointer transition-colors hover:text-secondary"
                     onClick={() => resetField("richText")}
