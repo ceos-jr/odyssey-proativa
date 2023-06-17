@@ -2,6 +2,7 @@ import { adminProcedure, protectedProcedure, router } from "@trpc/trpc";
 import { z } from "zod";
 import { SuggestionFormSchema } from "@components/Layout/ModSuggestionModal";
 
+
 export const moduleSuggestion = router({
   allByModuleId: adminProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.modSuggestion.findMany({
@@ -11,6 +12,7 @@ export const moduleSuggestion = router({
       },
     });
   }),
+<<<<<<< HEAD
   /*O endpoint createModSugg recebe como parâmetro um formulário referente a sugestão de um módulo e utiliza a função 'mutation' para criar essa sugestão por meio do método 'create' do Prisma.
   É um processo protegido, afeta apenas o usuário logado. */
   createModSugg: protectedProcedure
@@ -56,6 +58,24 @@ export const moduleSuggestion = router({
         take: 5, // Atualmente somente 5 sugestões são requisitadas
       });
     }),
+=======
+  getModSuggestions: adminProcedure.query(({ ctx }) => {
+    /*
+    - getSuggestions: Pede para o banco de dados encontrar* um grupo de sugestões aos módulos com informações adcionais
+      sobre quem as fez e quais modulos elas se referem e retorna esse valor.
+    */
+    return ctx.prisma.modSuggestion.findMany({
+      include: {
+        module: { select: { id: true, name: true } },
+        user: { select: { id: true, name: true, image: true } },
+      },
+      /*
+        *-> Nesse caso os valores requisitados são todas as sugestões aos modulos juntamente com o nome e id do modulo
+          em questão e nome, id e imagem do usuario que fez a sugestão. 
+      */
+    });
+  }),
+>>>>>>> 486232f6fb92d7c25440015264bb55f74a539d8c
 });
 
 

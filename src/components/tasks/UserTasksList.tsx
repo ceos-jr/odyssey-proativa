@@ -62,12 +62,6 @@ const UserTasksList = ({ tasksProgress }: UserTasksListProps) => {
           <Tr>
             <Th>Nome</Th>
             <Th>Status</Th>
-            {(tasksProgress === TaskProgress.submitted && (
-              <Th isNumeric>Data de submissão</Th>
-            )) ||
-              (tasksProgress === TasksProgress.completed && (
-                <Th isNumeric>Data de Conclusão</Th>
-              ))}
             <Th isNumeric>Nota</Th>
             <Th isNumeric>Ações</Th>
           </Tr>
