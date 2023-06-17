@@ -3,9 +3,9 @@ import { faker } from "@faker-js/faker";
 import moment from "moment";
 
 const createMockedTasks = async (prisma: PrismaClient, moduleId: string) => {
-  let tasks: Prisma.TaskCreateManyInput[] = [];
+  const tasks: Prisma.TaskCreateManyInput[] = [];
 
-  let goodDateToWork = moment().subtract(10, "months").toDate();
+  const goodDateToWork = moment().subtract(10, "months").toDate();
 
   const lessons = await prisma.lesson.findMany({
     where: { moduleId: moduleId, index: { lt: 4 } },

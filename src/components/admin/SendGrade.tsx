@@ -46,7 +46,7 @@ const SendGrade = ({
       const prevData = utils.admin.getLatestSubmissions.getData();
       const newData = prevData?.filter((sub) => sub.taskId !== data.taskId);
       utils.admin.getLatestSubmissions.setData(newData);
-
+      
       return { prevData };
     },
     onError(err, _, ctx) {

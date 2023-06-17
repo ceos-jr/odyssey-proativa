@@ -138,8 +138,9 @@ export const adminRouter = router({
       },
       include: {
         user: { select: { name: true, image: true } },
-        task: true,
+        task: true
       },
+      orderBy: { submittedAt: "desc" }
       /*
         *-> Nesse caso os valores requisitados são todos os envios que possuem o estado de role igual a "SUBMITTED" juntamente
           com nome e imagem de quem fez o envio e o tópico ao qual o envio se refere. 
@@ -211,7 +212,7 @@ export const adminRouter = router({
         },
         data: {
           grade: input.grade,
-          // completedAt: new Date(), não vai mais mudar aqui 
+          completedAt: new Date(),
           status: TaskStatus.Completed,
         },
         /*

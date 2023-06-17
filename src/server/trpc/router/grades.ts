@@ -40,7 +40,7 @@ export type GradeFrequency = {
 // {Function} gradeDistByUser - Retorna um array de distribuição de notas das tasks completadas de um usuário específico.
 
 // As notas são obtidas da tabela "UserTaskProgress", que contém o progresso do usuário em tarefas relacionadas ao curso.
-// As notas são filtradas pela coluna "status", que contém o estado da tarefa (completa ou incompleta), e pela coluna "submittedAt", que contém a data em que a tarefa foi concluída.
+// As notas são filtradas pela coluna "status", que contém o estado da tarefa (completa ou incompleta), e pela coluna "completedAt", que contém a data em que a tarefa foi concluída.
 
 export const gradesRouter = router({
   //Disponível para usuário autenticado
@@ -48,15 +48,15 @@ export const gradesRouter = router({
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
     WITH intervals AS (
       SELECT
-        date_trunc('day', "submittedAt") AS interval_start,
+        date_trunc('day', "completedAt") AS interval_start,
         SUM(grade) AS grade_sum,
         COUNT(grade) AS grade_count,
-        ROW_NUMBER() OVER (ORDER BY date_trunc('day', "submittedAt") DESC) AS row_num
+        ROW_NUMBER() OVER (ORDER BY date_trunc('day', "completedAt") DESC) AS row_num
       FROM
         "UserTaskProgress"
       WHERE
         status::text = ${TaskStatus.COMPLETED}::text
-        AND "submittedAt" BETWEEN NOW() - INTERVAL '1 MONTH' AND NOW()
+        AND "completedAt" BETWEEN NOW() - INTERVAL '1 MONTH' AND NOW()
       GROUP BY
         interval_start
     )
@@ -83,16 +83,16 @@ export const gradesRouter = router({
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('day', "submittedAt") AS interval_start,
+          date_trunc('day', "completedAt") AS interval_start,
           SUM(grade) AS grade_sum,
           COUNT(grade) AS grade_count,
-          ROW_NUMBER() OVER (ORDER BY date_trunc('day', "submittedAt") DESC) AS row_num
+          ROW_NUMBER() OVER (ORDER BY date_trunc('day', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
           "userId" = ${userId}
           AND status::text = ${TaskStatus.COMPLETED}::text
-          AND "submittedAt" BETWEEN NOW() - INTERVAL '1 MONTH' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '1 MONTH' AND NOW()
         GROUP BY
           interval_start
       )
@@ -112,15 +112,15 @@ export const gradesRouter = router({
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('week', "submittedAt") AS interval_start,
+          date_trunc('week', "completedAt") AS interval_start,
           SUM(grade) AS grade_sum,
           COUNT(grade) AS grade_count,
-          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "submittedAt") DESC) AS row_num
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
           status::text = ${TaskStatus.COMPLETED}::text
-          AND "submittedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
         GROUP BY
           interval_start
       )
@@ -146,16 +146,16 @@ export const gradesRouter = router({
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('week', "submittedAt") AS interval_start,
+          date_trunc('week', "completedAt") AS interval_start,
           SUM(grade) AS grade_sum,
           COUNT(grade) AS grade_count,
-          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "submittedAt") DESC) AS row_num
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
           "userId" = ${userId}
           AND status::text = ${TaskStatus.COMPLETED}::text
-          AND "submittedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '3 MONTH' AND NOW()
         GROUP BY
           interval_start
       )
@@ -175,15 +175,15 @@ export const gradesRouter = router({
     return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('week', "submittedAt") AS interval_start,
+          date_trunc('week', "completedAt") AS interval_start,
           SUM(grade) AS grade_sum,
           COUNT(grade) AS grade_count,
-          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "submittedAt") DESC) AS row_num
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
           status::text = ${TaskStatus.COMPLETED}::text
-          AND "submittedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
         GROUP BY
           interval_start
       )
@@ -209,16 +209,16 @@ export const gradesRouter = router({
       return ctx.prisma.$queryRaw<CumulativeAvg[]>`
       WITH intervals AS (
         SELECT
-          date_trunc('week', "submittedAt") AS interval_start,
+          date_trunc('week', "completedAt") AS interval_start,
           SUM(grade) AS grade_sum,
           COUNT(grade) AS grade_count,
-          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "submittedAt") DESC) AS row_num
+          ROW_NUMBER() OVER (ORDER BY date_trunc('week', "completedAt") DESC) AS row_num
         FROM
           "UserTaskProgress"
         WHERE
           "userId" = ${userId}
           AND status::text = ${TaskStatus.COMPLETED}::text
-          AND "submittedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
+          AND "completedAt" BETWEEN NOW() - INTERVAL '6 MONTH' AND NOW()
         GROUP BY
           interval_start
       )

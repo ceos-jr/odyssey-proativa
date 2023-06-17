@@ -6,8 +6,8 @@ const createMockedLessonProgress = async (
   moduleId: string,
   userId: string
 ) => {
-  let lessonsProgress: Prisma.UserLessonProgressCreateManyInput[] = [];
-  let goodTimeToWork = moment().subtract(9, "months");
+  const lessonsProgress: Prisma.UserLessonProgressCreateManyInput[] = [];
+  const goodTimeToWork = moment().subtract(9, "months");
 
   await prisma.userModuleProgress.create({
     data: {

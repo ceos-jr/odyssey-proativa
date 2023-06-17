@@ -37,6 +37,14 @@ const SubmitTaskAlert = ({
 
   const utils = trpc.useContext();
   const mutation = trpc.user.submitTask.useMutation({
+    async onMutate(data) {
+      await utils.admin.getLatestSubmissions.cancel();
+      const prevData = utils.admin.getLatestSubmissions.getData();
+      const newData = prevData?.filter((sub) => sub.taskId !== data.taskId);
+      utils.admin.getLatestSubmissions.setData(newData);
+      
+      return { prevData };
+    },
     onError(err) {
       showErrorToast(err.message, "Não foi possível submeter a atividade");
     },

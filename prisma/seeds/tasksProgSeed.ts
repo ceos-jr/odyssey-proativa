@@ -8,8 +8,8 @@ const createMockedTaskProgress = async (
   moduleId: string,
   userId: string
 ) => {
-  let tasksProgress: Prisma.UserTaskProgressCreateManyInput[] = [];
-  let previoussubmittedAt = moment();
+  const tasksProgress: Prisma.UserTaskProgressCreateManyInput[] = [];
+  let previoussubmittedAt = moment().subtract(2, 'days');
 
   const lessons = await prisma.lesson.findMany({
     where: { moduleId: moduleId },
@@ -22,26 +22,20 @@ const createMockedTaskProgress = async (
     les.tasks.forEach((task) => {
       const completedOrSubmitted: {
         grade?: number,
-        status: TaskStatus | undefined
+        status: TaskStatus | undefined,
+        subAt: Date,
+        compAt: Date | undefined
       } = counter%3 == 2 ? {
         grade: faker.number.int({ min: 0, max: 5 }),
-        status: TaskStatus.Completed
+        status: TaskStatus.Completed,
+        subAt: previoussubmittedAt.add(1, "day").toDate(),
+        compAt: previoussubmittedAt.add(2, "day").toDate()
       } : {
         grade: undefined,
-        status: TaskStatus.Submitted
+        status: TaskStatus.Submitted,
+        subAt: previoussubmittedAt.add(1, "day").toDate(),
+        compAt: undefined
       };
-
-      const taskProg: Prisma.UserTaskProgressUncheckedCreateInput = {
-        userId: userId,
-        grade: completedOrSubmitted.grade,
-        richText: faker.lorem.paragraphs(1),
-        startedAt: previoussubmittedAt.toDate(),
-        submittedAt: previoussubmittedAt.add(1, "day").toDate(),
-        lessonId: les.id,
-        taskId: task.id,
-        status: completedOrSubmitted.status,
-      };
-      tasksProgress.push(taskProg);
 
       let time: number;
 
@@ -51,6 +45,19 @@ const createMockedTaskProgress = async (
 
       previoussubmittedAt = previoussubmittedAt.subtract(time, "days");
       counter++;
+
+      const taskProg: Prisma.UserTaskProgressUncheckedCreateInput = {
+        userId: userId,
+        grade: completedOrSubmitted.grade,
+        richText: faker.lorem.paragraphs(1),
+        startedAt: previoussubmittedAt.toDate(),
+        completedAt: completedOrSubmitted.compAt,
+        submittedAt: completedOrSubmitted.subAt,
+        lessonId: les.id,
+        taskId: task.id,
+        status: completedOrSubmitted.status,
+      };
+      tasksProgress.push(taskProg);
     })
   );
 
