@@ -89,8 +89,7 @@ const UserSubmissions = () => {
                 </Thead>
                 <Tbody>
                   {lastSubmissions.data.map((sub) => (
-                    <Tr key={sub.taskId + sub.userId}>
-                      {console.log(sub)}
+                    <Tr key={(sub.taskId + sub.userId).toString()}>
                       <Td>
                         <div className="flex items-center gap-x-2">
                           <div className="relative h-8 w-8">

@@ -7,7 +7,7 @@ import useCustomToast from '@hooks/useCustomToast';
 import { trpc } from '@utils/trpc';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Control, type, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { type Control, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { AiFillDelete, AiOutlineArrowDown, AiOutlineArrowUp, AiOutlinePlus } from 'react-icons/ai';
 import * as z from 'zod';
 
