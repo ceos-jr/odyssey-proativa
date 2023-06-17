@@ -21,7 +21,6 @@ import { useState } from "react";
 import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
 import NextLink from "next/link";
 
-
 const UniqueModule = () => {
   const { data: session } = useSession();
   const [posting, setPosting] = useState(false);
@@ -100,10 +99,7 @@ const UniqueModule = () => {
                 {session?.user?.role === Roles.Admin && (
                   <>
                     <NextLink href={`/modules/${moduleId}/edit`}>
-                      <Button
-                        leftIcon={<AiOutlineDelete />}
-                        colorScheme="blue"
-                      >
+                      <Button leftIcon={<AiOutlineDelete />} colorScheme="blue">
                         Editar
                       </Button>
                     </NextLink>
@@ -159,9 +155,8 @@ const UniqueModule = () => {
               <SingleModSuggestionList moduleId={moduleId} />
             )}
           </>
-        )
-        }
-      </main >
+        )}
+      </main>
     </>
   );
 };
