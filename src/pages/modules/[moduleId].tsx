@@ -99,20 +99,20 @@ const UniqueModule = () => {
               <div className="grid justify-items-end gap-4">
                 <div className="flex w-full justify-end">
                   {!userRel ? (
-                    <div className="flex w-full gap-4 justify-center">
+                    <div className="flex w-full justify-center gap-4">
                       <Button
-                      colorScheme="green"
-                      isLoading={posting}
-                      onClick={() => {
-                        setPosting(true);
-                        subsToModule.mutate(moduleData);
-                      }}
+                        colorScheme="green"
+                        isLoading={posting}
+                        onClick={() => {
+                          setPosting(true);
+                          subsToModule.mutate(moduleData);
+                        }}
                       >
                         Inscrever
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex w-full gap-4 justify-end">
+                    <div className="flex w-full justify-end gap-4">
                       <Button
                         onClick={onOpen}
                         leftIcon={<AiOutlineInbox />}
@@ -133,11 +133,11 @@ const UniqueModule = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex justify-end w-full gap-4">
-                {session?.user?.role === Roles.Admin && (
+                <div className="flex w-full justify-end gap-4">
+                  {session?.user?.role === Roles.Admin && (
                     <>
                       <NextLink href={`/modules/${moduleId}/edit`}>
-                        <Button leftIcon={<BsPencil/>} colorScheme="blue">
+                        <Button leftIcon={<BsPencil />} colorScheme="blue">
                           Editar
                         </Button>
                       </NextLink>
@@ -149,7 +149,7 @@ const UniqueModule = () => {
                         Deletar
                       </Button>
                     </>
-                )}
+                  )}
                 </div>
               </div>
             </div>
