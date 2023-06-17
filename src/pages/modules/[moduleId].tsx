@@ -1,12 +1,10 @@
 import {
   Heading,
-  Text,
   Stack,
   Skeleton,
   SkeletonText,
   Button,
   useDisclosure,
-  TableContainer,
 } from "@chakra-ui/react";
 import DashboardLayout from "@components/Layout/DashboardLayout";
 import ModSuggestionModal from "@components/Layout/ModSuggestionModal";
@@ -14,7 +12,6 @@ import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
 import LessonsList from "@components/modules/LessonsList";
 import SingleModSuggestionList from "@components/modules/SingleModSuggestionList";
 import useCustomToast from "@hooks/useCustomToast";
-import { Role } from "@prisma/client";
 import { Roles } from "@utils/constants";
 import { trpc } from "@utils/trpc";
 import { useSession } from "@utils/useSession";
@@ -23,6 +20,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
 import NextLink from "next/link";
+
 
 const UniqueModule = () => {
   const { data: session } = useSession();
@@ -98,68 +96,72 @@ const UniqueModule = () => {
               <Heading as="h1" size="3xl">
                 {`Modulo de ${moduleData.name}`}
               </Heading>
-              {!userRel ? (
-                <Button
-                  colorScheme="green"
-                  isLoading={posting}
-                  onClick={() => {
-                    setPosting(true);
-                    subsToModule.mutate(moduleData);
-                  }}
-                >
-                  Inscrever
-                </Button>
-              ) : (
-                <div className="flex gap-4">
-                  {session?.user?.role === Role.ADMIN && (
+              <div className="flex gap-4">
+                {session?.user?.role === Roles.Admin && (
+                  <>
+                    <NextLink href={`/modules/${moduleId}/edit`}>
                       <Button
                         leftIcon={<AiOutlineDelete />}
-                        colorScheme="red"
-                        onClick={() => delModule.mutate(moduleId)}
+                        colorScheme="blue"
                       >
-                        Deletar
+                        Editar
                       </Button>
-                    ) && (
-                      <NextLink href={`/modules/${moduleId}/edit`}>
-                        <Button
-                          leftIcon={<AiOutlineDelete />}
-                          colorScheme="blue"
-                        >
-                          Editar
-                        </Button>
-                      </NextLink>
-                    )}
+                    </NextLink>
+                    <Button
+                      leftIcon={<AiOutlineDelete />}
+                      colorScheme="red"
+                      onClick={() => delModule.mutate(moduleId)}
+                    >
+                      Deletar
+                    </Button>
+                  </>
+                )}
+                {!userRel ? (
                   <Button
-                    onClick={onOpen}
-                    leftIcon={<AiOutlineInbox />}
-                    colorScheme="twitter"
-                  >
-                    Sugestões
-                  </Button>
-                  <Button
-                    colorScheme="red"
+                    colorScheme="green"
                     isLoading={posting}
                     onClick={() => {
                       setPosting(true);
-                      desubToModule.mutate({ moduleId: moduleData.id });
+                      subsToModule.mutate(moduleData);
                     }}
                   >
-                    Desinscrever
+                    Inscrever
                   </Button>
-                </div>
-              )}
+                ) : (
+                  <>
+                    <Button
+                      onClick={onOpen}
+                      leftIcon={<AiOutlineInbox />}
+                      colorScheme="twitter"
+                    >
+                      Sugestões
+                    </Button>
+                    <Button
+                      colorScheme="red"
+                      isLoading={posting}
+                      onClick={() => {
+                        setPosting(true);
+                        desubToModule.mutate({ moduleId: moduleData.id });
+                      }}
+                    >
+                      Desinscrever
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
             <DisplayMarkdown className="my-6" text={moduleData?.body || ""} />
             <Heading as="h2" className="my-4">
               Aulas
             </Heading>
             <LessonsList lessons={moduleData.lessons} userModRel={userRel} />
-            {session?.user?.role === Roles.Admin ? (
+            {session?.user?.role === Roles.Admin && (
               <SingleModSuggestionList moduleId={moduleId} />
-            ) : null}
+            )}
           </>
-        )}
-      </main>
+        )
+        }
+      </main >
     </>
   );
 };
