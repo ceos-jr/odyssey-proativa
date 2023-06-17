@@ -39,7 +39,7 @@ const EditVideos = ({
     <>
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex gap-2">
-          <Heading>Videos</Heading>
+          <Heading>Vídeos</Heading>
           <BiReset
             className="h-6 w-6 flex-shrink-0 cursor-pointer transition-colors hover:text-secondary"
             onClick={() => resetField("videos")}
@@ -57,7 +57,7 @@ const EditVideos = ({
             })
           }
         >
-          Novo Video
+          Novo Vídeo
         </Button>
       </div>
       {fields.map((field, index) => {
@@ -73,7 +73,7 @@ const EditVideos = ({
                   isInvalid={!!errors?.videos && !!errors.videos[index]?.name}
                   id={`videos_${index}_name`}
                 >
-                  <FormLabel>Nome do video</FormLabel>
+                  <FormLabel>Nome do vídeo</FormLabel>
                   <Input
                     placeholder="nome"
                     {...register(`videos.${index}.name` as const)}
@@ -90,7 +90,7 @@ const EditVideos = ({
                   isInvalid={!!errors?.videos && !!errors.videos[index]?.url}
                   id={`videos_${index}_url`}
                 >
-                  <FormLabel>URL do video</FormLabel>
+                  <FormLabel>URL do vídeo</FormLabel>
                   <Input
                     placeholder="url"
                     {...register(`videos.${index}.url` as const)}
@@ -104,7 +104,7 @@ const EditVideos = ({
                   )}
                 </FormControl>
               </div>
-              <FormLabel className="mt-4">Descrição do video</FormLabel>
+              <FormLabel className="mt-4">Descrição do vídeo</FormLabel>
               <Input
                 placeholder="descrição"
                 {...register(`videos.${index}.description` as const)}

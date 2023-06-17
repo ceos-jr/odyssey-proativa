@@ -21,7 +21,7 @@ const ResourceTab = ({ videos, links, projects }: LinkListProps) => {
       className="shadow-lg"
     >
       <TabList>
-        <Tab>Videos</Tab>
+        <Tab>Vídeos</Tab>
         <Tab>Docs</Tab>
         <Tab>Projetos</Tab>
       </TabList>
