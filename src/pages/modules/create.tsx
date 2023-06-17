@@ -93,7 +93,7 @@ const CreateModule = () => {
   return (
     <>
       <Head>
-        <title>Criar modulo • Proativa</title>
+        <title>Criar módulo • Proativa</title>
         <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex h-max flex-col p-4">
@@ -104,7 +104,7 @@ const CreateModule = () => {
               <FormLabel>Nome do Modulo</FormLabel>
               <Input
                 bgColor="white"
-                placeholder="o melhor modulo do mundo"
+                placeholder="o melhor módulo do mundo"
                 {...register("name")}
               />
               {errors.name && (
@@ -112,15 +112,15 @@ const CreateModule = () => {
               )}
             </FormControl>
             <FormControl id="description">
-              <FormLabel>Descrição do Modulo</FormLabel>
+              <FormLabel>Descrição do Módulo</FormLabel>
               <Input
                 bgColor="white"
-                placeholder="uma descrição concisa e util"
+                placeholder="uma descrição concisa e útil"
                 {...register("description")}
               />
             </FormControl>
             <FormControl id="body">
-              <FormLabel>Corpo do Modulo (em markdown)</FormLabel>
+              <FormLabel>Corpo do Módulo (em Markdown)</FormLabel>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <AutoResizeTextarea
                   placeholder="corpo do seu módulo"
@@ -160,7 +160,7 @@ const CreateModule = () => {
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                 >
-                  <FormLabel>Nome do tópico{field.index}</FormLabel>
+                  <FormLabel>Nome do Tópico</FormLabel>
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
@@ -239,7 +239,7 @@ const CreateModule = () => {
               className="my-4 w-1/3"
               type="submit"
             >
-              Criar Modulo
+              Criar Módulo
             </Button>
           </div>
         </form>

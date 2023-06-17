@@ -84,7 +84,7 @@ const VideoList = ({ videos }: VideoListProps) => {
             >
               ADMIN
             </Highlight>{" "}
-            para adicionar um video ou mande uma sugestão
+            para adicionar um vídeo ou mande uma sugestão
           </Text>
         </div>
       )}
