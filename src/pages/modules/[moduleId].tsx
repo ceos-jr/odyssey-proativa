@@ -19,6 +19,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
+import { BsPencil } from "react-icons/bs";
 import NextLink from "next/link";
 
 const UniqueModule = () => {
@@ -92,58 +93,64 @@ const UniqueModule = () => {
         ) : (
           <>
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <Heading as="h1" size="3xl">
+              <Heading className="w-6/12" as="h1" size="3xl">
                 {`Modulo de ${moduleData.name}`}
               </Heading>
-              <div className="flex gap-4">
-                {session?.user?.role === Roles.Admin && (
-                  <>
-                    <NextLink href={`/modules/${moduleId}/edit`}>
-                      <Button leftIcon={<AiOutlineDelete />} colorScheme="blue">
-                        Editar
-                      </Button>
-                    </NextLink>
-                    <Button
-                      leftIcon={<AiOutlineDelete />}
-                      colorScheme="red"
-                      onClick={() => delModule.mutate(moduleId)}
-                    >
-                      Deletar
-                    </Button>
-                  </>
-                )}
-                {!userRel ? (
-                  <Button
-                    colorScheme="green"
-                    isLoading={posting}
-                    onClick={() => {
-                      setPosting(true);
-                      subsToModule.mutate(moduleData);
-                    }}
-                  >
-                    Inscrever
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      onClick={onOpen}
-                      leftIcon={<AiOutlineInbox />}
-                      colorScheme="twitter"
-                    >
-                      Sugestões
-                    </Button>
-                    <Button
-                      colorScheme="red"
+              <div className="grid justify-items-end gap-4">
+                <div className="flex w-full justify-end">
+                  {!userRel ? (
+                    <div className="flex w-full gap-4 justify-center">
+                      <Button
+                      colorScheme="green"
                       isLoading={posting}
                       onClick={() => {
                         setPosting(true);
-                        desubToModule.mutate({ moduleId: moduleData.id });
+                        subsToModule.mutate(moduleData);
                       }}
-                    >
-                      Desinscrever
-                    </Button>
-                  </>
+                      >
+                        Inscrever
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex w-full gap-4 justify-end">
+                      <Button
+                        onClick={onOpen}
+                        leftIcon={<AiOutlineInbox />}
+                        colorScheme="twitter"
+                      >
+                        Sugestões
+                      </Button>
+                      <Button
+                        colorScheme="red"
+                        isLoading={posting}
+                        onClick={() => {
+                          setPosting(true);
+                          desubToModule.mutate({ moduleId: moduleData.id });
+                        }}
+                      >
+                        Desinscrever
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-end w-full gap-4">
+                {session?.user?.role === Roles.Admin && (
+                    <>
+                      <NextLink href={`/modules/${moduleId}/edit`}>
+                        <Button leftIcon={<BsPencil/>} colorScheme="blue">
+                          Editar
+                        </Button>
+                      </NextLink>
+                      <Button
+                        leftIcon={<AiOutlineDelete />}
+                        colorScheme="red"
+                        onClick={() => delModule.mutate(moduleId)}
+                      >
+                        Deletar
+                      </Button>
+                    </>
                 )}
+                </div>
               </div>
             </div>
             <DisplayMarkdown className="my-6" text={moduleData?.body || ""} />
