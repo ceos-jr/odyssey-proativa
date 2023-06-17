@@ -42,7 +42,7 @@ const SubmitTaskAlert = ({
       const prevData = utils.admin.getLatestSubmissions.getData();
       const newData = prevData?.filter((sub) => sub.taskId !== data.id);
       utils.admin.getLatestSubmissions.setData(newData);
-      
+
       return { prevData };
     },
     onError(err) {

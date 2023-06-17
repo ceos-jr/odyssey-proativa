@@ -31,7 +31,7 @@ moment.locale("pt-br");
 
 type UserSubmissionOutput = Pick<
   RouterTypes["admin"]["getLatestSubmissions"]["output"][0],
-  "task" | "userId" | "richText" 
+  "task" | "userId" | "richText"
 >;
 type SubmissionData = UserSubmissionOutput & {
   username: string;
@@ -108,7 +108,7 @@ const UserSubmissions = () => {
                         </div>
                       </Td>
                       <Td>{sub.task.name}</Td>
-                      <Td>{moment(sub.submittedAt).format('L')}</Td>
+                      <Td>{moment(sub.submittedAt).format("L")}</Td>
                       <Td className="flex justify-end">
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />

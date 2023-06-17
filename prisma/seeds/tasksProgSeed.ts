@@ -9,7 +9,7 @@ const createMockedTaskProgress = async (
   userId: string
 ) => {
   const tasksProgress: Prisma.UserTaskProgressCreateManyInput[] = [];
-  let previoussubmittedAt = moment().subtract(2, 'days');
+  let previoussubmittedAt = moment().subtract(2, "days");
 
   const lessons = await prisma.lesson.findMany({
     where: { moduleId: moduleId },
@@ -21,21 +21,24 @@ const createMockedTaskProgress = async (
   lessons.forEach((les) =>
     les.tasks.forEach((task) => {
       const completedOrSubmitted: {
-        grade?: number,
-        status: TaskStatus | undefined,
-        subAt: Date,
-        compAt: Date | undefined
-      } = counter%3 == 2 ? {
-        grade: faker.number.int({ min: 0, max: 5 }),
-        status: TaskStatus.Completed,
-        subAt: previoussubmittedAt.add(1, "day").toDate(),
-        compAt: previoussubmittedAt.add(2, "day").toDate()
-      } : {
-        grade: undefined,
-        status: TaskStatus.Submitted,
-        subAt: previoussubmittedAt.add(1, "day").toDate(),
-        compAt: undefined
-      };
+        grade?: number;
+        status: TaskStatus | undefined;
+        subAt: Date;
+        compAt: Date | undefined;
+      } =
+        counter % 3 == 2
+          ? {
+              grade: faker.number.int({ min: 0, max: 5 }),
+              status: TaskStatus.Completed,
+              subAt: previoussubmittedAt.add(1, "day").toDate(),
+              compAt: previoussubmittedAt.add(2, "day").toDate(),
+            }
+          : {
+              grade: undefined,
+              status: TaskStatus.Submitted,
+              subAt: previoussubmittedAt.add(1, "day").toDate(),
+              compAt: undefined,
+            };
 
       let time: number;
 

@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 /*Importações: Funções e tipos definidos pelo tRPC que vão ser utilizados nos endpoints. */
-import { 
+import {
   router,
   adminProcedure,
   protectedProcedure,
@@ -15,7 +15,7 @@ import {
 type TotalAndUnfCountByUser = {
   total: bigint;
   finished: bigint;
-}; 
+};
 
 /*O endpoint taskRouter é utilizado somente pelo admin para criar novas tasks. Dentro do método 'mutation', que é assíncrono, ele espera o banco de dados criar a task usando o método 'create' do Prisma.*/
 export const taskRouter = router({
@@ -83,7 +83,7 @@ export const taskRouter = router({
   /*O método totalAndUnfCountByUser retorna o total de tasks e o total de tasks não finalizadas por usuário. Caso o usuário não seja o Admin, o trpc jogará um erro. */
   totalAndUnfCountByUser: protectedProcedure
     .input(z.string().optional())
-    .query(async ({ ctx, input }) => { 
+    .query(async ({ ctx, input }) => {
       if (input && ctx.session.user.role !== "ADMIN")
         throw new TRPCError({ code: "UNAUTHORIZED" });
       const userId = input ? input : ctx.session.user.id;
@@ -98,7 +98,7 @@ export const taskRouter = router({
       return {
         total: Number(data[0]?.total),
         finished: Number(data[0]?.finished),
-      }; 
+      };
     }),
 
   /*O método getTasksByUser coleta as tarefas do usuário. melhorar a documentação.*/
