@@ -2,7 +2,6 @@ import { adminProcedure, protectedProcedure, router } from "@trpc/trpc";
 import { z } from "zod";
 import { SuggestionFormSchema } from "@components/Layout/ModSuggestionModal";
 
-
 export const moduleSuggestion = router({
   allByModuleId: adminProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.modSuggestion.findMany({
@@ -25,7 +24,7 @@ export const moduleSuggestion = router({
         },
       });
     }),
-    updSttsOnModSugg: adminProcedure
+  updSttsOnModSugg: adminProcedure
     .input(z.object({ id: z.string(), readed: z.boolean() }))
     .mutation(({ ctx, input }) => {
       /*
@@ -74,5 +73,3 @@ export const moduleSuggestion = router({
     });
   }),
 });
-
-
