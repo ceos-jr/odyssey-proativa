@@ -189,7 +189,7 @@ const EditModule = () => {
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                 >
-                  <FormLabel>Nome do tópico{field.index}</FormLabel>
+                  <FormLabel>Nome do tópico</FormLabel>
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
