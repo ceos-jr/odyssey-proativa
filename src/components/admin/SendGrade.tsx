@@ -44,7 +44,9 @@ const SendGrade = ({
     async onMutate(data) {
       await utils.admin.getLatestSubmissions.cancel();
       const prevData = utils.admin.getLatestSubmissions.getData();
-      const newData = prevData?.filter((sub) => sub.taskId !== data.taskId);
+      const newData = prevData?.filter(
+        (sub) => sub.taskId !== data.taskId || sub.userId !== data.userId
+      );
       utils.admin.getLatestSubmissions.setData(newData);
 
       return { prevData };
