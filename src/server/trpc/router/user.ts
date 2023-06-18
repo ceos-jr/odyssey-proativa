@@ -130,6 +130,7 @@ export const userRouter = router({
         data: {
           richText: input.richText,
           status: TaskStatus.Submitted,
+          submittedAt: new Date(),
         },
       });
     }),

@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 import moment from "moment";
 
 const createMockedModules = async (prisma: PrismaClient) => {
-  let modules: Prisma.ModuleCreateManyInput[] = [];
+  const modules: Prisma.ModuleCreateManyInput[] = [];
 
   const goodDateToWork = moment().subtract(10, "months").toDate();
 

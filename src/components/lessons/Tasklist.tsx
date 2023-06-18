@@ -36,7 +36,7 @@ interface TasklistProps {
 }
 
 const Tasklist = ({ lessonId, tasks }: TasklistProps) => {
-  const { data: userTasksStts } = trpc.user.getTasks4Less.useQuery(lessonId);
+  const { data: userTasksStts } = trpc.user.getTasks4Less.useQuery(lessonId); // userTaskProgress
   const [task, setTask] = useState<TasksType[0] | null>(null);
   const sendTaskAle = useDisclosure();
   const taskModal = useDisclosure();

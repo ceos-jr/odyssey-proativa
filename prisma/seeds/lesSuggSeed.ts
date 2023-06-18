@@ -7,7 +7,7 @@ const createMockedLesSuggestion = async (
   moduleId: string,
   userId: string
 ) => {
-  let suggestions: Prisma.LesSuggestionCreateManyInput[] = [];
+  const suggestions: Prisma.LesSuggestionCreateManyInput[] = [];
   const lessons = await prisma.lesson.findMany({
     where: { moduleId: moduleId },
     take: 2,
