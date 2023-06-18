@@ -113,19 +113,6 @@ export const userRouter = router({
         data: { lastTimeSeen: new Date() },
       });
     }),
-  /*O endpoint createModSugg recebe como parâmetro um formulário referente a sugestão de um módulo e utiliza a função 'mutation' para criar essa sugestão por meio do método 'create' do Prisma.
-  É um processo protegido, afeta apenas o usuário logado. */
-  createModSugg: protectedProcedure
-    .input(SuggestionFormSchema)
-    .mutation(({ ctx, input }) => {
-      return ctx.prisma.modSuggestion.create({
-        data: {
-          moduleId: input.moduleId,
-          userId: ctx.session.user.id,
-          text: input.text,
-        },
-      });
-    }),
   /*O endpoint submitTask recebe como um parâmeto um objeto, o qual possui um ID específico e um campo de texto, e é validado pela biblioteca 'zod'. A função 'mutation' utiliza essa informação para atualizar a resposta da tarefa e mudar a condição dela para 'submetida', utilizando o método 'update' do Prisma.
   É um processo protegido, afeta apenas o usuário logado. */
   submitTask: protectedProcedure

@@ -83,7 +83,6 @@ const UserSubmissions = () => {
                   <Tr>
                     <Th>Usuário</Th>
                     <Th>Atividade</Th>
-                    <Th>Data de submissão</Th>
                     <Th isNumeric>Ações</Th>
                   </Tr>
                 </Thead>
