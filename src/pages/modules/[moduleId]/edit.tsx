@@ -6,81 +6,97 @@ import {
   Heading,
   Icon,
   Input,
+  useDisclosure,
 } from "@chakra-ui/react";
-import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
 import DashboardLayout from "@components/Layout/DashboardLayout";
-import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
-import { zodResolver } from "@hookform/resolvers/zod";
-import useCustomToast from "@hooks/useCustomToast";
-import { trpc } from "@utils/trpc";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import {
   type Control,
-  useFieldArray,
   useForm,
   useWatch,
+  useFieldArray,
 } from "react-hook-form";
+import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
+import AutoResizeTextarea from "@components/Layout/AutoResizeTextarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   AiFillDelete,
   AiOutlineArrowDown,
   AiOutlineArrowUp,
   AiOutlinePlus,
 } from "react-icons/ai";
-
+import { trpc } from "@utils/trpc";
+import { useRouter } from "next/router";
+import useCustomToast from "@hooks/useCustomToast";
+import { FormSchemaUpdate } from "src/pages/modules/index";
+import DeleteLessonAlert from "@components/modules/DeleteLessonAlert";
+import { useState } from "react";
 import createIndexRules from "@utils/indexRules";
-import * as z from "zod";
 
-export const FormSchemaCreate = z.object({
-  name: z.string().min(1, { message: "O nome do módulo é necessário" }),
-  body: z.string(),
-  description: z.string(),
-  lessons: z
-    .array(
-      z.object({
-        name: z.string().min(1, { message: "O nome do tópico é obrigatório" }),
-        richText: z.string(),
-        index: z.number(),
-      })
-    )
-    .min(1, { message: "Você deve incluir pelo menos 1 tópico" }),
-});
+type FormSchemaType = z.infer<typeof FormSchemaUpdate>;
 
-type FormSchemaType = z.infer<typeof FormSchemaCreate>;
+const EditModule = () => {
+  const router = useRouter();
+  const moduleId = useRouter().query.moduleId as string;
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [lessonToDelete, setLessonToDelete] = useState<number>(0);
 
-const CreateModule = () => {
+  const { data: formS } = trpc.module.getUnique.useQuery(
+    {
+      moduleId,
+    },
+    { refetchOnWindowFocus: true }
+  );
+
   const {
     handleSubmit,
     control,
     register,
     formState: { errors },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(FormSchemaCreate),
-    defaultValues: { lessons: [{ name: "", richText: "", index: 0 }] },
+    resolver: zodResolver(FormSchemaUpdate),
+    defaultValues: {
+      name: formS?.name ?? "",
+      body: formS?.body ?? "",
+      description: formS?.description ?? "",
+      lessons: formS?.lessons?.map((lesson, index) => {
+        return {
+          id: lesson.id ?? "",
+          name: lesson.name,
+          index: lesson.index,
+        };
+      }) ?? [
+        {
+          id: "",
+          name: "",
+          index: 0,
+        },
+      ],
+    },
     mode: "all",
   });
 
-  const { fields, append, remove, move } = useFieldArray({
+  const { fields, append, remove, move, update } = useFieldArray({
     name: "lessons",
     control,
   });
 
-  const fieldsIndexRules = createIndexRules(fields, true, {
+  const fieldsIndexRules = createIndexRules(fields, false, {
     maxLength: 10,
     minLength: 1,
     lengthToIndexDiff: -1,
   });
 
-  const router = useRouter();
   const { showErrorToast, showSuccessToast } = useCustomToast();
 
-  const createModWLessons = trpc.module.createModWLessons.useMutation({
+  const editModule = trpc.module.editModule.useMutation({
     onError(err) {
-      showErrorToast(err.message, "Não foi possível criar o módulo");
+      showErrorToast(err.message, "Não foi possível editar o módulo");
     },
     onSuccess() {
-      showSuccessToast("O módulo foi criado com sucesso");
-      router.push("/modules");
+      showSuccessToast("O módulo foi editado com sucesso");
+      router.push(`/modules/${moduleId}`);
     },
   });
 
@@ -89,23 +105,35 @@ const CreateModule = () => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       data.lessons[index]!.index = index + 1;
     });
-    createModWLessons.mutate(data);
+    editModule.mutate({ inputModule: data, modId: moduleId });
   };
+
   return (
     <>
       <Head>
-        <title>Criar módulo • Proativa</title>
+        <title>Editar modulo • Proativa</title>
         <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex h-max flex-col p-4">
+        <DeleteLessonAlert
+          isOpen={isOpen}
+          onClose={onClose}
+          onClickToDelete={() => {
+            const handleRemove = fieldsIndexRules.handleRemove(lessonToDelete);
+            if (handleRemove) {
+              remove(lessonToDelete);
+            }
+            onClose();
+          }}
+        />
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mx-auto flex max-w-4xl flex-col gap-y-4">
-            <Heading>Modulo</Heading>
-            <FormControl id="name" isInvalid={!!errors.name} isRequired>
+            <Heading>Editar Modulo</Heading>
+            <FormControl id="name" isInvalid={!!errors.name}>
               <FormLabel>Nome do Modulo</FormLabel>
               <Input
                 bgColor="white"
-                placeholder="o melhor módulo do mundo"
+                placeholder="o melhor modulo do mundo"
                 {...register("name")}
               />
               {errors.name && (
@@ -113,15 +141,15 @@ const CreateModule = () => {
               )}
             </FormControl>
             <FormControl id="description">
-              <FormLabel>Descrição do Módulo</FormLabel>
+              <FormLabel>Descrição do Modulo</FormLabel>
               <Input
                 bgColor="white"
-                placeholder="uma descrição concisa e útil"
+                placeholder="uma descrição concisa e util"
                 {...register("description")}
               />
             </FormControl>
             <FormControl id="body">
-              <FormLabel>Corpo do Módulo (em Markdown)</FormLabel>
+              <FormLabel>Corpo do Modulo (em markdown)</FormLabel>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <AutoResizeTextarea
                   placeholder="corpo do seu módulo"
@@ -141,7 +169,7 @@ const CreateModule = () => {
                   const newIndex = fieldsIndexRules.getAppendIndex() ?? false;
                   if (newIndex) {
                     append({
-                      richText: "",
+                      id: newIndex.toString(),
                       name: "",
                       index: newIndex,
                     });
@@ -161,7 +189,7 @@ const CreateModule = () => {
                   id={`lessons_${index}_name`}
                   isInvalid={!!errors.lessons && !!errors.lessons[index]}
                 >
-                  <FormLabel>Nome do Tópico</FormLabel>
+                  <FormLabel>Nome do tópico</FormLabel>
                   <div className="flex justify-between gap-x-4">
                     <Input
                       placeholder="nome"
@@ -173,12 +201,8 @@ const CreateModule = () => {
                       colorScheme="red"
                       variant="solid"
                       onClick={() => {
-                        const lessonToDelete = index;
-                        const handleRemove =
-                          fieldsIndexRules.handleRemove(lessonToDelete);
-                        if (handleRemove) {
-                          remove(lessonToDelete);
-                        }
+                        setLessonToDelete(index);
+                        onOpen();
                       }}
                     >
                       Deletar
@@ -196,10 +220,6 @@ const CreateModule = () => {
                         );
 
                         if (moveResult != null) {
-                          // if (next != moveResult) {
-                          //   limits(next);
-                          //   test();
-                          // }
                           move(index, moveResult);
                         }
                       }}
@@ -215,12 +235,7 @@ const CreateModule = () => {
                           index,
                           next
                         );
-
                         if (moveResult != null) {
-                          // if (next != moveResult) {
-                          //   limits(next);
-                          //   test();
-                          // }
                           move(index, moveResult);
                         }
                       }}
@@ -240,7 +255,7 @@ const CreateModule = () => {
               className="my-4 w-1/3"
               type="submit"
             >
-              Criar Módulo
+              Editar Modulo
             </Button>
           </div>
         </form>
@@ -249,13 +264,13 @@ const CreateModule = () => {
   );
 };
 
-export default CreateModule;
+export default EditModule;
 
 const PreviewText = ({ control }: { control: Control<FormSchemaType> }) => {
   const text = useWatch({ control, name: "body" });
   return <DisplayMarkdown text={text} />;
 };
 
-CreateModule.getLayout = function getLayout(page: React.ReactElement) {
+EditModule.getLayout = function getLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
 };
