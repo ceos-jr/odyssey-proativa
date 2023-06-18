@@ -54,7 +54,7 @@ const ModSuggestionModal = ({
   const { showErrorToast, showSuccessToast } = useCustomToast();
   const utils = trpc.useContext();
 
-  const createSugg = trpc.user.createModSugg.useMutation({
+  const createSugg = trpc.modSug.createModSugg.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possível enviar a sugestão");
     },

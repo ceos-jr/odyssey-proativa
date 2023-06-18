@@ -3,7 +3,7 @@ import { trpc } from "@utils/trpc";
 import AllUsersSuggestions from "./AllUsersSuggestions";
 
 const AllModulesSuggestions = () => {
-  const { data } = trpc.admin.getModSuggestions.useQuery();
+  const { data } = trpc.modSug.getModSuggestions.useQuery();
   const { changeModGlobally } = useUpdateSuggestion();
 
   const handleChange = (id: string, readed: boolean) => {
