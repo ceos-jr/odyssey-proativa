@@ -95,22 +95,6 @@ export const adminRouter = router({
     */
     return ctx.prisma.lesson.count({});
   }),
-  getModSuggestions: adminProcedure.query(({ ctx }) => {
-    /*
-    - getSuggestions: Pede para o banco de dados encontrar* um grupo de sugestões aos módulos com informações adcionais
-      sobre quem as fez e quais modulos elas se referem e retorna esse valor.
-    */
-    return ctx.prisma.modSuggestion.findMany({
-      include: {
-        module: { select: { id: true, name: true } },
-        user: { select: { id: true, name: true, image: true } },
-      },
-      /*
-        *-> Nesse caso os valores requisitados são todas as sugestões aos modulos juntamente com o nome e id do modulo
-          em questão e nome, id e imagem do usuario que fez a sugestão. 
-      */
-    });
-  }),
   getLessSuggestions: adminProcedure.query(({ ctx }) => {
     /*
     - getLessSuggestions: Pede ao banco de dados encontrar* um grupo de sugestões aos tópicos com informações adcionais
@@ -140,6 +124,7 @@ export const adminRouter = router({
         user: { select: { name: true, image: true } },
         task: true,
       },
+      orderBy: { submittedAt: "desc" },
       /*
         *-> Nesse caso os valores requisitados são todos os envios que possuem o estado de role igual a "SUBMITTED" juntamente
           com nome e imagem de quem fez o envio e o tópico ao qual o envio se refere. 

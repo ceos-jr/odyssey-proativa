@@ -95,7 +95,8 @@ model UserTaskProgress {
   status    TaskStatus            @default(NOTSUBMITTED)
   richText String?
   grade Float?
-  completedAt  DateTime?
+  completedAt DateTime?
+  submittedAt  DateTime?
 
   @@unique([userId, taskId])
 }

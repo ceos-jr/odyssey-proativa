@@ -437,36 +437,4 @@ export const moduleRouter = router({
         )
       );
     }),
-  updSttsOnModSugg: adminProcedure
-    .input(z.object({ id: z.string(), readed: z.boolean() }))
-    .mutation(({ ctx, input }) => {
-      /*
-      - updSttsOnModSugg("Update Status On Module Suggestions"): Pede ao banco de dados para atualizar* uma sugestão aos 
-        modulos, podendo marcar ela como lida ou não lida.
-          -> Esse processo é exclusivo para administradores.
-        
-        *> Nesse caso atualizar é uma "mutation" do prisma, ou seja uma operação que muda valores no banco de dados.  
-      */
-      return ctx.prisma.modSuggestion.update({
-        where: { id: input.id },
-        data: { readed: input.readed },
-      });
-    }),
-  getUserModSuggestions: adminProcedure
-    .input(z.string())
-    .query(({ ctx, input }) => {
-      /*
-      - getUserModSuggestions: Pede ao banco de dados para encontar sugestões aos 
-        modulos de um usuario específico**.
-          -> Esse processo é exclusivo para administradores.
-        
-        **-> Nesse caso o usuário específico é aquele com id igual input, que é do tipo z.string().
-      */
-      return ctx.prisma.modSuggestion.findMany({
-        where: { userId: input },
-        include: { module: { select: { name: true } } },
-        orderBy: { createdAt: "desc" }, // Os valores são ordenados de maneira decrescente em relação a data de criação
-        take: 5, // Atualmente somente 5 sugestões são requisitadas
-      });
-    }),
 });

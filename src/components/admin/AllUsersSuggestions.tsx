@@ -32,7 +32,7 @@ import "moment/locale/pt-br";
 import { FaUserCircle } from "react-icons/fa";
 moment.locale("pt-br");
 
-type ModSugg = RouterTypes["admin"]["getModSuggestions"]["output"][0];
+type ModSugg = RouterTypes["modSug"]["getModSuggestions"]["output"][0];
 type LessSugg = RouterTypes["admin"]["getLessSuggestions"]["output"][0];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

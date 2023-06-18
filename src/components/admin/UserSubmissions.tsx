@@ -25,6 +25,9 @@ import { useRef, useState } from "react";
 import SendGrade from "./SendGrade";
 import SeeSubmissionModal from "./SeeSubmissionModal";
 import ShowTaskModal from "@components/lessons/ShowTaskModal";
+import moment from "moment";
+import "moment/locale/pt-br";
+moment.locale("pt-br");
 
 type UserSubmissionOutput = Pick<
   RouterTypes["admin"]["getLatestSubmissions"]["output"][0],
@@ -80,12 +83,13 @@ const UserSubmissions = () => {
                   <Tr>
                     <Th>Usuário</Th>
                     <Th>Atividade</Th>
+                    <Th>Data de submissão</Th>
                     <Th isNumeric>Ações</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {lastSubmissions.data.map((sub) => (
-                    <Tr key={sub.taskId}>
+                    <Tr key={(sub.taskId + sub.userId).toString()}>
                       <Td>
                         <div className="flex items-center gap-x-2">
                           <div className="relative h-8 w-8">
@@ -104,6 +108,7 @@ const UserSubmissions = () => {
                         </div>
                       </Td>
                       <Td>{sub.task.name}</Td>
+                      <Td>{moment(sub.submittedAt).format("L")}</Td>
                       <Td className="flex justify-end">
                         <Menu>
                           <MenuButton as={IconButton} icon={<BsThreeDots />} />
