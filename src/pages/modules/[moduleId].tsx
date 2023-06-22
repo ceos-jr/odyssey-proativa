@@ -19,6 +19,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
+import { FaFileSignature } from "react-icons/fa";
 import { BsPencil } from "react-icons/bs";
 import NextLink from "next/link";
 
@@ -27,14 +28,25 @@ const UniqueModule = () => {
   const [posting, setPosting] = useState(false);
   const { showErrorToast, showSuccessToast } = useCustomToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const router = useRouter();
 
+  const router = useRouter();
   const utils = trpc.useContext();
   const moduleId = useRouter().query.moduleId as string;
   const { data: moduleData } = trpc.module.getUnique.useQuery({
     moduleId,
   });
   const { data: userRel } = trpc.module.getUserModStats.useQuery({ moduleId });
+
+  const shiftOwner = trpc.module.shiftOwner.useMutation({
+    onError(err) {
+      showErrorToast(err.message, "Não mudar o responsável por esse módulo") // melhorar esse texto
+    },
+    onSuccess() {
+      showSuccessToast("Operação realizada") // Melhorar esse texto
+      utils.module.getUserModStats.refetch({ moduleId });
+    }
+  });
+
   const delModule = trpc.admin.delModule.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possível deletar o módulo");
@@ -44,6 +56,7 @@ const UniqueModule = () => {
       router.push("/modules");
     },
   });
+
   const subsToModule = trpc.module.subsToModule.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possível se inscrever no módulo");
@@ -147,6 +160,13 @@ const UniqueModule = () => {
                         onClick={() => delModule.mutate(moduleId)}
                       >
                         Deletar
+                      </Button>
+                      <Button
+                        leftIcon={<FaFileSignature />}
+                        colorScheme="teal"
+                        onClick={() => shiftOwner.mutate(moduleId)}
+                      >
+                        Assinar
                       </Button>
                     </>
                   )}

@@ -52,6 +52,7 @@ model User {
   tasksProgress   UserTaskProgress[]
   modSuggestions  ModSuggestion[]
   lesSuggestions  LesSuggestion[]
+  Module          Module[]
 }
 
 model UserModuleProgress {
@@ -92,10 +93,10 @@ model UserTaskProgress {
   lessonId     String
   userLessProg UserLessonProgress @relation(fields: [userId, lessonId], references: [userId, lessonId], onDelete: Cascade)
   startedAt    DateTime           @default(now())
-  status    TaskStatus            @default(NOTSUBMITTED)
-  richText String?
-  grade Float?
-  completedAt DateTime?
+  status       TaskStatus         @default(NOTSUBMITTED)
+  richText     String?
+  grade        Float?
+  completedAt  DateTime?
   submittedAt  DateTime?
 
   @@unique([userId, taskId])
@@ -111,6 +112,8 @@ model VerificationToken {
 
 model Module {
   id          String               @id @default(cuid())
+  ownerId     String?
+  owner       User?                @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   name        String
   body        String?              @db.Text
   description String?              @db.Text
@@ -144,8 +147,8 @@ model Lesson {
   links       Link[]
   projects    Project[]
   suggestions LesSuggestion[]
-  previous String?
-  next String?
+  previous    String?
+  next        String?
 }
 
 model Task {
@@ -217,7 +220,7 @@ enum Role {
   UNAUTHENTICATED
 }
 
-enum TaskStatus{
+enum TaskStatus {
   NOTSUBMITTED
   SUBMITTED
   COMPLETED
