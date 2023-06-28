@@ -49,6 +49,7 @@ model User {
   tasksProgress   UserTaskProgress[]
   lesSuggestions  LesSuggestion[]
   modSuggestions  ModSuggestion[]
+  lesComments     LessonComment[]
 }
 
 model UserModuleProgress {
@@ -153,6 +154,7 @@ model Lesson {
   users       UserLessonProgress[]
   videos      Video[]
   suggestions LesSuggestion[]
+  comments  LessonComment[]
 }
 
 model Task {
@@ -215,6 +217,18 @@ model LesSuggestion {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("les_suggestions")
+}
+
+model LessonComment{
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  text      String   @db.Text
+
+  @@map("lesson_comments")
 }
 
 enum Role {
