@@ -1,6 +1,7 @@
 import { router } from "../trpc";
 import { adminRouter } from "./admin";
 import { authRouter } from "./auth";
+import { commentsRouter } from "./comments";
 import { gradesRouter } from "./grades";
 import { lessonRouter } from "./lesson";
 import { lessonSuggestion } from "./lesson_sug";
@@ -19,6 +20,7 @@ export const appRouter = router({
   grades: gradesRouter,
   modSug: moduleSuggestion,
   lessSug: lessonSuggestion,
+  comments: commentsRouter,
 });
 
 // export type definition of API
