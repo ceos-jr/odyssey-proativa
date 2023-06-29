@@ -244,5 +244,17 @@ export const adminRouter = router({
         where: { userId: input },
         include: { module: { select: { name: true } } },
       });
-    }),
+  }),
+  getOwnedMod: adminProcedure 
+  .input(z.string().optional())
+  .query(({ctx, input}) => {
+    const ownerId = input ?? ctx.session.user.id;
+
+    const ownerMods = ctx.prisma.module.findMany({
+      where: { ownerId: ownerId },  
+      orderBy: { updatedAt: "desc" }
+    });
+
+    return ownerMods;
+  })
 });

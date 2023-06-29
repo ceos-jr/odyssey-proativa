@@ -5,6 +5,7 @@ import UnfinishedUserModules from "@components/modules/UnfinishedUserModules";
 import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import CompletedUserModules from "@components/modules/CompletedUserModules";
+import SignedModules from "@components/modules/SignedModules"
 import { Roles } from "@utils/constants";
 import { z } from "zod";
 
@@ -18,6 +19,7 @@ const Modules = () => {
       <main className="container mx-auto flex h-max flex-col gap-4 p-4">
         <UnfinishedUserModules />
         <CompletedUserModules />
+        <SignedModules />
         <AllModules />
       </main>
     </>

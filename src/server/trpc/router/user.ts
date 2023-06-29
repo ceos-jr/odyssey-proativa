@@ -176,5 +176,5 @@ export const userRouter = router({
         });
       }
       return null;
-    }),
+    })
 });

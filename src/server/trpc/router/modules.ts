@@ -1,5 +1,6 @@
 import { FormSchemaCreate } from "src/pages/modules/create";
 import { FormSchemaUpdate } from "src/pages/modules/index";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
@@ -337,7 +338,8 @@ export const moduleRouter = router({
           data: {
             name: inputModule.name,
             body: inputModule.body,
-            description: inputModule.description,
+            description: inputModule.description
+            // Adicionar -> updatedAt
           },
           select: {
             lessons: {
@@ -465,5 +467,5 @@ export const moduleRouter = router({
       } else {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-    }),
+    })
 });
