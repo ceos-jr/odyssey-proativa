@@ -21,6 +21,7 @@ import { useRouter } from "next/router";
 import { AiOutlineInbox } from "react-icons/ai";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
+import LessonComments from "@components/lessons/LessonComments";
 import LessonFooter from "@components/lessons/LessonFooter";
 import { Roles } from "@utils/constants";
 
@@ -96,6 +97,7 @@ const Lesson = () => {
               projects={lesson.data.projects}
             />
             <TaskList lessonId={lessonId} tasks={lesson.data.tasks} />
+            <LessonComments /> 
             <LessonFooter {...lesson.data} />
           </>
         )}

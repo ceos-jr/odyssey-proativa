@@ -17,7 +17,7 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.3.7",
+    "@chakra-ui/react": "^2.7.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@next-auth/prisma-adapter": "^1.0.4",
