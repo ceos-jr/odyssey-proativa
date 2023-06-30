@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Heading,
   Avatar,
@@ -7,52 +7,130 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Button
+  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai"
+import { type RouterTypes } from "@utils/trpc";
+import AddCommentModal from "@components/lessons/AddCommentModal"
+import DeleteCommentAlert from "@components/lessons/DeleteCommentAlert"
+import useCustomToast from "@hooks/useCustomToast";
+import { useSession } from "@utils/useSession";
+import { trpc } from "@utils/trpc";
+import { useRouter } from "next/router";
 
-const CommentCard = () => {
+export type Comments = NonNullable<
+  RouterTypes["comments"]["getByLessonId"]["output"]
+>;
+
+interface LessonCommentsProps {
+  comments: Comments
+  lessonId: string
+}
+
+interface CommentCardProps {
+  comment: Comments[0]
+  onClickToDelete: (commentId: string) => void;
+}
+
+const CommentCard = ({ comment, onClickToDelete }: CommentCardProps) => {
+  const { data } = useSession();
+
   return (
     <div className={`
       grid max-h-[150px] w-1/2 grid-cols-10 grid-rows-5
       rounded-lg bg-white shadow-lg py-2`
     }>
       <div className="flex items-center col-span-full row-span-1 px-2">
-        <Avatar size="sm" marginRight="1rem" name="gabrigas" />
+        <Avatar
+          size="sm" 
+          marginRight="1rem" 
+          name={comment.user.name ?? ""}
+          src={comment.user.image ?? ""} 
+        />
         <Heading as="h3" size="sm" marginRight="auto">
-          Gabrigas
+          {comment.user.name}
         </Heading>
-        <Menu>
-          <MenuButton size="sm" as={IconButton} icon={<BsThreeDots />} /> 
-          <MenuList>
-            <MenuItem icon={<AiFillDelete />}>Deletar</MenuItem>
-          </MenuList>
-        </Menu>
+        {(comment.user.id === data?.user?.id) && (
+          <Menu>
+            <MenuButton size="sm" as={IconButton} icon={<BsThreeDots />} /> 
+            <MenuList>
+              <MenuItem 
+                onClick={() => onClickToDelete(comment.id)}
+                icon={<AiFillDelete />} 
+              >
+                Deletar
+              </MenuItem>
+            </MenuList>
+          </Menu> 
+        )}
       </div>
       <div className="col-span-full row-span-4 py-2 px-4 overflow-y-auto">
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis ea ab voluptatibus quaerat? Quia, reiciendis officia voluptatum, repellendus debitis velit non ad cum doloribus sit nulla. Eum cupiditate quam corporis. Odio voluptates adipisci quibusdam fugit, delectus molestias expedita aliquam eaque veritatis assumenda sed itaque doloremque voluptatum, velit veniam voluptate? Vero! 
-        </p>
+        <p>{comment.text}</p>
       </div>
     </div>
   );
 };
 
-const LessonComments = () => {
+const LessonComments = ({ comments, lessonId }: LessonCommentsProps) => {
+  const [commentToDelete, setCommentToDelete] = useState<string>("") 
+  const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+  const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+  const { showErrorToast, showSuccessToast } = useCustomToast();
+  const router = useRouter()
+
+  const deleteComment = trpc.comments.deleteLessComment.useMutation({
+    onError(err) {
+      showErrorToast(err.message, "Não foi possivel deletar o comentario")    
+    },
+    onSuccess() {
+      showSuccessToast("O comentário foi deletado com sucesso");
+    },
+  })
+ 
+  const onClickToDelete = (commentId: string) => {
+    setCommentToDelete(commentId)
+    onAlertOpen()
+  }
+
+  const clickToDeleteComment = () => {
+    onAlertClose()
+    deleteComment.mutate(commentToDelete)
+    router.push(`/lessons/${lessonId}`)
+  }
+
   return (
     <>
       <Heading as="h2" size="xl">
         Comentários
       </Heading>
       <div className="flex flex-col gap-4 rounded-lg bg-white py-4 px-8 shadow-lg">
-        <CommentCard />
-        <CommentCard />
-        <CommentCard />
-        <CommentCard />
-        <CommentCard />
+        {comments.length > 0 ?
+          comments.map((comment) => {
+            return (
+              <CommentCard 
+                key={comment.id} 
+                comment={comment} 
+                onClickToDelete={onClickToDelete}
+              />
+            )
+          }) 
+          : <p>Este tópico ainda não contém comentários</p> 
+        }
+        <AddCommentModal
+          onClose={onModalClose}
+          isOpen={isModalOpen}
+          lessonId={lessonId}
+        /> 
+        <DeleteCommentAlert
+          onClose={onAlertClose} 
+          isOpen={isAlertOpen}
+          onClickToDelete={clickToDeleteComment}
+        />
         <div className="my-4">
           <Button
+            onClick={onModalOpen}
             colorScheme="green"
           >
             Comentar 
