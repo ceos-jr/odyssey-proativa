@@ -18,6 +18,10 @@ import DeleteCommentAlert from "@components/lessons/DeleteCommentAlert";
 import useCustomToast from "@hooks/useCustomToast";
 import { useSession } from "@utils/useSession";
 import { trpc } from "@utils/trpc";
+import moment from "moment";
+import "moment/locale/pt-br";
+
+moment.locale("pt-br");
 
 export type Comments = NonNullable<
   RouterTypes["comments"]["getByLessonId"]["output"]
@@ -39,8 +43,8 @@ const CommentCard = ({ comment, onClickToDelete }: CommentCardProps) => {
   return (
     <div
       className={`
-      grid max-h-[150px] w-1/2 grid-cols-10 grid-rows-5
-      rounded-lg bg-white py-2 shadow-lg`}
+      grid min-h-[75px] w-full grid-cols-10 grid-rows-5
+      bg-white py-2 border-b border-gray-200`}
     >
       <div className="col-span-full row-span-1 flex items-center px-2">
         <Avatar
@@ -52,6 +56,9 @@ const CommentCard = ({ comment, onClickToDelete }: CommentCardProps) => {
         <Heading as="h3" size="sm" marginRight="auto">
           {comment.user.name}
         </Heading>
+        <span className="text-semidbold mx-4">
+          {moment(comment.createdAt).fromNow()}
+        </span>
         {comment.user.id === data?.user?.id && (
           <Menu>
             <MenuButton size="sm" as={IconButton} icon={<BsThreeDots />} />
@@ -66,7 +73,7 @@ const CommentCard = ({ comment, onClickToDelete }: CommentCardProps) => {
           </Menu>
         )}
       </div>
-      <div className="col-span-full row-span-4 overflow-y-auto py-2 px-4">
+      <div className="col-span-full row-span-4 py-2 px-4">
         <p>{comment.text}</p>
       </div>
     </div>
@@ -121,7 +128,7 @@ const LessonComments = ({ comments, lessonId }: LessonCommentsProps) => {
       <Heading as="h2" size="xl">
         Comentários
       </Heading>
-      <div className="flex flex-col gap-4 rounded-lg bg-white py-4 px-8 shadow-lg">
+      <div className="flex flex-col rounded-lg bg-white py-4 px-8 shadow-lg">
         {comments.length > 0 ? (
           comments.map((comment) => {
             return (
