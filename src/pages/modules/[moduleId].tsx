@@ -109,68 +109,62 @@ const UniqueModule = () => {
               <Heading className="w-6/12" as="h1" size="3xl">
                 {`Modulo de ${moduleData.name}`}
               </Heading>
-              <div className="grid justify-items-end gap-4">
-                <div className="flex w-full justify-end">
-                  {!userRel ? (
-                    <div className="flex w-full justify-center gap-4">
-                      <Button
-                        colorScheme="green"
-                        isLoading={posting}
-                        onClick={() => {
-                          setPosting(true);
-                          subsToModule.mutate(moduleData);
-                        }}
-                      >
-                        Inscrever
+              <div className="flex flex-wrap justify-end gap-4">
+                {!userRel ? (
+                  <Button
+                    colorScheme="green"
+                    isLoading={posting}
+                    onClick={() => {
+                      setPosting(true);
+                      subsToModule.mutate(moduleData);
+                    }}
+                  >
+                    Inscrever
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={onOpen}
+                      leftIcon={<AiOutlineInbox />}
+                      colorScheme="twitter"
+                    >
+                      Sugestões
+                    </Button>
+                    <Button
+                      colorScheme="red"
+                      isLoading={posting}
+                      onClick={() => {
+                        setPosting(true);
+                        desubToModule.mutate({ moduleId: moduleData.id });
+                      }}
+                    >
+                      Desinscrever
+                    </Button>
+                  </>
+                )}
+                {session?.user?.role === Roles.Admin && (
+                  <>
+                    <NextLink href={`/modules/${moduleId}/edit`}>
+                      <Button leftIcon={<BsPencil />} colorScheme="blue">
+                        Editar
                       </Button>
-                    </div>
-                  ) : (
-                    <div className="flex w-full justify-end gap-4">
-                      <Button
-                        onClick={onOpen}
-                        leftIcon={<AiOutlineInbox />}
-                        colorScheme="twitter"
-                      >
-                        Sugestões
-                      </Button>
-                      <Button
-                        colorScheme="red"
-                        isLoading={posting}
-                        onClick={() => {
-                          setPosting(true);
-                          desubToModule.mutate({ moduleId: moduleData.id });
-                        }}
-                      >
-                        Desinscrever
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <div className="flex w-full justify-end gap-4">
-                  {session?.user?.role === Roles.Admin && (
-                    <>
-                      <NextLink href={`/modules/${moduleId}/edit`}>
-                        <Button leftIcon={<BsPencil />} colorScheme="blue">
-                          Editar
-                        </Button>
-                      </NextLink>
-                      <Button
-                        leftIcon={<AiOutlineDelete />}
-                        colorScheme="red"
-                        onClick={() => delModule.mutate(moduleId)}
-                      >
-                        Deletar
-                      </Button>
-                      <Button
-                        leftIcon={<FaFileSignature />}
-                        colorScheme="teal"
-                        onClick={() => shiftOwner.mutate(moduleId)}
-                      >
-                        Assinar
-                      </Button>
-                    </>
-                  )}
-                </div>
+                    </NextLink>
+                    <Button
+                      leftIcon={<AiOutlineDelete />}
+                      colorScheme="red"
+                      onClick={() => delModule.mutate(moduleId)}
+                    >
+                      Deletar
+                    </Button>
+                    <Button
+                      leftIcon={<FaFileSignature />}
+                      colorScheme="teal"
+                      onClick={() => shiftOwner.mutate(moduleId)}
+                    >
+                      Assinar
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
             <DisplayMarkdown className="my-6" text={moduleData?.body || ""} />

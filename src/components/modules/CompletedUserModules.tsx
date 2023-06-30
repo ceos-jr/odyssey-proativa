@@ -1,12 +1,13 @@
-import { Heading, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
+import { Box, Heading, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import ModProgCard from "@components/home/ModProgCard";
 import { trpc } from "@utils/trpc";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
 
 const CompletedUserModules = () => {
   const compUserMod = trpc.user.getCompMod.useQuery();
+
   return (
-    <>
+    <Box p={4} borderRadius="md" bg="yellow.300" marginBottom="6">
       {!compUserMod.data ? (
         <>
           <Skeleton height="40px" />
@@ -18,8 +19,7 @@ const CompletedUserModules = () => {
         </>
       ) : (
         <>
-          {" "}
-          <Heading as="h1">Módulos completados</Heading>
+          <Heading as="h1" mb={4}>Módulos completados</Heading>
           {compUserMod.data.length === 0 ? (
             <Text>Nenhum módulo completado foi encontrado</Text>
           ) : (
@@ -39,7 +39,7 @@ const CompletedUserModules = () => {
           )}
         </>
       )}
-    </>
+    </Box>
   );
 };
 

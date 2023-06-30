@@ -5,6 +5,7 @@ import {
   SimpleGrid,
   Text,
   Highlight,
+  Box,
 } from "@chakra-ui/react";
 import { trpc } from "@utils/trpc";
 import ModuleLoadingSke from "@components/modules/ModuleLoadingSkeleton";
@@ -17,8 +18,9 @@ import NextLink from "next/link";
 const AllModules = () => {
   const allModules = trpc.module.getAll.useQuery();
   const { data: session } = useSession();
+
   return (
-    <>
+    <Box bg="yellow.300" p={4} rounded="lg" marginBottom="6">
       {!allModules.data ? (
         <>
           <Skeleton height="40px" />
@@ -30,31 +32,34 @@ const AllModules = () => {
         </>
       ) : (
         <>
-          <div className="flex flex-col justify-between gap-2 sm:flex-row">
-            {" "}
-            <Heading as="h1">Todos os Módulos</Heading>
+          <Box display={{ base: "block", sm: "flex" }} justifyContent="space-between" alignItems={{ base: "initial", sm: "center" }} mb={2}>
+            <Heading as="h1" mr={{ base: 0, sm: 4 }}>Todos os Módulos</Heading>
             {session?.user?.role === Roles.Admin && (
               <NextLink href="/modules/create">
-                {" "}
                 <Button
-                  colorScheme="whatsapp"
                   variant="solid"
-                  className="hidden sm:inline-flex"
+                  display={{ base: "block", sm: "inline-flex" }}
                   leftIcon={<BsJournalPlus />}
+                  color="black"
+                  borderColor="black"
+                  bg="green.300"
+                  borderWidth="1px"
+                  _hover={{ bg: "green.400" }}
+                  _active={{ bg: "green.500" }}
+                  mt={{ base: 2, sm: 0 }}
                 >
                   Criar
                 </Button>
               </NextLink>
             )}
-          </div>
+          </Box>
           {allModules.data.length === 0 ? (
             <Text>
               <Highlight
                 query="ADMIN"
                 styles={{ px: "2", py: "1", rounded: "full", bg: "red.300" }}
               >
-                Nenhum módulo foi encontrado, fale com seu ADMIN para criar um
-                novo
+                Nenhum módulo foi encontrado, fale com seu ADMIN para criar um novo
               </Highlight>
             </Text>
           ) : (
@@ -72,7 +77,7 @@ const AllModules = () => {
           )}
         </>
       )}
-    </>
+    </Box>
   );
 };
 
