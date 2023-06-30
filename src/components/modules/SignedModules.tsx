@@ -28,9 +28,7 @@ const SignedModules = () => {
             Seus Módulos
           </Heading>
           {ownedMod.data.length === 0 ? (
-            <Text>
-              Você não possui nenhum módulo sob sua responsabilidade
-            </Text>
+            <Text>Você não possui nenhum módulo sob sua responsabilidade</Text>
           ) : (
             <SimpleGrid columns={{ sm: 2, md: 3, lg: 4 }} gap={6}>
               {ownedMod.data.map((mod) => (

@@ -39,12 +39,12 @@ const UniqueModule = () => {
 
   const shiftOwner = trpc.module.shiftOwner.useMutation({
     onError(err) {
-      showErrorToast(err.message, "Não mudar o responsável por esse módulo") // melhorar esse texto
+      showErrorToast(err.message, "Não mudar o responsável por esse módulo"); // melhorar esse texto
     },
     onSuccess() {
-      showSuccessToast("Operação realizada") // Melhorar esse texto
+      showSuccessToast("Operação realizada"); // Melhorar esse texto
       utils.module.getUserModStats.refetch({ moduleId });
-    }
+    },
   });
 
   const delModule = trpc.admin.delModule.useMutation({

@@ -5,7 +5,7 @@ import UnfinishedUserModules from "@components/modules/UnfinishedUserModules";
 import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import CompletedUserModules from "@components/modules/CompletedUserModules";
-import SignedModules from "@components/modules/SignedModules"
+import SignedModules from "@components/modules/SignedModules";
 import { Roles } from "@utils/constants";
 import { z } from "zod";
 

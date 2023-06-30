@@ -338,7 +338,7 @@ export const moduleRouter = router({
           data: {
             name: inputModule.name,
             body: inputModule.body,
-            description: inputModule.description
+            description: inputModule.description,
             // Adicionar -> updatedAt
           },
           select: {
@@ -439,33 +439,33 @@ export const moduleRouter = router({
         )
       );
     }),
-  shiftOwner: adminProcedure 
+  shiftOwner: adminProcedure
     .input(z.string())
-    .mutation(async ({ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       const modId = input;
 
       const ownerQuery = await ctx.prisma.module.findUnique({
-        where: {id: modId },
+        where: { id: modId },
         select: {
-          ownerId: true
-        }
+          ownerId: true,
+        },
       });
 
       if (ownerQuery !== null) {
         const ownerNow = ownerQuery;
-        const newOwner = (ownerNow.ownerId !== ctx.session.user.id) ? (
-            ctx.session.user.id) : (null);
-        
+        const newOwner =
+          ownerNow.ownerId !== ctx.session.user.id ? ctx.session.user.id : null;
+
         const updateOwner = ctx.prisma.module.update({
           where: { id: modId },
           data: {
-            ownerId: newOwner
-          }
-        })
+            ownerId: newOwner,
+          },
+        });
 
         return updateOwner;
       } else {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-    })
+    }),
 });

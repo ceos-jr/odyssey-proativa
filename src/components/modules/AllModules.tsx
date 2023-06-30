@@ -32,8 +32,15 @@ const AllModules = () => {
         </>
       ) : (
         <>
-          <Box display={{ base: "block", sm: "flex" }} justifyContent="space-between" alignItems={{ base: "initial", sm: "center" }} mb={2}>
-            <Heading as="h1" mr={{ base: 0, sm: 4 }}>Todos os Módulos</Heading>
+          <Box
+            display={{ base: "block", sm: "flex" }}
+            justifyContent="space-between"
+            alignItems={{ base: "initial", sm: "center" }}
+            mb={2}
+          >
+            <Heading as="h1" mr={{ base: 0, sm: 4 }}>
+              Todos os Módulos
+            </Heading>
             {session?.user?.role === Roles.Admin && (
               <NextLink href="/modules/create">
                 <Button
@@ -59,7 +66,8 @@ const AllModules = () => {
                 query="ADMIN"
                 styles={{ px: "2", py: "1", rounded: "full", bg: "red.300" }}
               >
-                Nenhum módulo foi encontrado, fale com seu ADMIN para criar um novo
+                Nenhum módulo foi encontrado, fale com seu ADMIN para criar um
+                novo
               </Highlight>
             </Text>
           ) : (
