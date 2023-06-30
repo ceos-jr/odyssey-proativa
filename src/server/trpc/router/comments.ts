@@ -41,7 +41,7 @@ export const commentsRouter = router({
 
   createLessComment: protectedProcedure
     .input(z.object({ lessonId: z.string(), text: z.string() }))
-    .query(({ ctx, input }) => {
+    .mutation(({ ctx, input }) => {
       return ctx.prisma.lessonComment.create({
         data: {
           lessonId: input.lessonId,
