@@ -19,6 +19,7 @@ import { trpc } from "@utils/trpc";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/router";
 
 export const AddCommentSchema = z.object({
   lessonId: z.string(),
@@ -49,8 +50,8 @@ const AddCommentModal = ({
     resolver: zodResolver(AddCommentSchema),
     mode: "onBlur",
   });
-
   const { showErrorToast, showSuccessToast } = useCustomToast();
+  const router = useRouter()
 
   const CreateComment = trpc.comments.createLessComment.useMutation({
     onError(err) {
@@ -64,6 +65,7 @@ const AddCommentModal = ({
   const onSubmit = (data: AddCommentFormType) => {
     CreateComment.mutate(data);
     reset({ lessonId, text: "" });
+    router.push(`/lessons/${lessonId}`)
   };
 
   useEffect(() => {
