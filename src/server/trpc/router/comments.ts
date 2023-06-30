@@ -18,7 +18,7 @@ export const commentsRouter = router({
           lesson: true,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       });
     }),
@@ -34,7 +34,7 @@ export const commentsRouter = router({
           user: true,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       });
     }),

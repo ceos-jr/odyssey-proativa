@@ -19,13 +19,10 @@ import { trpc } from "@utils/trpc";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useRouter } from "next/router";
 
 export const AddCommentSchema = z.object({
   lessonId: z.string(),
-  text: z
-    .string()
-    .min(1, { message: "O conteúdo da mensagem é necessário" })
+  text: z.string().min(1, { message: "O conteúdo da mensagem é necessário" }),
 });
 
 export type AddCommentFormType = z.infer<typeof AddCommentSchema>;
@@ -51,13 +48,14 @@ const AddCommentModal = ({
     mode: "onBlur",
   });
   const { showErrorToast, showSuccessToast } = useCustomToast();
-  const router = useRouter()
+  const utils = trpc.useContext();
 
   const CreateComment = trpc.comments.createLessComment.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possivel enviar comentário");
     },
     onSuccess() {
+      utils.comments.getByLessonId.refetch(lessonId);
       showSuccessToast("O comentário foi enviado com sucesso");
     },
   });
@@ -65,7 +63,6 @@ const AddCommentModal = ({
   const onSubmit = (data: AddCommentFormType) => {
     CreateComment.mutate(data);
     reset({ lessonId, text: "" });
-    router.push(`/lessons/${lessonId}`)
   };
 
   useEffect(() => {
@@ -76,9 +73,7 @@ const AddCommentModal = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent className="place-self-center self-center">
-        <ModalHeader>
-          Faça um comentário 
-        </ModalHeader>
+        <ModalHeader>Faça um comentário</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)} id="form">
