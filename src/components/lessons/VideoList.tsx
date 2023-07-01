@@ -10,21 +10,45 @@ import { type Video } from "@prisma/client";
 import NextImage from "next/image";
 import NextLink from "next/link";
 import { AiFillYoutube, AiOutlineYoutube } from "react-icons/ai";
+import { SiUdemy } from "react-icons/si";
 
 interface VideoListProps {
   videos: Video[];
 }
 
-const VideoList = ({ videos }: VideoListProps) => {
-  const getYoutubeId = (url: string) => {
-    const regExp =
+const Thumbnail = ({ url }: { url: string }) => {
+  const getyoutubeId = (url: string) => {
+    const youtubeExp =
       /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    if (match && match[2])
-      return match && match[2].length === 11 ? match[2] : undefined;
+    const youtubeMatch = url.match(youtubeExp);
+    if (youtubeMatch && youtubeMatch[2])
+      return youtubeMatch && youtubeMatch[2].length === 11
+        ? youtubeMatch[2]
+        : undefined;
     return undefined;
   };
 
+  const youtubeId = getyoutubeId(url);
+
+  return (
+    <div className="relative aspect-video sm:w-60">
+      {youtubeId !== undefined ? (
+        <NextImage
+          src={`https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`}
+          alt="thumbnail"
+          fill
+          className="rounded-xl object-cover"
+        />
+      ) : url.includes("udemy.com") ? (
+        <SiUdemy className="h-full w-full" />
+      ) : (
+        <AiFillYoutube className="h-full w-full" />
+      )}
+    </div>
+  );
+};
+
+const VideoList = ({ videos }: VideoListProps) => {
   return (
     <>
       {videos.length !== 0 ? (
@@ -34,20 +58,8 @@ const VideoList = ({ videos }: VideoListProps) => {
               key={video.id}
               className="flex gap-x-8 rounded-lg p-4 transition-colors hover:bg-gray-100"
             >
-              <div className="relative aspect-video sm:w-60">
-                {getYoutubeId(video.url) !== undefined ? (
-                  <NextImage
-                    src={`https://img.youtube.com/vi/${getYoutubeId(
-                      video.url
-                    )}/mqdefault.jpg`}
-                    alt="thumbnail"
-                    fill
-                    className="rounded-xl object-cover"
-                  />
-                ) : (
-                  <AiFillYoutube className="h-full w-full" />
-                )}
-              </div>
+              <Thumbnail url={video.url} />
+
               <div className="flex w-full flex-col">
                 <Heading as="h4" size="md">
                   {video.name}
