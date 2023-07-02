@@ -1,5 +1,6 @@
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { mockUsers as mU } from "../src/utils/mock-user";
+import createMockedComments from "./seeds/commentsSeed";
 import createMockedLessonProgress from "./seeds/lessonsProgSeed";
 import createMockedLessons from "./seeds/lessonsSeed";
 import createMockedLesSuggestion from "./seeds/lesSuggSeed";
@@ -76,6 +77,8 @@ async function main() {
   await prisma.module.createMany({ data: modules });
   console.log("creating lessons");
   await createMockedLessons(prisma, modules[0]?.id as string);
+  console.log("creating comments");
+  await createMockedComments(prisma);
   console.log("creating tasks");
   await createMockedTasks(prisma, modules[0]?.id as string);
   console.log("creating lessonsProgress");
