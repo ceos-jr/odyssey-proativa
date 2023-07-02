@@ -439,33 +439,54 @@ export const moduleRouter = router({
         )
       );
     }),
-  shiftOwner: adminProcedure
+  shiftSignature: adminProcedure 
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       const modId = input;
-
-      const ownerQuery = await ctx.prisma.module.findUnique({
-        where: { id: modId },
-        select: {
-          ownerId: true,
+      const userId = ctx.session.user.id;
+      console.log(modId);
+      const signedModule = await ctx.prisma.signedModule.findUnique({
+        where: {
+          userId_moduleId: {
+            userId: userId, moduleId: modId
+          }
         },
       });
-
-      if (ownerQuery !== null) {
-        const ownerNow = ownerQuery;
-        const newOwner =
-          ownerNow.ownerId !== ctx.session.user.id ? ctx.session.user.id : null;
-
-        const updateOwner = ctx.prisma.module.update({
-          where: { id: modId },
-          data: {
-            ownerId: newOwner,
-          },
-        });
-
-        return updateOwner;
+      if (signedModule) {
+        return await ctx.prisma.signedModule.delete({
+          where: {
+            userId_moduleId: {
+              userId: userId, moduleId: modId
+            }
+          }
+        })
       } else {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        return await ctx.prisma.signedModule.create({
+          data: {
+            userId: userId, 
+            moduleId: modId
+          }
+        })
       }
     }),
+    verifySignature: adminProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const modId = input;
+      const userId = ctx.session.user.id;
+
+      let isSigned = true;
+
+      await ctx.prisma.signedModule.findUniqueOrThrow({
+        where: {
+          userId_moduleId: {
+            userId: userId, moduleId: modId
+          }
+        },
+      }).catch(() => {
+        isSigned = false;
+      });
+
+      return isSigned;
+    })
 });

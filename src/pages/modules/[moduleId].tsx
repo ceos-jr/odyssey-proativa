@@ -36,14 +36,20 @@ const UniqueModule = () => {
     moduleId,
   });
   const { data: userRel } = trpc.module.getUserModStats.useQuery({ moduleId });
+  const { data: isSigned } = trpc.module.verifySignature.useQuery(moduleId);
 
-  const shiftOwner = trpc.module.shiftOwner.useMutation({
+  const shiftSignature = trpc.module.shiftSignature.useMutation({
     onError(err) {
-      showErrorToast(err.message, "Não mudar o responsável por esse módulo"); // melhorar esse texto
+      showErrorToast(err.message, "Não foi possível alterar a assinatura desse modulo");
     },
     onSuccess() {
-      showSuccessToast("Operação realizada"); // Melhorar esse texto
       utils.module.getUserModStats.refetch({ moduleId });
+      utils.module.verifySignature.refetch(moduleId);
+      if (!isSigned) {
+        showSuccessToast("Você assinou esse modulo");
+      } else {
+        showSuccessToast("retirou a assinatura do modulo");
+      }
     },
   });
 
@@ -144,11 +150,6 @@ const UniqueModule = () => {
                 )}
                 {session?.user?.role === Roles.Admin && (
                   <>
-                    <NextLink href={`/modules/${moduleId}/edit`}>
-                      <Button leftIcon={<BsPencil />} colorScheme="blue">
-                        Editar
-                      </Button>
-                    </NextLink>
                     <Button
                       leftIcon={<AiOutlineDelete />}
                       colorScheme="red"
@@ -156,13 +157,33 @@ const UniqueModule = () => {
                     >
                       Deletar
                     </Button>
-                    <Button
-                      leftIcon={<FaFileSignature />}
-                      colorScheme="teal"
-                      onClick={() => shiftOwner.mutate(moduleId)}
-                    >
-                      Assinar
-                    </Button>
+                    {isSigned ? (
+                      <div className="flex flex-wrap justify-end gap-4">
+                        <NextLink href={`/modules/${moduleId}/edit`}>
+                          <Button leftIcon={<BsPencil />} colorScheme="blue">
+                            Editar
+                          </Button>
+                        </NextLink>
+                        <Button
+                        leftIcon={<FaFileSignature />}
+                        colorScheme="red"
+                        onClick={() => shiftSignature.mutate(moduleId)}
+                        >
+                          Retirar Assinatura
+                        </Button>
+                      </div>
+                    ):(
+                      <>
+                        <Button
+                        leftIcon={<FaFileSignature />}
+                        colorScheme="green"
+                        onClick={() => shiftSignature.mutate(moduleId)}
+                        >
+                          Assinar
+                        </Button>
+                      </>
+                    )}
+
                   </>
                 )}
               </div>

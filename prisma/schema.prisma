@@ -4,10 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
 }
 
@@ -17,12 +13,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -43,28 +39,28 @@ model User {
   email           String?              @unique
   emailVerified   DateTime?
   image           String?
-  accounts        Account[]
-  sessions        Session[]
   role            Role                 @default(GUEST)
+  accounts        Account[]
   achievements    Achievement[]
-  modulesProgress UserModuleProgress[]
+  sessions        Session[]
+  signedModules   SignedModule[]
   lessonsProgress UserLessonProgress[]
+  modulesProgress UserModuleProgress[]
   tasksProgress   UserTaskProgress[]
-  modSuggestions  ModSuggestion[]
   lesSuggestions  LesSuggestion[]
-  Module          Module[]
+  modSuggestions  ModSuggestion[]
 }
 
 model UserModuleProgress {
   userId       String
-  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   moduleId     String
-  module       Module               @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  lessonProg   UserLessonProgress[]
   startedAt    DateTime             @default(now())
   lastTimeSeen DateTime             @default(now())
   completed    Boolean              @default(false)
   completedAt  DateTime?
+  lessonProg   UserLessonProgress[]
+  module       Module               @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, moduleId])
 }
@@ -73,13 +69,13 @@ model UserLessonProgress {
   userId       String
   moduleId     String
   lessonId     String
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson       Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  userModProg  UserModuleProgress @relation(fields: [userId, moduleId], references: [userId, moduleId], onDelete: Cascade)
   startedAt    DateTime           @default(now())
   lastTimeSeen DateTime           @default(now())
   completed    Boolean            @default(false)
   completedAt  DateTime?
+  lesson       Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userModProg  UserModuleProgress @relation(fields: [userId, moduleId], references: [userId, moduleId], onDelete: Cascade)
   tasksProg    UserTaskProgress[]
 
   @@unique([userId, lessonId])
@@ -87,17 +83,17 @@ model UserLessonProgress {
 
 model UserTaskProgress {
   userId       String
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   taskId       String
-  task         Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
   lessonId     String
-  userLessProg UserLessonProgress @relation(fields: [userId, lessonId], references: [userId, lessonId], onDelete: Cascade)
   startedAt    DateTime           @default(now())
   status       TaskStatus         @default(NOTSUBMITTED)
   richText     String?
   grade        Float?
   completedAt  DateTime?
   submittedAt  DateTime?
+  task         Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userLessProg UserLessonProgress @relation(fields: [userId, lessonId], references: [userId, lessonId], onDelete: Cascade)
 
   @@unique([userId, taskId])
 }
@@ -112,24 +108,32 @@ model VerificationToken {
 
 model Module {
   id          String               @id @default(cuid())
-  ownerId     String?
-  owner       User?                @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   name        String
-  body        String?              @db.Text
-  description String?              @db.Text
+  body        String?
+  description String?
   updatedAt   DateTime             @default(now())
   lessons     Lesson[]
+  signers     SignedModule[]
   users       UserModuleProgress[]
   suggestions ModSuggestion[]
+}
+
+model SignedModule {
+  moduleId String
+  userId   String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
 }
 
 model Achievement {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
   image       String?
   conqueredAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
@@ -138,23 +142,23 @@ model Lesson {
   name        String
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
-  richText    String               @db.Text
-  users       UserLessonProgress[]
+  richText    String
   moduleId    String
-  module      Module               @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  tasks       Task[]
-  videos      Video[]
-  links       Link[]
-  projects    Project[]
-  suggestions LesSuggestion[]
   previous    String?
   next        String?
+  module      Module               @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  links       Link[]
+  projects    Project[]
+  tasks       Task[]
+  users       UserLessonProgress[]
+  videos      Video[]
+  suggestions LesSuggestion[]
 }
 
 model Task {
   id        String             @id @default(cuid())
   name      String
-  richText  String             @db.Text
+  richText  String
   createdAt DateTime           @default(now())
   lessonId  String
   lesson    Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
@@ -191,11 +195,11 @@ model ModSuggestion {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   moduleId  String
-  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  text      String   @db.Text
+  text      String
   readed    Boolean  @default(false)
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("mod_suggestions")
 }
@@ -204,11 +208,11 @@ model LesSuggestion {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonId  String
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  text      String   @db.Text
+  text      String
   readed    Boolean  @default(false)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("les_suggestions")
 }
