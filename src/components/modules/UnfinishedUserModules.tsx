@@ -4,7 +4,7 @@ import { trpc } from "@utils/trpc";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
 import { ColorPattern } from "../../pages/modules/index";
 
-const UnfinishedUserModules = ({color}:{color: ColorPattern}) => {
+const UnfinishedUserModules = ({ color }: { color: ColorPattern }) => {
   const unfUserMod = trpc.user.getUnfMod.useQuery();
 
   return (

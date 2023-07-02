@@ -4,7 +4,7 @@ import { trpc } from "@utils/trpc";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
 import { ColorPattern } from "../../pages/modules/index";
 
-const CompletedUserModules = ({color}:{color: ColorPattern}) => {
+const CompletedUserModules = ({ color }: { color: ColorPattern }) => {
   const compUserMod = trpc.user.getCompMod.useQuery();
 
   return (
@@ -24,7 +24,9 @@ const CompletedUserModules = ({color}:{color: ColorPattern}) => {
             Módulos completados
           </Heading>
           {compUserMod.data.length === 0 ? (
-            <Text color={color.text}>Nenhum módulo completado foi encontrado</Text>
+            <Text color={color.text}>
+              Nenhum módulo completado foi encontrado
+            </Text>
           ) : (
             <SimpleGrid columns={{ sm: 2, md: 3, lg: 4 }} gap={6}>
               {compUserMod.data.map((mod) => (

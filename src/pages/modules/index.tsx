@@ -11,8 +11,8 @@ import { Roles } from "@utils/constants";
 import { z } from "zod";
 
 export interface ColorPattern {
-  bg: string,
-  text: string
+  bg: string;
+  text: string;
 }
 
 const Modules = () => {
@@ -22,8 +22,8 @@ const Modules = () => {
     getColor: function () {
       const color: ColorPattern = {
         bg: "blue.800",
-        text: "white"
-      }
+        text: "white",
+      };
 
       if (this.odd === true) {
         color.bg = "yellow.300";
@@ -33,7 +33,7 @@ const Modules = () => {
       this.odd = !this.odd;
 
       return color;
-    }
+    },
   };
 
   return (
@@ -44,11 +44,11 @@ const Modules = () => {
       </Head>
       <main className="container mx-auto flex h-max flex-col gap-4 p-4">
         {session?.user?.role === Roles.Admin && (
-          <SignedModules color={colorLogic.getColor()}/>
+          <SignedModules color={colorLogic.getColor()} />
         )}
-        <UnfinishedUserModules color={colorLogic.getColor()}/>
-        <CompletedUserModules color={colorLogic.getColor()}/>
-        <AllModules color={colorLogic.getColor()}/>
+        <UnfinishedUserModules color={colorLogic.getColor()} />
+        <CompletedUserModules color={colorLogic.getColor()} />
+        <AllModules color={colorLogic.getColor()} />
       </main>
     </>
   );

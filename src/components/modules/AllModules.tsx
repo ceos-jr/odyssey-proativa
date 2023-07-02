@@ -16,7 +16,7 @@ import { BsJournalPlus } from "react-icons/bs";
 import NextLink from "next/link";
 import { ColorPattern } from "../../pages/modules/index";
 
-const AllModules = ({color}:{color: ColorPattern}) => {
+const AllModules = ({ color }: { color: ColorPattern }) => {
   const allModules = trpc.module.getAll.useQuery();
   const { data: session } = useSession();
 
