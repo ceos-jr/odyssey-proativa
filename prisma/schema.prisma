@@ -154,7 +154,7 @@ model Lesson {
   users       UserLessonProgress[]
   videos      Video[]
   suggestions LesSuggestion[]
-  comments  LessonComment[]
+  comments    LessonComment[]
 }
 
 model Task {
@@ -219,14 +219,14 @@ model LesSuggestion {
   @@map("les_suggestions")
 }
 
-model LessonComment{
+model LessonComment {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonId  String
   lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  text      String   @db.Text
+  text      String
 
   @@map("lesson_comments")
 }
