@@ -19,6 +19,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiOutlineDelete, AiOutlineInbox } from "react-icons/ai";
+import { FaFileSignature } from "react-icons/fa";
 import { BsPencil } from "react-icons/bs";
 import NextLink from "next/link";
 
@@ -27,14 +28,34 @@ const UniqueModule = () => {
   const [posting, setPosting] = useState(false);
   const { showErrorToast, showSuccessToast } = useCustomToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const router = useRouter();
 
+  const router = useRouter();
   const utils = trpc.useContext();
   const moduleId = useRouter().query.moduleId as string;
   const { data: moduleData } = trpc.module.getUnique.useQuery({
     moduleId,
   });
   const { data: userRel } = trpc.module.getUserModStats.useQuery({ moduleId });
+  const { data: isSigned } = trpc.module.verifySignature.useQuery(moduleId);
+
+  const shiftSignature = trpc.module.shiftSignature.useMutation({
+    onError(err) {
+      showErrorToast(
+        err.message,
+        "Não foi possível alterar a assinatura desse modulo"
+      );
+    },
+    onSuccess() {
+      utils.module.getUserModStats.refetch({ moduleId });
+      utils.module.verifySignature.refetch(moduleId);
+      if (!isSigned) {
+        showSuccessToast("Você assinou esse modulo");
+      } else {
+        showSuccessToast("retirou a assinatura do modulo");
+      }
+    },
+  });
+
   const delModule = trpc.admin.delModule.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possível deletar o módulo");
@@ -44,6 +65,7 @@ const UniqueModule = () => {
       router.push("/modules");
     },
   });
+
   const subsToModule = trpc.module.subsToModule.useMutation({
     onError(err) {
       showErrorToast(err.message, "Não foi possível se inscrever no módulo");
@@ -96,61 +118,76 @@ const UniqueModule = () => {
               <Heading className="w-6/12" as="h1" size="3xl">
                 {`Modulo de ${moduleData.name}`}
               </Heading>
-              <div className="grid justify-items-end gap-4">
-                <div className="flex w-full justify-end">
-                  {!userRel ? (
-                    <div className="flex w-full justify-center gap-4">
-                      <Button
-                        colorScheme="green"
-                        isLoading={posting}
-                        onClick={() => {
-                          setPosting(true);
-                          subsToModule.mutate(moduleData);
-                        }}
-                      >
-                        Inscrever
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex w-full justify-end gap-4">
-                      <Button
-                        onClick={onOpen}
-                        leftIcon={<AiOutlineInbox />}
-                        colorScheme="twitter"
-                      >
-                        Sugestões
-                      </Button>
-                      <Button
-                        colorScheme="red"
-                        isLoading={posting}
-                        onClick={() => {
-                          setPosting(true);
-                          desubToModule.mutate({ moduleId: moduleData.id });
-                        }}
-                      >
-                        Desinscrever
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <div className="flex w-full justify-end gap-4">
-                  {session?.user?.role === Roles.Admin && (
-                    <>
-                      <NextLink href={`/modules/${moduleId}/edit`}>
-                        <Button leftIcon={<BsPencil />} colorScheme="blue">
-                          Editar
+              <div className="flex flex-wrap justify-end gap-4">
+                {!userRel ? (
+                  <Button
+                    colorScheme="green"
+                    isLoading={posting}
+                    onClick={() => {
+                      setPosting(true);
+                      subsToModule.mutate(moduleData);
+                    }}
+                  >
+                    Inscrever
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={onOpen}
+                      leftIcon={<AiOutlineInbox />}
+                      colorScheme="twitter"
+                    >
+                      Sugestões
+                    </Button>
+                    <Button
+                      colorScheme="red"
+                      isLoading={posting}
+                      onClick={() => {
+                        setPosting(true);
+                        desubToModule.mutate({ moduleId: moduleData.id });
+                      }}
+                    >
+                      Desinscrever
+                    </Button>
+                  </>
+                )}
+                {session?.user?.role === Roles.Admin && (
+                  <>
+                    <Button
+                      leftIcon={<AiOutlineDelete />}
+                      colorScheme="red"
+                      onClick={() => delModule.mutate(moduleId)}
+                    >
+                      Deletar
+                    </Button>
+                    {isSigned ? (
+                      <div className="flex flex-wrap justify-end gap-4">
+                        <NextLink href={`/modules/${moduleId}/edit`}>
+                          <Button leftIcon={<BsPencil />} colorScheme="blue">
+                            Editar
+                          </Button>
+                        </NextLink>
+                        <Button
+                          leftIcon={<FaFileSignature />}
+                          colorScheme="red"
+                          onClick={() => shiftSignature.mutate(moduleId)}
+                        >
+                          Retirar Assinatura
                         </Button>
-                      </NextLink>
-                      <Button
-                        leftIcon={<AiOutlineDelete />}
-                        colorScheme="red"
-                        onClick={() => delModule.mutate(moduleId)}
-                      >
-                        Deletar
-                      </Button>
-                    </>
-                  )}
-                </div>
+                      </div>
+                    ) : (
+                      <>
+                        <Button
+                          leftIcon={<FaFileSignature />}
+                          colorScheme="green"
+                          onClick={() => shiftSignature.mutate(moduleId)}
+                        >
+                          Assinar
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
             <DisplayMarkdown className="my-6" text={moduleData?.body || ""} />

@@ -1,12 +1,14 @@
-import { Heading, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
+import { Box, Heading, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import ModProgCard from "@components/home/ModProgCard";
 import { trpc } from "@utils/trpc";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
+import { ColorPattern } from "../../pages/modules/index";
 
-const UnfinishedUserModules = () => {
+const UnfinishedUserModules = ({ color }: { color: ColorPattern }) => {
   const unfUserMod = trpc.user.getUnfMod.useQuery();
+
   return (
-    <>
+    <Box p={4} borderRadius="md" bg={color.bg} marginBottom="6">
       {!unfUserMod.data ? (
         <>
           <Skeleton height="40px" />
@@ -18,10 +20,11 @@ const UnfinishedUserModules = () => {
         </>
       ) : (
         <>
-          {" "}
-          <Heading as="h1">Módulos não completados</Heading>
+          <Heading as="h1" color={color.text} mb={4}>
+            Módulos não completados
+          </Heading>
           {unfUserMod.data.length === 0 ? (
-            <Text>
+            <Text color={color.text}>
               Nenhum módulo não completado foi encontrado, por favor se inscreva
               em um módulo
             </Text>
@@ -42,7 +45,7 @@ const UnfinishedUserModules = () => {
           )}
         </>
       )}
-    </>
+    </Box>
   );
 };
 

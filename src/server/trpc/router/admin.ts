@@ -245,4 +245,24 @@ export const adminRouter = router({
         include: { module: { select: { name: true } } },
       });
     }),
+  getSignedModules: adminProcedure
+    .input(z.string().optional())
+    .query(async ({ ctx, input }) => {
+      const signerId = input ?? ctx.session.user.id;
+
+      const signedModules = await ctx.prisma.module.findMany({
+        where: {
+          signers: {
+            some: {
+              userId: signerId,
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      });
+
+      return signedModules;
+    }),
 });

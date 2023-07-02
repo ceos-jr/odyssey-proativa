@@ -1,5 +1,6 @@
 import { FormSchemaCreate } from "src/pages/modules/create";
 import { FormSchemaUpdate } from "src/pages/modules/index";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
@@ -338,6 +339,7 @@ export const moduleRouter = router({
             name: inputModule.name,
             body: inputModule.body,
             description: inputModule.description,
+            // Adicionar -> updatedAt
           },
           select: {
             lessons: {
@@ -436,5 +438,60 @@ export const moduleRouter = router({
           })
         )
       );
+    }),
+  shiftSignature: adminProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const modId = input;
+      const userId = ctx.session.user.id;
+      console.log(modId);
+      const signedModule = await ctx.prisma.signedModule.findUnique({
+        where: {
+          userId_moduleId: {
+            userId: userId,
+            moduleId: modId,
+          },
+        },
+      });
+      if (signedModule) {
+        return await ctx.prisma.signedModule.delete({
+          where: {
+            userId_moduleId: {
+              userId: userId,
+              moduleId: modId,
+            },
+          },
+        });
+      } else {
+        return await ctx.prisma.signedModule.create({
+          data: {
+            userId: userId,
+            moduleId: modId,
+          },
+        });
+      }
+    }),
+  verifySignature: adminProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const modId = input;
+      const userId = ctx.session.user.id;
+
+      let isSigned = true;
+
+      await ctx.prisma.signedModule
+        .findUniqueOrThrow({
+          where: {
+            userId_moduleId: {
+              userId: userId,
+              moduleId: modId,
+            },
+          },
+        })
+        .catch(() => {
+          isSigned = false;
+        });
+
+      return isSigned;
     }),
 });
