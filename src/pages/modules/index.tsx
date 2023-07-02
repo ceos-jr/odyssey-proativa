@@ -6,10 +6,36 @@ import { type GetServerSideProps } from "next";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import CompletedUserModules from "@components/modules/CompletedUserModules";
 import SignedModules from "@components/modules/SignedModules";
+import { useSession } from "@utils/useSession";
 import { Roles } from "@utils/constants";
 import { z } from "zod";
 
+export interface ColorPattern {
+  bg: string,
+  text: string
+}
+
 const Modules = () => {
+  const { data: session } = useSession();
+  const colorPattern = {
+    odd: true,
+    getColor: function () {
+      const color: ColorPattern = {
+        bg: "blue.800",
+        text: "white"
+      }
+
+      if (this.odd === true) {
+        color.bg = "yellow.300";
+        color.text = "black";
+      }
+
+      this.odd = !this.odd;
+
+      return color;
+    }
+  };
+
   return (
     <>
       <Head>
@@ -17,10 +43,12 @@ const Modules = () => {
         <meta name="description" content="Odyssey Proativa" />
       </Head>
       <main className="container mx-auto flex h-max flex-col gap-4 p-4">
-        <UnfinishedUserModules />
-        <CompletedUserModules />
-        <SignedModules />
-        <AllModules />
+        {session?.user?.role === Roles.Admin && (
+          <SignedModules color={colorPattern.getColor()}/>
+        )}
+        <UnfinishedUserModules color={colorPattern.getColor()}/>
+        <CompletedUserModules color={colorPattern.getColor()}/>
+        <AllModules color={colorPattern.getColor()}/>
       </main>
     </>
   );

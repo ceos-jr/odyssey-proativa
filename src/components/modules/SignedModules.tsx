@@ -3,14 +3,15 @@ import { trpc } from "@utils/trpc";
 import React from "react";
 import ModuleCard from "./ModuleCard";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
+import type ColorPattern from "../../pages/modules/index";
 
-const SignedModules = () => {
+const SignedModules = ({ color }: ColorPattern) => {
   const signedModules = trpc.admin.getSignedModules.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
   return (
-    <Box bg="blue.800" p={4} rounded="lg" marginBottom="6">
+    <Box p={4} bg={color.bg} rounded="lg" marginBottom="6">
       {!signedModules.data ? (
         <>
           <Skeleton height="40px" />
@@ -23,11 +24,11 @@ const SignedModules = () => {
       ) : (
         <>
           {" "}
-          <Heading as="h1" color="white">
+          <Heading as="h1" color={color.text}>
             Seus Modulos
           </Heading>
           {signedModules.data.length === 0 ? (
-            <Text color="white">
+            <Text color={color.text}>
               Você não possui nenhum módulo sob sua responsabilidade
             </Text>
           ) : (

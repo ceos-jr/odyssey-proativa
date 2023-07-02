@@ -14,13 +14,14 @@ import { useSession } from "@utils/useSession";
 import { Roles } from "@utils/constants";
 import { BsJournalPlus } from "react-icons/bs";
 import NextLink from "next/link";
+import type ColorPattern from "../../pages/modules/index";
 
-const AllModules = () => {
+const AllModules = ({ color }: ColorPattern) => {
   const allModules = trpc.module.getAll.useQuery();
   const { data: session } = useSession();
 
   return (
-    <Box bg="yellow.300" p={4} rounded="lg" marginBottom="6">
+    <Box bg={color.bg} p={4} rounded="lg" marginBottom="6">
       {!allModules.data ? (
         <>
           <Skeleton height="40px" />
@@ -38,7 +39,7 @@ const AllModules = () => {
             alignItems={{ base: "initial", sm: "center" }}
             mb={2}
           >
-            <Heading as="h1" mr={{ base: 0, sm: 4 }}>
+            <Heading as="h1" color={color.text} mr={{ base: 0, sm: 4 }}>
               Todos os Módulos
             </Heading>
             {session?.user?.role === Roles.Admin && (
@@ -61,7 +62,7 @@ const AllModules = () => {
             )}
           </Box>
           {allModules.data.length === 0 ? (
-            <Text>
+            <Text color={color.text}>
               <Highlight
                 query="ADMIN"
                 styles={{ px: "2", py: "1", rounded: "full", bg: "red.300" }}
