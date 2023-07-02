@@ -40,7 +40,10 @@ const UniqueModule = () => {
 
   const shiftSignature = trpc.module.shiftSignature.useMutation({
     onError(err) {
-      showErrorToast(err.message, "Não foi possível alterar a assinatura desse modulo");
+      showErrorToast(
+        err.message,
+        "Não foi possível alterar a assinatura desse modulo"
+      );
     },
     onSuccess() {
       utils.module.getUserModStats.refetch({ moduleId });
@@ -165,25 +168,24 @@ const UniqueModule = () => {
                           </Button>
                         </NextLink>
                         <Button
-                        leftIcon={<FaFileSignature />}
-                        colorScheme="red"
-                        onClick={() => shiftSignature.mutate(moduleId)}
+                          leftIcon={<FaFileSignature />}
+                          colorScheme="red"
+                          onClick={() => shiftSignature.mutate(moduleId)}
                         >
                           Retirar Assinatura
                         </Button>
                       </div>
-                    ):(
+                    ) : (
                       <>
                         <Button
-                        leftIcon={<FaFileSignature />}
-                        colorScheme="green"
-                        onClick={() => shiftSignature.mutate(moduleId)}
+                          leftIcon={<FaFileSignature />}
+                          colorScheme="green"
+                          onClick={() => shiftSignature.mutate(moduleId)}
                         >
                           Assinar
                         </Button>
                       </>
                     )}
-
                   </>
                 )}
               </div>

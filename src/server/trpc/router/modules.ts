@@ -439,7 +439,7 @@ export const moduleRouter = router({
         )
       );
     }),
-  shiftSignature: adminProcedure 
+  shiftSignature: adminProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       const modId = input;
@@ -448,28 +448,30 @@ export const moduleRouter = router({
       const signedModule = await ctx.prisma.signedModule.findUnique({
         where: {
           userId_moduleId: {
-            userId: userId, moduleId: modId
-          }
+            userId: userId,
+            moduleId: modId,
+          },
         },
       });
       if (signedModule) {
         return await ctx.prisma.signedModule.delete({
           where: {
             userId_moduleId: {
-              userId: userId, moduleId: modId
-            }
-          }
-        })
+              userId: userId,
+              moduleId: modId,
+            },
+          },
+        });
       } else {
         return await ctx.prisma.signedModule.create({
           data: {
-            userId: userId, 
-            moduleId: modId
-          }
-        })
+            userId: userId,
+            moduleId: modId,
+          },
+        });
       }
     }),
-    verifySignature: adminProcedure
+  verifySignature: adminProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const modId = input;
@@ -477,16 +479,19 @@ export const moduleRouter = router({
 
       let isSigned = true;
 
-      await ctx.prisma.signedModule.findUniqueOrThrow({
-        where: {
-          userId_moduleId: {
-            userId: userId, moduleId: modId
-          }
-        },
-      }).catch(() => {
-        isSigned = false;
-      });
+      await ctx.prisma.signedModule
+        .findUniqueOrThrow({
+          where: {
+            userId_moduleId: {
+              userId: userId,
+              moduleId: modId,
+            },
+          },
+        })
+        .catch(() => {
+          isSigned = false;
+        });
 
       return isSigned;
-    })
+    }),
 });

@@ -25,7 +25,7 @@ const SignedModules = () => {
           {" "}
           <Heading as="h1" color="white">
             Seus Modulos
-            </Heading>
+          </Heading>
           {signedModules.data.length === 0 ? (
             <Text color="white">
               Você não possui nenhum módulo sob sua responsabilidade
