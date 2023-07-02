@@ -1,18 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `SigendModule` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "SigendModule" DROP CONSTRAINT "SigendModule_moduleId_fkey";
-
--- DropForeignKey
-ALTER TABLE "SigendModule" DROP CONSTRAINT "SigendModule_userId_fkey";
-
--- DropTable
-DROP TABLE "SigendModule";
-
 -- CreateTable
 CREATE TABLE "SignedModule" (
     "moduleId" TEXT NOT NULL,
