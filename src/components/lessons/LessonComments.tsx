@@ -44,7 +44,7 @@ const CommentCard = ({ comment, onClickToDelete }: CommentCardProps) => {
     <div
       className={`
       grid min-h-[75px] w-full grid-cols-10 grid-rows-5
-      bg-white py-2 border-b border-gray-200`}
+      border-b border-gray-200 bg-white py-2`}
     >
       <div className="col-span-full row-span-1 flex items-center px-2">
         <Avatar
