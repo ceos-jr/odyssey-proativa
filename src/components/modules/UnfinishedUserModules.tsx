@@ -2,9 +2,9 @@ import { Box, Heading, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import ModProgCard from "@components/home/ModProgCard";
 import { trpc } from "@utils/trpc";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
-import type ColorPattern from "../../pages/modules/index";
+import { ColorPattern } from "../../pages/modules/index";
 
-const UnfinishedUserModules = ({ color }: ColorPattern) => {
+const UnfinishedUserModules = ({color}:{color: ColorPattern}) => {
   const unfUserMod = trpc.user.getUnfMod.useQuery();
 
   return (

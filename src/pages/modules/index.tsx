@@ -17,7 +17,7 @@ export interface ColorPattern {
 
 const Modules = () => {
   const { data: session } = useSession();
-  const colorPattern = {
+  const colorLogic = {
     odd: true,
     getColor: function () {
       const color: ColorPattern = {
@@ -44,11 +44,11 @@ const Modules = () => {
       </Head>
       <main className="container mx-auto flex h-max flex-col gap-4 p-4">
         {session?.user?.role === Roles.Admin && (
-          <SignedModules color={colorPattern.getColor()}/>
+          <SignedModules color={colorLogic.getColor()}/>
         )}
-        <UnfinishedUserModules color={colorPattern.getColor()}/>
-        <CompletedUserModules color={colorPattern.getColor()}/>
-        <AllModules color={colorPattern.getColor()}/>
+        <UnfinishedUserModules color={colorLogic.getColor()}/>
+        <CompletedUserModules color={colorLogic.getColor()}/>
+        <AllModules color={colorLogic.getColor()}/>
       </main>
     </>
   );

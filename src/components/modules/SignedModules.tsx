@@ -3,9 +3,9 @@ import { trpc } from "@utils/trpc";
 import React from "react";
 import ModuleCard from "./ModuleCard";
 import ModuleLoadingSke from "./ModuleLoadingSkeleton";
-import type ColorPattern from "../../pages/modules/index";
+import { ColorPattern } from "../../pages/modules/index";
 
-const SignedModules = ({ color }: ColorPattern) => {
+const SignedModules = ({color}:{color: ColorPattern}) => {
   const signedModules = trpc.admin.getSignedModules.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
