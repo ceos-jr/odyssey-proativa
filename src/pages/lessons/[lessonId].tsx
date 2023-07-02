@@ -21,7 +21,9 @@ import { useRouter } from "next/router";
 import { AiOutlineInbox } from "react-icons/ai";
 import { getServerAuthSession } from "src/server/common/get-server-auth-session";
 import DisplayMarkdown from "@components/Layout/DisplayMarkdown";
-import LessonComments, { type Comments } from "@components/lessons/LessonComments";
+import LessonComments, {
+  type Comments,
+} from "@components/lessons/LessonComments";
 import LessonFooter from "@components/lessons/LessonFooter";
 import { Roles } from "@utils/constants";
 
@@ -32,7 +34,7 @@ const Lesson = () => {
   const lesson = trpc.lesson.getLesson.useQuery({
     lessonId,
   });
-  const comments = trpc.comments.getByLessonId.useQuery(lessonId)
+  const comments = trpc.comments.getByLessonId.useQuery(lessonId);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -99,10 +101,10 @@ const Lesson = () => {
               projects={lesson.data.projects}
             />
             <TaskList lessonId={lessonId} tasks={lesson.data.tasks} />
-            <LessonComments 
-              comments={comments.data ?? [] as Comments}
+            <LessonComments
+              comments={comments.data ?? ([] as Comments)}
               lessonId={lessonId}
-            /> 
+            />
             <LessonFooter {...lesson.data} />
           </>
         )}

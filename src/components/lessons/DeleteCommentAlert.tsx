@@ -36,8 +36,8 @@ const DeleteLessonAlert = ({
         <AlertDialogHeader>Deletar o comentário</AlertDialogHeader>
         <AlertDialogCloseButton />
         <AlertDialogBody>
-          Você tem certeza que deseja deletar esse comentário? Essa ação não pode
-          ser desfeita
+          Você tem certeza que deseja deletar esse comentário? Essa ação não
+          pode ser desfeita
         </AlertDialogBody>
         <AlertDialogFooter>
           <Button ref={cancelRef} onClick={onClose}>
